@@ -14,8 +14,8 @@ Panduan berikut berisi langkah-langkah untuk melakukan inisialisasi basis data p
 ```env
 database.default.hostname = localhost
 database.default.database = db_siama
-database.default.username = root
-database.default.password = 
+database.default.username = root (sesuaikan dengan username anda)
+database.default.password = (sesuaikan dengan password anda)
 database.default.DBDriver = MySQLi
 database.default.port     = 3306
 ```
