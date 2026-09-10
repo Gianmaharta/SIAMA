@@ -11,9 +11,7 @@ $routes->post('login/process', 'Auth::process');
 $routes->get('logout', 'Auth::logout');
 
 // --- Rute Terproteksi (Hanya yang sudah login) ---
-$routes->get('dashboard', function() {
-    return view('dashboard/index');
-}, ['filter' => 'auth']);
+$routes->get('dashboard', 'Dashboard::index', ['filter' => 'auth']);
 
 // --- Rute Terproteksi dengan Role Khusus ---
 // Contoh dummy rute untuk Admin_Pemkab (id_role = 1)
