@@ -1,4 +1,4 @@
-# SIAM - Sistem Informasi Arsip Digital
+# SIAMA - Sistem Alih Media Arsip
 
 Panduan berikut berisi langkah-langkah untuk melakukan inisialisasi basis data proyek **SIAMA** di lingkungan lokal masing-masing, terutama untuk tim *Frontend*.
 
