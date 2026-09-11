@@ -3,7 +3,9 @@
 use CodeIgniter\Router\RouteCollection;
 
 /** @var RouteCollection $routes */
-$routes->get('/', 'Home::index');
+$routes->get('/', function() {
+    return redirect()->to('/login');
+});
 
 // --- Rute Otentikasi ---
 $routes->get('login', 'Auth::index');
@@ -34,3 +36,23 @@ $routes->group('approval', ['filter' => ['auth', 'role:2,4']], static function (
 // --- API Documentation (Swagger) ---
 $routes->get('swagger', 'Swagger::index');
 $routes->get('swagger/json', 'Swagger::json');
+
+// --- Master OPD (Khusus Admin_Pemkab) ---
+$routes->group('opd', ['filter' => ['auth', 'role:1']], static function ($routes) {
+    $routes->get('/', 'Opd::index');
+    $routes->get('create', 'Opd::create');
+    $routes->post('store', 'Opd::store');
+    $routes->get('edit/(:num)', 'Opd::edit/$1');
+    $routes->post('update/(:num)', 'Opd::update/$1');
+    $routes->get('delete/(:num)', 'Opd::delete/$1');
+});
+
+// --- Master Bidang (Admin_Pemkab & Admin_OPD) ---
+$routes->group('bidang', ['filter' => ['auth', 'role:1,3']], static function ($routes) {
+    $routes->get('/', 'Bidang::index');
+    $routes->get('create', 'Bidang::create');
+    $routes->post('store', 'Bidang::store');
+    $routes->get('edit/(:num)', 'Bidang::edit/$1');
+    $routes->post('update/(:num)', 'Bidang::update/$1');
+    $routes->get('delete/(:num)', 'Bidang::delete/$1');
+});
