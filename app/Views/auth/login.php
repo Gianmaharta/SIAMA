@@ -33,7 +33,23 @@
             <input type="password" id="password" name="password" required>
         </div>
 
+        <div style="margin-bottom: 15px;">
+            <input type="checkbox" id="showPassword" onclick="togglePassword()">
+            <label for="showPassword" style="font-size: 14px;">Tampilkan Password</label>
+        </div>
+
         <button type="submit">Login</button>
     </form>
+
+    <script>
+        function togglePassword() {
+            var pwd = document.getElementById("password");
+            if (pwd.type === "password") {
+                pwd.type = "text";
+            } else {
+                pwd.type = "password";
+            }
+        }
+    </script>
 </body>
 </html>
