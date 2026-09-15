@@ -56,3 +56,25 @@ $routes->group('bidang', ['filter' => ['auth', 'role:1,3']], static function ($r
     $routes->post('update/(:num)', 'Bidang::update/$1');
     $routes->get('delete/(:num)', 'Bidang::delete/$1');
 });
+
+// --- Modul Surat Perintah Tugas (SPT) ---
+$routes->group('spt', ['filter' => 'auth'], static function ($routes) {
+    $routes->get('/', 'Spt::index');
+    $routes->get('create', 'Spt::create', ['filter' => 'role:2,3']);
+    $routes->post('store', 'Spt::store', ['filter' => 'role:2,3']);
+    $routes->get('detail/(:num)', 'Spt::detail/$1');
+});
+
+// --- Modul Pengelolaan Arsip Digital ---
+$routes->group('arsip', ['filter' => 'auth'], static function ($routes) {
+    // Semua role yang sudah login dapat melihat daftar & detail arsip (filter role di Controller)
+    $routes->get('/', 'Arsip::index');
+    $routes->get('detail/(:num)', 'Arsip::detail/$1');
+
+    // Hanya Arsiparis (id_role: 5) yang boleh membuat, mengubah, dan menghapus arsip
+    $routes->get('create', 'Arsip::create', ['filter' => 'role:5']);
+    $routes->post('store', 'Arsip::store', ['filter' => 'role:5']);
+    $routes->get('edit/(:num)', 'Arsip::edit/$1', ['filter' => 'role:5']);
+    $routes->post('update/(:num)', 'Arsip::update/$1', ['filter' => 'role:5']);
+    $routes->get('delete/(:num)', 'Arsip::delete/$1', ['filter' => 'role:5']);
+});

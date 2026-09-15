@@ -38,9 +38,22 @@ class CreateSptTable extends Migration
                 'constraint' => '255',
                 'null'       => true,
             ],
-            'keterangan' => [
+            'perihal' => [
                 'type' => 'TEXT',
-                'null' => true,
+                'null' => false,
+            ],
+            'tanggal_mulai' => [
+                'type' => 'DATE',
+                'null' => false,
+            ],
+            'tanggal_selesai' => [
+                'type' => 'DATE',
+                'null' => false,
+            ],
+            'status' => [
+                'type'       => 'VARCHAR',
+                'constraint' => '50',
+                'default'    => 'Aktif',
             ],
         ]);
 

@@ -55,7 +55,7 @@ class SiamaSeeder extends Seeder
                 'email'     => 'pimpinan@siama.test',
                 'password'  => $hashedPassword,
                 'nama'      => 'Kepala Dinas (Pimpinan)',
-                'id_opd'    => null,
+                'id_opd'    => 1,
                 'id_bidang' => null,
                 'is_active' => 1,
             ],
