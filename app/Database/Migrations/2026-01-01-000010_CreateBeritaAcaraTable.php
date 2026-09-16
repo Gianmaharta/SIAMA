@@ -10,14 +10,18 @@ class CreateBeritaAcaraTable extends Migration
     {
         $this->forge->addField([
             'id_berita_acara' => [
-                'type'           => 'INT',
-                'constraint'     => 11,
-                'auto_increment' => true,
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+            ],
+            'id_opd' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+                'null'       => false,
             ],
             'id_spt' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'null'       => false,
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+                'null'       => true,
             ],
             'nomor_ba' => [
                 'type'       => 'VARCHAR',
@@ -28,42 +32,57 @@ class CreateBeritaAcaraTable extends Migration
                 'type' => 'DATE',
                 'null' => false,
             ],
-            'id_pelaksana' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'null'       => false,
-            ],
-            'id_kabid' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'null'       => false,
-            ],
-            'id_pimpinan' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'null'       => false,
-            ],
-            'status_persetujuan' => [
+            'status' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '50',
                 'default'    => 'Draf',
             ],
-            'catatan_revisi' => [
-                'type' => 'TEXT',
-                'null' => true,
-            ],
-            'file_ba_pdf' => [
+            'file_ba' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '255',
+                'null'       => true,
+            ],
+            'id_pembuat' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+                'null'       => false,
+            ],
+            'id_verifikator' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+                'null'       => true,
+            ],
+            'id_pimpinan' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+                'null'       => true,
+            ],
+            'created_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'updated_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'created_by' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+                'null'       => true,
+            ],
+            'updated_by' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
                 'null'       => true,
             ],
         ]);
 
         $this->forge->addKey('id_berita_acara', true);
-        $this->forge->addForeignKey('id_spt', 'spt', 'id_spt', 'CASCADE', 'CASCADE');
-        $this->forge->addForeignKey('id_pelaksana', 'users', 'id_user', 'CASCADE', 'CASCADE');
-        $this->forge->addForeignKey('id_kabid', 'users', 'id_user', 'CASCADE', 'CASCADE');
-        $this->forge->addForeignKey('id_pimpinan', 'users', 'id_user', 'CASCADE', 'CASCADE');
+        $this->forge->addKey('id_opd', false);
+        $this->forge->addKey('id_spt', false);
+        $this->forge->addKey('id_pembuat', false);
+        $this->forge->addKey('id_verifikator', false);
+        $this->forge->addKey('id_pimpinan', false);
         $this->forge->createTable('berita_acara');
     }
 

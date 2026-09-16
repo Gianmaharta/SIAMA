@@ -10,24 +10,28 @@ class CreateArsipTable extends Migration
     {
         $this->forge->addField([
             'id_arsip' => [
-                'type'           => 'INT',
-                'constraint'     => 11,
-                'auto_increment' => true,
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+            ],
+            'id_spt' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+                'null'       => true,
             ],
             'id_opd' => [
-                'type'       => 'INT',
-                'constraint' => 11,
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
                 'null'       => false,
             ],
             'id_bidang' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'null'       => false,
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+                'null'       => true,
             ],
-            'id_klasifikasi' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'null'       => false,
+            'id_kode_klasifikasi' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+                'null'       => true,
             ],
             'nomor_arsip' => [
                 'type'       => 'VARCHAR',
@@ -39,59 +43,81 @@ class CreateArsipTable extends Migration
                 'constraint' => '255',
                 'null'       => false,
             ],
-            'tahun_penciptaan' => [
+            'kurun_waktu' => [
+                'type'       => 'VARCHAR',
+                'constraint' => '50',
+                'null'       => true,
+            ],
+            'tingkat_perkembangan' => [
+                'type'       => 'VARCHAR',
+                'constraint' => '50',
+                'null'       => true,
+            ],
+            'jumlah' => [
                 'type'       => 'INT',
                 'constraint' => 11,
-                'null'       => false,
+                'null'       => true,
             ],
-            'kategori_jra' => [
+            'kondisi' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '50',
-                'null'       => false,
+                'null'       => true,
             ],
-            'kondisi_fisik' => [
-                'type'       => 'VARCHAR',
-                'constraint' => '50',
-                'null'       => false,
-            ],
-            'metode_alih_media' => [
-                'type'       => 'VARCHAR',
-                'constraint' => '50',
-                'null'       => false,
-            ],
-            'skor_prioritas' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'default'    => 0,
-            ],
-            'file_digital' => [
+            'file_arsip' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '255',
                 'null'       => true,
             ],
-            'status_autentikasi' => [
+            'id_user_upload' => [
                 'type'       => 'VARCHAR',
-                'constraint' => '50',
-                'default'    => 'Belum Watermark',
+                'constraint' => 36,
+                'null'       => false,
             ],
-            'status_alih_media' => [
+            'status_verifikasi' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '50',
-                'default'    => 'Belum Diajukan',
+                'default'    => 'Menunggu',
+            ],
+            'id_berita_acara' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+                'null'       => true,
+            ],
+            'created_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'updated_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
             ],
             'created_by' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'null'       => false,
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+                'null'       => true,
+            ],
+            'updated_by' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+                'null'       => true,
             ],
         ]);
 
         $this->forge->addKey('id_arsip', true);
-        $this->forge->addForeignKey('id_opd', 'opd', 'id_opd', 'CASCADE', 'CASCADE');
-        $this->forge->addForeignKey('id_bidang', 'bidang', 'id_bidang', 'CASCADE', 'CASCADE');
-        $this->forge->addForeignKey('id_klasifikasi', 'kode_klasifikasi', 'id_klasifikasi', 'RESTRICT', 'CASCADE');
-        $this->forge->addForeignKey('created_by', 'users', 'id_user', 'CASCADE', 'CASCADE');
+        $this->forge->addKey('id_spt', false);
+        $this->forge->addKey('id_opd', false);
+        $this->forge->addKey('id_bidang', false);
+        $this->forge->addKey('id_kode_klasifikasi', false);
+        $this->forge->addKey('id_user_upload', false);
+        $this->forge->addKey('id_berita_acara', false);
         $this->forge->createTable('arsip');
+        
+        // Add FULLTEXT index separately since CodeIgniter's forge doesn't natively support fulltext easily in all drivers via addKey
+        // However, this is MySQL specific.
+        $db = \Config\Database::connect();
+        if ($db->DBDriver === 'MySQLi') {
+            $db->query('ALTER TABLE arsip ADD FULLTEXT INDEX search_index (nomor_arsip, nama_arsip, kurun_waktu)');
+        }
     }
 
     public function down()

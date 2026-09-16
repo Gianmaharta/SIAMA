@@ -10,26 +10,25 @@ class CreateSptPelaksanaTable extends Migration
     {
         $this->forge->addField([
             'id_spt' => [
-                'type'       => 'INT',
-                'constraint' => 11,
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
                 'null'       => false,
             ],
             'id_user' => [
-                'type'       => 'INT',
-                'constraint' => 11,
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
                 'null'       => false,
             ],
             'id_bidang' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'null'       => false,
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+                'null'       => true,
             ],
         ]);
 
-        $this->forge->addKey(['id_spt', 'id_user'], true);
-        $this->forge->addForeignKey('id_spt', 'spt', 'id_spt', 'CASCADE', 'CASCADE');
-        $this->forge->addForeignKey('id_user', 'users', 'id_user', 'CASCADE', 'CASCADE');
-        $this->forge->addForeignKey('id_bidang', 'bidang', 'id_bidang', 'CASCADE', 'CASCADE');
+        $this->forge->addKey('id_spt', false);
+        $this->forge->addKey('id_user', false);
+        $this->forge->addKey('id_bidang', false);
         $this->forge->createTable('spt_pelaksana');
     }
 

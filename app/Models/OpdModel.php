@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class OpdModel extends Model
+class OpdModel extends BaseModel
 {
     protected $table            = 'opd';
     protected $primaryKey       = 'id_opd';
-    protected $useAutoIncrement = true;
+    protected $useAutoIncrement = false;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['kode_opd', 'nama_opd', 'kuota_storage_mb', 'is_active'];
+    protected $allowedFields    = ['id_opd', 'kode_opd', 'nama_opd', 'kuota_storage_mb', 'is_active', 'created_by', 'updated_by'];
 
     // Validasi
     protected $validationRules      = [
@@ -29,4 +29,19 @@ class OpdModel extends Model
     ];
     protected $skipValidation       = false;
     protected $cleanValidationRules = true;
+
+    /**
+     * Sinkronisasi data dari API Eksternal
+     */
+    public function syncFromApi($apiData)
+    {
+        foreach ($apiData as $data) {
+            $existing = $this->where('kode_opd', $data['kode_opd'])->first();
+            if ($existing) {
+                $this->update($existing['id_opd'], $data);
+            } else {
+                $this->insert($data);
+            }
+        }
+    }
 }

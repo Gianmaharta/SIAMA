@@ -9,10 +9,9 @@ class CreateKodeKlasifikasiTable extends Migration
     public function up()
     {
         $this->forge->addField([
-            'id_klasifikasi' => [
-                'type'           => 'INT',
-                'constraint'     => 11,
-                'auto_increment' => true,
+            'id_kode_klasifikasi' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
             ],
             'kode' => [
                 'type'       => 'VARCHAR',
@@ -24,19 +23,31 @@ class CreateKodeKlasifikasiTable extends Migration
                 'constraint' => '255',
                 'null'       => false,
             ],
-            'retensi_aktif' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'null'       => false,
+            'deskripsi' => [
+                'type' => 'TEXT',
+                'null' => true,
             ],
-            'retensi_inaktif' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'null'       => false,
+            'created_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'updated_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'created_by' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+                'null'       => true,
+            ],
+            'updated_by' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+                'null'       => true,
             ],
         ]);
 
-        $this->forge->addKey('id_klasifikasi', true);
+        $this->forge->addKey('id_kode_klasifikasi', true);
         $this->forge->createTable('kode_klasifikasi');
     }
 

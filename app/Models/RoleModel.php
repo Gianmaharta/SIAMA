@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class RoleModel extends Model
+class RoleModel extends BaseModel
 {
     protected $table            = 'roles';
     protected $primaryKey       = 'id_role';
-    protected $useAutoIncrement = true;
+    protected $useAutoIncrement = false;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['nama_role'];
+    protected $allowedFields    = ['id_role', 'nama_role', 'deskripsi', 'created_by', 'updated_by'];
 
     // Dates
     protected $useTimestamps = false;

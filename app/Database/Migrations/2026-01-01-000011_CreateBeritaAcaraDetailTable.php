@@ -10,20 +10,19 @@ class CreateBeritaAcaraDetailTable extends Migration
     {
         $this->forge->addField([
             'id_berita_acara' => [
-                'type'       => 'INT',
-                'constraint' => 11,
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
                 'null'       => false,
             ],
             'id_arsip' => [
-                'type'       => 'INT',
-                'constraint' => 11,
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
                 'null'       => false,
             ],
         ]);
 
-        $this->forge->addKey(['id_berita_acara', 'id_arsip'], true);
-        $this->forge->addForeignKey('id_berita_acara', 'berita_acara', 'id_berita_acara', 'CASCADE', 'CASCADE');
-        $this->forge->addForeignKey('id_arsip', 'arsip', 'id_arsip', 'CASCADE', 'CASCADE');
+        $this->forge->addKey('id_berita_acara', false);
+        $this->forge->addKey('id_arsip', false);
         $this->forge->createTable('berita_acara_detail');
     }
 

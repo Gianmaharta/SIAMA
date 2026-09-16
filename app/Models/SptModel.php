@@ -2,18 +2,19 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class SptModel extends Model
+class SptModel extends BaseModel
 {
     protected $table            = 'spt';
     protected $primaryKey       = 'id_spt';
-    protected $useAutoIncrement = true;
+    protected $useAutoIncrement = false;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     
     protected $allowedFields    = [
+        'id_spt',
         'nomor_spt', 
         'tanggal_spt', 
         'id_opd', 
@@ -22,7 +23,9 @@ class SptModel extends Model
         'tanggal_selesai', 
         'status', 
         'id_pimpinan',
-        'file_spt'
+        'file_spt',
+        'created_by',
+        'updated_by'
     ];
 
     // Validasi

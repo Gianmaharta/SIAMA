@@ -10,20 +10,19 @@ class CreateUserRolesTable extends Migration
     {
         $this->forge->addField([
             'id_user' => [
-                'type'       => 'INT',
-                'constraint' => 11,
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
                 'null'       => false,
             ],
             'id_role' => [
-                'type'       => 'INT',
-                'constraint' => 11,
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
                 'null'       => false,
             ],
         ]);
 
-        $this->forge->addKey(['id_user', 'id_role'], true);
-        $this->forge->addForeignKey('id_user', 'users', 'id_user', 'CASCADE', 'CASCADE');
-        $this->forge->addForeignKey('id_role', 'roles', 'id_role', 'CASCADE', 'CASCADE');
+        $this->forge->addKey('id_user', false);
+        $this->forge->addKey('id_role', false);
         $this->forge->createTable('user_roles');
     }
 

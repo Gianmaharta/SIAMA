@@ -10,13 +10,12 @@ class CreateSptTable extends Migration
     {
         $this->forge->addField([
             'id_spt' => [
-                'type'           => 'INT',
-                'constraint'     => 11,
-                'auto_increment' => true,
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
             ],
             'id_opd' => [
-                'type'       => 'INT',
-                'constraint' => 11,
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
                 'null'       => false,
             ],
             'nomor_spt' => [
@@ -29,8 +28,8 @@ class CreateSptTable extends Migration
                 'null' => false,
             ],
             'id_pimpinan' => [
-                'type'       => 'INT',
-                'constraint' => 11,
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
                 'null'       => false,
             ],
             'file_spt' => [
@@ -55,11 +54,29 @@ class CreateSptTable extends Migration
                 'constraint' => '50',
                 'default'    => 'Aktif',
             ],
+            'created_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'updated_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'created_by' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+                'null'       => true,
+            ],
+            'updated_by' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+                'null'       => true,
+            ],
         ]);
 
         $this->forge->addKey('id_spt', true);
-        $this->forge->addForeignKey('id_opd', 'opd', 'id_opd', 'CASCADE', 'CASCADE');
-        $this->forge->addForeignKey('id_pimpinan', 'users', 'id_user', 'CASCADE', 'CASCADE');
+        $this->forge->addKey('id_opd', false);
+        $this->forge->addKey('id_pimpinan', false);
         $this->forge->createTable('spt');
     }
 

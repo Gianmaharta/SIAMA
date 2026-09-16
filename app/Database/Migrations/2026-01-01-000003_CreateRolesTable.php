@@ -10,14 +10,35 @@ class CreateRolesTable extends Migration
     {
         $this->forge->addField([
             'id_role' => [
-                'type'           => 'INT',
-                'constraint'     => 11,
-                'auto_increment' => true,
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
             ],
             'nama_role' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '50',
                 'null'       => false,
+            ],
+            'deskripsi' => [
+                'type' => 'TEXT',
+                'null' => true,
+            ],
+            'created_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'updated_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'created_by' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+                'null'       => true,
+            ],
+            'updated_by' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+                'null'       => true,
             ],
         ]);
 

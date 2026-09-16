@@ -33,9 +33,9 @@ class Dashboard extends BaseController
 
         $stats = [];
 
-        // Logika penarikan data sesuai id_role
-        switch ($data['id_role']) {
-            case 1: // Admin Pemkab
+        // Logika penarikan data sesuai nama_role (karena id_role sekarang adalah UUID)
+        switch ($data['nama_role']) {
+            case 'Admin_Pemkab':
                 $stats['total_opd']          = $db->table('opd')->countAllResults();
                 $stats['total_users']        = $userModel->countAllResults();
                 $stats['total_arsip']        = $arsipModel->countAllGlobal();
@@ -43,18 +43,18 @@ class Dashboard extends BaseController
                 $stats['total_berita_acara'] = $beritaAcaraModel->countAllGlobal();
                 break;
 
-            case 2: // Pimpinan
+            case 'Pimpinan':
                 $stats['spt_diterbitkan']      = $sptModel->countAllGlobal(); // Atau spesifik id_pimpinan jika diperlukan
                 $stats['ba_menanti_pimpinan']  = $beritaAcaraModel->countMenungguTtdPimpinan($data['user_id']);
                 break;
 
-            case 3: // Admin OPD
+            case 'Admin_OPD':
                 $stats['total_users_opd']   = $userModel->where('id_opd', $data['id_opd'])->countAllResults();
                 $stats['total_bidang_opd']  = $db->table('bidang')->where('id_opd', $data['id_opd'])->countAllResults();
                 $stats['total_arsip_opd']   = $arsipModel->countByOpd($data['id_opd']);
                 break;
 
-            case 4: // Kepala Bidang
+            case 'Kepala_Bidang':
                 if ($data['id_bidang']) {
                     $stats['total_arsip_bidang'] = $arsipModel->countByBidang($data['id_bidang']);
                 } else {
@@ -63,7 +63,7 @@ class Dashboard extends BaseController
                 $stats['ba_menanti_kabid']   = $beritaAcaraModel->countMenungguVerifikasiKabid($data['user_id']);
                 break;
 
-            case 5: // Arsiparis
+            case 'Arsiparis':
                 $stats['arsip_diunggah']     = $arsipModel->where('created_by', $data['user_id'])->countAllResults();
                 $stats['penugasan_spt']      = $sptModel->countByPelaksana($data['user_id']);
                 break;

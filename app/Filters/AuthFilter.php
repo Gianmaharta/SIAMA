@@ -30,6 +30,15 @@ class AuthFilter implements FilterInterface
             // Jika belum login, redirect ke halaman login dengan pesan error
             return redirect()->to('/login')->with('error', 'Silakan login terlebih dahulu untuk mengakses halaman tersebut.');
         }
+
+        // Cek force change password
+        if (session()->get('is_default_password') == 1) {
+            // Biarkan lewat jika mengakses route /change-password
+            $uri = $request->getUri()->getPath();
+            if ($uri !== 'change-password' && $uri !== 'change-password/process' && $uri !== 'logout') {
+                return redirect()->to('/change-password')->with('error', 'Anda harus mengganti password default Anda terlebih dahulu sebelum dapat menggunakan sistem.');
+            }
+        }
     }
 
     /**

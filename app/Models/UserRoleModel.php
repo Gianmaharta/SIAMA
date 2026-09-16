@@ -2,17 +2,18 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class UserRoleModel extends Model
+class UserRoleModel extends BaseModel
 {
     protected $table            = 'user_roles';
-    protected $primaryKey       = 'id_user'; // Composite key is hard in CI4 model, using id_user temporarily
+    // Gunakan 'id_user' sebagai primaryKey bayangan karena CI4 butuh primary key tunggal untuk fungsi tertentu
+    protected $primaryKey       = 'id_user'; 
     protected $useAutoIncrement = false;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['user_id', 'role_id']; // Not really used for insertion right now
+    protected $allowedFields    = ['id_user', 'id_role']; // Not really used for insertion right now
 
     // Dates
     protected $useTimestamps = false;

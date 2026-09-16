@@ -10,13 +10,12 @@ class CreateBidangTable extends Migration
     {
         $this->forge->addField([
             'id_bidang' => [
-                'type'           => 'INT',
-                'constraint'     => 11,
-                'auto_increment' => true,
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
             ],
             'id_opd' => [
-                'type'       => 'INT',
-                'constraint' => 11,
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
                 'null'       => false,
             ],
             'nama_bidang' => [
@@ -24,10 +23,28 @@ class CreateBidangTable extends Migration
                 'constraint' => '255',
                 'null'       => false,
             ],
+            'created_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'updated_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'created_by' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+                'null'       => true,
+            ],
+            'updated_by' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+                'null'       => true,
+            ],
         ]);
 
         $this->forge->addKey('id_bidang', true);
-        $this->forge->addForeignKey('id_opd', 'opd', 'id_opd', 'CASCADE', 'CASCADE');
+        $this->forge->addKey('id_opd', false);
         $this->forge->createTable('bidang');
     }
 

@@ -26,23 +26,23 @@ Dashboard - SIAMA
 
 <h3>Statistik Ringkasan:</h3>
 <ul>
-    <?php if ($id_role == 1) : // Admin Pemkab ?>
+    <?php if ($nama_role == 'Admin_Pemkab') : ?>
         <li>Total OPD: <strong><?= esc($stats['total_opd']) ?></strong></li>
         <li>Total Seluruh Pengguna: <strong><?= esc($stats['total_users']) ?></strong></li>
         <li>Total Arsip Global: <strong><?= esc($stats['total_arsip']) ?></strong></li>
         <li>Total SPT Global: <strong><?= esc($stats['total_spt']) ?></strong></li>
         <li>Total Berita Acara Global: <strong><?= esc($stats['total_berita_acara']) ?></strong></li>
-    <?php elseif ($id_role == 2) : // Pimpinan ?>
+    <?php elseif ($nama_role == 'Pimpinan') : ?>
         <li>Total SPT Diterbitkan: <strong><?= esc($stats['spt_diterbitkan']) ?></strong></li>
         <li>Berita Acara Menanti TTD Pimpinan: <strong><?= esc($stats['ba_menanti_pimpinan']) ?></strong></li>
-    <?php elseif ($id_role == 3) : // Admin OPD ?>
+    <?php elseif ($nama_role == 'Admin_OPD') : ?>
         <li>Total Pengguna di OPD Anda: <strong><?= esc($stats['total_users_opd']) ?></strong></li>
         <li>Total Bidang di OPD Anda: <strong><?= esc($stats['total_bidang_opd']) ?></strong></li>
         <li>Total Arsip di OPD Anda: <strong><?= esc($stats['total_arsip_opd']) ?></strong></li>
-    <?php elseif ($id_role == 4) : // Kepala Bidang ?>
+    <?php elseif ($nama_role == 'Kepala_Bidang') : ?>
         <li>Total Arsip di Bidang Anda: <strong><?= esc($stats['total_arsip_bidang']) ?></strong></li>
         <li>Berita Acara Menanti Verifikasi Kabid: <strong><?= esc($stats['ba_menanti_kabid']) ?></strong></li>
-    <?php elseif ($id_role == 5) : // Arsiparis ?>
+    <?php elseif ($nama_role == 'Arsiparis') : ?>
         <li>Total Arsip yang Anda Unggah: <strong><?= esc($stats['arsip_diunggah']) ?></strong></li>
         <li>Penugasan SPT Anda: <strong><?= esc($stats['penugasan_spt']) ?></strong></li>
     <?php endif; ?>

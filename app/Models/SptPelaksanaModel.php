@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class SptPelaksanaModel extends Model
+class SptPelaksanaModel extends BaseModel
 {
     protected $table            = 'spt_pelaksana';
     // Gunakan array untuk composite key, meski CI4 basic model kurang mensupport penuh,

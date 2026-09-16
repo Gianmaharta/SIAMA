@@ -11,6 +11,8 @@ $routes->get('/', function() {
 $routes->get('login', 'Auth::index');
 $routes->post('login/process', 'Auth::process');
 $routes->get('logout', 'Auth::logout');
+$routes->get('change-password', 'Auth::changePassword');
+$routes->post('change-password/process', 'Auth::processChangePassword');
 
 // --- Rute Terproteksi (Hanya yang sudah login) ---
 $routes->get('dashboard', 'Dashboard::index', ['filter' => 'auth']);

@@ -2,21 +2,21 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class BidangModel extends Model
+class BidangModel extends BaseModel
 {
     protected $table            = 'bidang';
     protected $primaryKey       = 'id_bidang';
-    protected $useAutoIncrement = true;
+    protected $useAutoIncrement = false;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_opd', 'nama_bidang'];
+    protected $allowedFields    = ['id_bidang', 'id_opd', 'nama_bidang', 'created_by', 'updated_by'];
 
     // Validasi
     protected $validationRules      = [
-        'id_opd'      => 'required|numeric',
+        'id_opd'      => 'required',
         'nama_bidang' => 'required|max_length[255]'
     ];
     protected $validationMessages   = [
@@ -33,7 +33,7 @@ class BidangModel extends Model
     /**
      * Mengambil data bidang beserta nama OPD-nya
      *
-     * @param int|null $id_opd Filter berdasarkan OPD tertentu jika diisi
+     * @param string|null $id_opd Filter berdasarkan OPD tertentu jika diisi
      * @return array
      */
     public function getBidangWithOpd($id_opd = null)
@@ -47,5 +47,22 @@ class BidangModel extends Model
         }
 
         return $builder->get()->getResultArray();
+    }
+
+    /**
+     * Sinkronisasi data dari API Eksternal
+     */
+    public function syncFromApi($apiData)
+    {
+        foreach ($apiData as $data) {
+            $existing = $this->where('nama_bidang', $data['nama_bidang'])
+                             ->where('id_opd', $data['id_opd'])
+                             ->first();
+            if ($existing) {
+                $this->update($existing['id_bidang'], $data);
+            } else {
+                $this->insert($data);
+            }
+        }
     }
 }

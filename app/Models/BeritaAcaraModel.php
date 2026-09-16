@@ -2,14 +2,30 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class BeritaAcaraModel extends Model
+class BeritaAcaraModel extends BaseModel
 {
     protected $table            = 'berita_acara';
     protected $primaryKey       = 'id_berita_acara';
-    protected $useAutoIncrement = true;
+    protected $useAutoIncrement = false;
     protected $returnType       = 'array';
+    protected $useSoftDeletes   = false;
+    protected $protectFields    = true;
+    protected $allowedFields    = [
+        'id_berita_acara',
+        'id_opd',
+        'id_spt',
+        'nomor_ba',
+        'tanggal_ba',
+        'status',
+        'file_ba',
+        'id_pembuat',
+        'id_verifikator',
+        'id_pimpinan',
+        'created_by',
+        'updated_by'
+    ];
 
     public function countAllGlobal()
     {

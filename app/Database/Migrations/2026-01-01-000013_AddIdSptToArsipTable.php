@@ -4,38 +4,55 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-/**
- * Migration: Tambah kolom id_spt (nullable FK) ke tabel arsip.
- * Kolom ini digunakan untuk menghubungkan arsip dengan Surat Perintah Tugas (SPT)
- * yang mendasari kegiatan alih media. Bersifat opsional (nullable).
- */
-class AddIdSptToArsipTable extends Migration
+class CreateActivityLogTable extends Migration
 {
     public function up()
     {
-        $fields = [
-            'id_spt' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'null'       => true,
-                'after'      => 'id_arsip',
+        $this->forge->addField([
+            'id' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
             ],
-        ];
+            'user_id' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+                'null'       => true,
+            ],
+            'module' => [
+                'type'       => 'VARCHAR',
+                'constraint' => '100',
+                'null'       => true,
+            ],
+            'action' => [
+                'type'       => 'VARCHAR',
+                'constraint' => '50',
+                'null'       => false, // create, update, delete
+            ],
+            'description' => [
+                'type' => 'TEXT',
+                'null' => true,
+            ],
+            'old_data' => [
+                'type' => 'JSON',
+                'null' => true,
+            ],
+            'new_data' => [
+                'type' => 'JSON',
+                'null' => true,
+            ],
+            'created_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+        ]);
 
-        $this->forge->addColumn('arsip', $fields);
-
-        // Tambahkan Foreign Key ke tabel spt via raw query
-        // (CI4 forge tidak mendukung addForeignKey setelah addColumn dalam satu operasi)
-        $this->db->query(
-            'ALTER TABLE `arsip` ADD CONSTRAINT `fk_arsip_id_spt` 
-             FOREIGN KEY (`id_spt`) REFERENCES `spt`(`id_spt`) 
-             ON DELETE SET NULL ON UPDATE CASCADE'
-        );
+        $this->forge->addKey('id', true);
+        $this->forge->addKey('user_id', false);
+        $this->forge->createTable('activity_log');
     }
 
     public function down()
     {
-        $this->db->query('ALTER TABLE `arsip` DROP FOREIGN KEY `fk_arsip_id_spt`');
-        $this->forge->dropColumn('arsip', 'id_spt');
+        $this->forge->dropTable('activity_log');
     }
 }

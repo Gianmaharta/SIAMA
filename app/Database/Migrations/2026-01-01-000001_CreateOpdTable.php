@@ -10,9 +10,8 @@ class CreateOpdTable extends Migration
     {
         $this->forge->addField([
             'id_opd' => [
-                'type'           => 'INT',
-                'constraint'     => 11,
-                'auto_increment' => true,
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
             ],
             'kode_opd' => [
                 'type'       => 'VARCHAR',
@@ -32,6 +31,24 @@ class CreateOpdTable extends Migration
             'is_active' => [
                 'type'       => 'BOOLEAN',
                 'default'    => true,
+            ],
+            'created_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'updated_at' => [
+                'type' => 'DATETIME',
+                'null' => true,
+            ],
+            'created_by' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+                'null'       => true,
+            ],
+            'updated_by' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 36,
+                'null'       => true,
             ],
         ]);
 
