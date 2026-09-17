@@ -62,34 +62,34 @@ class Arsip extends BaseController
     public function index()
     {
         $session  = session();
-        $id_role  = (int) $session->get('id_role');
+        $nama_role = $session->get('nama_role');
         $id_opd   = $session->get('id_opd');
         $id_bidang = $session->get('id_bidang');
-        $user_id  = (int) $session->get('user_id');
+        $user_id  = $session->get('user_id'); // user_id is also a string UUID
 
-        switch ($id_role) {
-            case 1: // Admin_Pemkab: semua arsip se-Kabupaten
+        switch ($nama_role) {
+            case 'Admin_Pemkab': // Admin_Pemkab: semua arsip se-Kabupaten
                 $arsip_list = $this->arsipModel->getArsipWithRelations();
                 break;
 
-            case 2: // Pimpinan: semua arsip di OPD-nya
-            case 3: // Admin_OPD: semua arsip di OPD-nya
+            case 'Pimpinan': // Pimpinan: semua arsip di OPD-nya
+            case 'Admin_OPD': // Admin_OPD: semua arsip di OPD-nya
                 $arsip_list = $this->arsipModel->getArsipWithRelations(null, $id_opd);
                 break;
 
-            case 4: // Kepala Bidang: arsip di Bidangnya
+            case 'Kepala_Bidang': // Kepala Bidang: arsip di Bidangnya
                 $arsip_list = $this->arsipModel->getArsipWithRelations(null, $id_opd, $id_bidang);
                 break;
 
-            case 5: // Arsiparis: hanya arsip yang dia buat (created_by)
+            case 'Arsiparis': // Arsiparis: hanya arsip yang dia buat (created_by)
                 $arsip_list = $this->arsipModel
-                    ->select('arsip.*, opd.nama_opd, bidang.nama_bidang, kode_klasifikasi.kode AS kode_klasifikasi, kode_klasifikasi.nama_klasifikasi, spt.nomor_spt')
+                    ->select('arsip.*, opd.nama_opd, bidang.nama_bidang, kode_klasifikasi.kode AS kode_klasifikasi_text, kode_klasifikasi.nama_klasifikasi, spt.nomor_spt')
                     ->join('opd',              'opd.id_opd = arsip.id_opd',                             'left')
                     ->join('bidang',           'bidang.id_bidang = arsip.id_bidang',                    'left')
-                    ->join('kode_klasifikasi', 'kode_klasifikasi.id_klasifikasi = arsip.id_klasifikasi', 'left')
+                    ->join('kode_klasifikasi', 'kode_klasifikasi.id_kode_klasifikasi = arsip.id_kode_klasifikasi', 'left') // fix join condition while we're at it
                     ->join('spt',              'spt.id_spt = arsip.id_spt',                              'left')
                     ->where('arsip.created_by', $user_id)
-                    ->orderBy('arsip.id_arsip', 'DESC')
+                    ->orderBy('arsip.created_at', 'DESC')
                     ->findAll();
                 break;
 
@@ -131,7 +131,7 @@ class Arsip extends BaseController
 
         // Ambil seluruh Kode Klasifikasi (master data)
         $klasifikasi_list = $this->db->table('kode_klasifikasi')
-            ->select('id_klasifikasi, kode, nama_klasifikasi')
+            ->select('id_kode_klasifikasi, kode, nama_klasifikasi')
             ->orderBy('kode', 'ASC')
             ->get()
             ->getResultArray();
@@ -163,10 +163,12 @@ class Arsip extends BaseController
         if (! $this->validate([
             'nomor_arsip'      => 'required|max_length[100]',
             'nama_arsip'       => 'required|max_length[255]',
-            'id_klasifikasi'   => 'required|numeric',
-            'id_bidang'        => 'required|numeric',
-            'tahun_penciptaan' => 'permit_empty|numeric',
-            'skor_prioritas'   => 'permit_empty|numeric',
+            'id_kode_klasifikasi' => 'required',
+            'id_bidang'        => 'required',
+            'kurun_waktu'      => 'permit_empty|max_length[50]',
+            'tingkat_perkembangan' => 'permit_empty|max_length[50]',
+            'jumlah'           => 'permit_empty|numeric',
+            'kondisi'          => 'permit_empty|max_length[50]',
         ])) {
             return redirect()->back()->withInput()->with('error', implode('<br>', $this->validator->getErrors()));
         }
@@ -198,19 +200,19 @@ class Arsip extends BaseController
         $data = [
             'id_spt'            => $this->request->getPost('id_spt')          ?: null,
             'id_opd'            => $id_opd,
-            'id_bidang'         => (int) $this->request->getPost('id_bidang'),
-            'id_klasifikasi'    => (int) $this->request->getPost('id_klasifikasi'),
+            'id_bidang'         => $this->request->getPost('id_bidang'),
+            'id_kode_klasifikasi' => $this->request->getPost('id_kode_klasifikasi'),
             'nomor_arsip'       => $this->request->getPost('nomor_arsip'),
             'nama_arsip'        => $this->request->getPost('nama_arsip'),
-            'tahun_penciptaan'  => $this->request->getPost('tahun_penciptaan') ?: null,
-            'kategori_jra'      => $this->request->getPost('kategori_jra')     ?: '',
-            'kondisi_fisik'     => $this->request->getPost('kondisi_fisik')    ?: 'Baik',
-            'metode_alih_media' => $this->request->getPost('metode_alih_media') ?: 'Scan',
-            'skor_prioritas'    => (int) ($this->request->getPost('skor_prioritas') ?: 0),
-            'file_digital'      => $fileDigitalName,
-            'status_autentikasi' => 'Belum Watermark',
-            'status_alih_media'  => 'Belum Diajukan',
+            'kurun_waktu'       => $this->request->getPost('kurun_waktu') ?: null,
+            'tingkat_perkembangan' => $this->request->getPost('tingkat_perkembangan') ?: null,
+            'jumlah'            => (int) ($this->request->getPost('jumlah') ?: 0),
+            'kondisi'           => $this->request->getPost('kondisi') ?: 'Baik',
+            'file_arsip'        => $fileDigitalName,
+            'status_verifikasi' => 'Menunggu',
+            'status_autentikasi' => 'Belum Dinilai',
             'created_by'        => $user_id,
+            'id_user_upload'    => $user_id,
         ];
 
         // Nonaktifkan validasi model sementara (sudah divalidasi manual di atas)
@@ -232,7 +234,7 @@ class Arsip extends BaseController
      *
      * @param int $id id_arsip
      */
-    public function detail(int $id)
+    public function detail($id)
     {
         $arsip = $this->arsipModel->getArsipWithRelations($id);
 
@@ -242,8 +244,8 @@ class Arsip extends BaseController
 
         // Susun URL berkas (jika ada)
         $file_url = null;
-        if (! empty($arsip['file_digital'])) {
-            $file_url = base_url(self::UPLOAD_URL . $arsip['file_digital']);
+        if (! empty($arsip['file_arsip'])) {
+            $file_url = base_url(self::UPLOAD_URL . $arsip['file_arsip']);
         }
 
         return view('arsip/detail', [
@@ -263,7 +265,7 @@ class Arsip extends BaseController
      *
      * @param int $id id_arsip
      */
-    public function edit(int $id)
+    public function edit($id)
     {
         $session = session();
         $id_opd  = $session->get('id_opd');
@@ -285,7 +287,7 @@ class Arsip extends BaseController
             ->findAll();
 
         $klasifikasi_list = $this->db->table('kode_klasifikasi')
-            ->select('id_klasifikasi, kode, nama_klasifikasi')
+            ->select('id_kode_klasifikasi, kode, nama_klasifikasi')
             ->orderBy('kode', 'ASC')
             ->get()
             ->getResultArray();
@@ -310,7 +312,7 @@ class Arsip extends BaseController
      *
      * @param int $id id_arsip
      */
-    public function update(int $id)
+    public function update($id)
     {
         $arsip = $this->arsipModel->find($id);
 
@@ -322,16 +324,18 @@ class Arsip extends BaseController
         if (! $this->validate([
             'nomor_arsip'      => 'required|max_length[100]',
             'nama_arsip'       => 'required|max_length[255]',
-            'id_klasifikasi'   => 'required|numeric',
-            'id_bidang'        => 'required|numeric',
-            'tahun_penciptaan' => 'permit_empty|numeric',
-            'skor_prioritas'   => 'permit_empty|numeric',
+            'id_kode_klasifikasi' => 'required',
+            'id_bidang'        => 'required',
+            'kurun_waktu'      => 'permit_empty|max_length[50]',
+            'tingkat_perkembangan' => 'permit_empty|max_length[50]',
+            'jumlah'           => 'permit_empty|numeric',
+            'kondisi'          => 'permit_empty|max_length[50]',
         ])) {
             return redirect()->back()->withInput()->with('error', implode('<br>', $this->validator->getErrors()));
         }
 
         // ----- Proses File Baru (jika ada) -----
-        $fileDigitalName = $arsip['file_digital']; // Pertahankan file lama sebagai default
+        $fileDigitalName = $arsip['file_arsip']; // Pertahankan file lama sebagai default
         $fileObj = $this->request->getFile('file_arsip');
 
         if ($fileObj !== null && $fileObj->isValid() && ! $fileObj->hasMoved()) {
@@ -347,8 +351,8 @@ class Arsip extends BaseController
             }
 
             // Hapus file lama jika ada
-            if (! empty($arsip['file_digital'])) {
-                $oldFilePath = self::UPLOAD_PATH . $arsip['file_digital'];
+            if (! empty($arsip['file_arsip'])) {
+                $oldFilePath = self::UPLOAD_PATH . $arsip['file_arsip'];
                 if (file_exists($oldFilePath)) {
                     unlink($oldFilePath);
                 }
@@ -362,18 +366,16 @@ class Arsip extends BaseController
         // ----- Susun Data Update -----
         $data = [
             'id_spt'             => $this->request->getPost('id_spt')           ?: null,
-            'id_bidang'          => (int) $this->request->getPost('id_bidang'),
-            'id_klasifikasi'     => (int) $this->request->getPost('id_klasifikasi'),
+            'id_bidang'          => $this->request->getPost('id_bidang'),
+            'id_kode_klasifikasi'  => $this->request->getPost('id_kode_klasifikasi'),
             'nomor_arsip'        => $this->request->getPost('nomor_arsip'),
             'nama_arsip'         => $this->request->getPost('nama_arsip'),
-            'tahun_penciptaan'   => $this->request->getPost('tahun_penciptaan')  ?: null,
-            'kategori_jra'       => $this->request->getPost('kategori_jra')      ?: '',
-            'kondisi_fisik'      => $this->request->getPost('kondisi_fisik')     ?: 'Baik',
-            'metode_alih_media'  => $this->request->getPost('metode_alih_media') ?: 'Scan',
-            'skor_prioritas'     => (int) ($this->request->getPost('skor_prioritas') ?: 0),
-            'file_digital'       => $fileDigitalName,
-            'status_autentikasi' => $this->request->getPost('status_autentikasi') ?: $arsip['status_autentikasi'],
-            'status_alih_media'  => $this->request->getPost('status_alih_media')  ?: $arsip['status_alih_media'],
+            'kurun_waktu'        => $this->request->getPost('kurun_waktu') ?: null,
+            'tingkat_perkembangan' => $this->request->getPost('tingkat_perkembangan') ?: null,
+            'jumlah'             => (int) ($this->request->getPost('jumlah') ?: 0),
+            'kondisi'            => $this->request->getPost('kondisi') ?: 'Baik',
+            'file_arsip'         => $fileDigitalName,
+            'status_verifikasi'  => $this->request->getPost('status_verifikasi') ?: $arsip['status_verifikasi'],
         ];
 
         $this->arsipModel->skipValidation(true)->update($id, $data);
@@ -391,7 +393,7 @@ class Arsip extends BaseController
      *
      * @param int $id id_arsip
      */
-    public function delete(int $id)
+    public function delete($id)
     {
         $arsip = $this->arsipModel->find($id);
 
@@ -400,8 +402,8 @@ class Arsip extends BaseController
         }
 
         // Hapus file fisik dari server (jika ada)
-        if (! empty($arsip['file_digital'])) {
-            $filePath = self::UPLOAD_PATH . $arsip['file_digital'];
+        if (! empty($arsip['file_arsip'])) {
+            $filePath = self::UPLOAD_PATH . $arsip['file_arsip'];
             if (file_exists($filePath)) {
                 unlink($filePath);
             }

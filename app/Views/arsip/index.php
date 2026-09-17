@@ -19,9 +19,9 @@ Daftar Arsip Digital - SIAMA
     </div>
 <?php endif; ?>
 
-<?php $id_role = session()->get('id_role'); ?>
+<?php $nama_role = session()->get('nama_role'); ?>
 
-<?php if ($id_role == 5) : // Tombol Tambah Arsip hanya untuk Arsiparis ?>
+<?php if ($nama_role === 'Arsiparis') : // Tombol Tambah Arsip hanya untuk Arsiparis ?>
     <div style="margin-bottom: 15px;">
         <a href="<?= base_url('/arsip/create') ?>">
             <button type="button">+ Tambah Arsip Baru</button>
@@ -37,7 +37,8 @@ Daftar Arsip Digital - SIAMA
             <th>Nama Arsip</th>
             <th>Kode Klasifikasi</th>
             <th>Bidang</th>
-            <th>Status Alih Media</th>
+            <th>Skor Prioritas</th>
+            <th>Status Verifikasi</th>
             <th>Berkas File</th>
             <th>Aksi</th>
         </tr>
@@ -50,16 +51,17 @@ Daftar Arsip Digital - SIAMA
                     <td><?= esc($row['nomor_arsip']) ?></td>
                     <td><?= esc($row['nama_arsip']) ?></td>
                     <td>
-                        <?= esc($row['kode_klasifikasi'] ?? '-') ?>
+                        <?= esc($row['kode_klasifikasi_text'] ?? '-') ?>
                         <?php if (! empty($row['nama_klasifikasi'])) : ?>
                             <br><small><?= esc($row['nama_klasifikasi']) ?></small>
                         <?php endif; ?>
                     </td>
                     <td><?= esc($row['nama_bidang'] ?? '-') ?></td>
-                    <td><?= esc($row['status_alih_media']) ?></td>
+                    <td><?= (! empty($row['skor_prioritas'])) ? esc($row['skor_prioritas']) : 'Belum Dinilai' ?></td>
+                    <td><?= esc($row['status_verifikasi']) ?></td>
                     <td>
-                        <?php if (! empty($row['file_digital'])) : ?>
-                            <a href="<?= base_url('uploads/arsip/' . $row['file_digital']) ?>" target="_blank">Lihat Berkas</a>
+                        <?php if (! empty($row['file_arsip'])) : ?>
+                            <a href="<?= base_url('uploads/arsip/' . $row['file_arsip']) ?>" target="_blank">Lihat Berkas</a>
                         <?php else : ?>
                             <em>Belum ada</em>
                         <?php endif; ?>
@@ -68,12 +70,12 @@ Daftar Arsip Digital - SIAMA
                         <a href="<?= base_url('/arsip/detail/' . $row['id_arsip']) ?>">
                             <button type="button">Detail</button>
                         </a>
-                        <?php if ($id_role == 5) : ?>
+                        <?php if ($nama_role === 'Arsiparis') : ?>
                             <a href="<?= base_url('/arsip/edit/' . $row['id_arsip']) ?>">
                                 <button type="button">Edit</button>
                             </a>
                             <a href="<?= base_url('/arsip/delete/' . $row['id_arsip']) ?>"
-                               onclick="return confirm('Yakin ingin menghapus arsip ini beserta file digitalnya?')">
+                               onclick="return confirm('Yakin ingin menghapus arsip ini beserta file fisiknya?')">
                                 <button type="button">Hapus</button>
                             </a>
                         <?php endif; ?>

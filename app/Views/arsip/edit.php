@@ -41,14 +41,14 @@ Edit Data Arsip - SIAMA
     </div>
 
     <!-- Kode Klasifikasi -->
-    <div style="margin-bottom: 12px;">
-        <label for="id_klasifikasi"><strong>Kode Klasifikasi <span style="color:red;">*</span></strong></label><br>
-        <select id="id_klasifikasi" name="id_klasifikasi" required style="width: 100%; max-width: 400px;">
+    <div style="margin-bottom: 15px;">
+        <label for="id_kode_klasifikasi"><strong>Kode Klasifikasi <span style="color:red;">*</span></strong></label><br>
+        <select id="id_kode_klasifikasi" name="id_kode_klasifikasi" required style="width: 100%; max-width: 400px;">
             <option value="">-- Pilih Kode Klasifikasi --</option>
             <?php foreach ($klasifikasi_list as $klas) : ?>
-                <option value="<?= $klas['id_klasifikasi'] ?>"
-                    <?= (old('id_klasifikasi', $arsip['id_klasifikasi']) == $klas['id_klasifikasi']) ? 'selected' : '' ?>>
-                    <?= esc($klas['kode']) ?> — <?= esc($klas['nama_klasifikasi']) ?>
+                <option value="<?= $klas['id_kode_klasifikasi'] ?>"
+                    <?= (old('id_kode_klasifikasi', $arsip['id_kode_klasifikasi']) == $klas['id_kode_klasifikasi']) ? 'selected' : '' ?>>
+                    <?= esc($klas['kode']) ?> - <?= esc($klas['nama_klasifikasi']) ?>
                 </option>
             <?php endforeach; ?>
         </select>
@@ -84,22 +84,22 @@ Edit Data Arsip - SIAMA
 
     <!-- Tahun Penciptaan -->
     <div style="margin-bottom: 12px;">
-        <label for="tahun_penciptaan"><strong>Tahun Penciptaan</strong></label><br>
+        <label for="kurun_waktu"><strong>Tahun Penciptaan</strong></label><br>
         <input type="number"
-               id="tahun_penciptaan"
-               name="tahun_penciptaan"
-               value="<?= old('tahun_penciptaan', esc($arsip['tahun_penciptaan'])) ?>"
+               id="kurun_waktu"
+               name="kurun_waktu"
+               value="<?= old('kurun_waktu', esc($arsip['kurun_waktu'])) ?>"
                min="1900"
                max="<?= date('Y') ?>"
                style="width: 150px;">
     </div>
 
-    <!-- Kategori JRA -->
+    <!-- Tingkat Perkembangan -->
     <div style="margin-bottom: 12px;">
-        <label for="kategori_jra"><strong>Kategori JRA</strong></label><br>
-        <select id="kategori_jra" name="kategori_jra" style="width: 100%; max-width: 300px;">
+        <label for="tingkat_perkembangan"><strong>Tingkat Perkembangan</strong></label><br>
+        <select id="tingkat_perkembangan" name="tingkat_perkembangan" style="width: 100%; max-width: 300px;">
             <option value="">-- Pilih Kategori --</option>
-            <?php $currentJra = old('kategori_jra', $arsip['kategori_jra']); ?>
+            <?php $currentJra = old('tingkat_perkembangan', $arsip['tingkat_perkembangan']); ?>
             <option value="Permanen"    <?= $currentJra == 'Permanen'    ? 'selected' : '' ?>>Permanen</option>
             <option value="Musnah"      <?= $currentJra == 'Musnah'      ? 'selected' : '' ?>>Musnah</option>
             <option value="Diserahkan"  <?= $currentJra == 'Diserahkan'  ? 'selected' : '' ?>>Diserahkan</option>
@@ -108,54 +108,26 @@ Edit Data Arsip - SIAMA
 
     <!-- Kondisi Fisik -->
     <div style="margin-bottom: 12px;">
-        <label for="kondisi_fisik"><strong>Kondisi Fisik</strong></label><br>
-        <select id="kondisi_fisik" name="kondisi_fisik" style="width: 100%; max-width: 300px;">
-            <?php $currentKondisi = old('kondisi_fisik', $arsip['kondisi_fisik']); ?>
+        <label for="kondisi"><strong>Kondisi Fisik</strong></label><br>
+        <select id="kondisi" name="kondisi" style="width: 100%; max-width: 300px;">
+            <?php $currentKondisi = old('kondisi', $arsip['kondisi']); ?>
             <option value="Baik"         <?= $currentKondisi == 'Baik'         ? 'selected' : '' ?>>Baik</option>
             <option value="Rusak Ringan" <?= $currentKondisi == 'Rusak Ringan' ? 'selected' : '' ?>>Rusak Ringan</option>
             <option value="Rusak Berat"  <?= $currentKondisi == 'Rusak Berat'  ? 'selected' : '' ?>>Rusak Berat</option>
         </select>
     </div>
 
-    <!-- Metode Alih Media -->
-    <div style="margin-bottom: 12px;">
-        <label for="metode_alih_media"><strong>Metode Alih Media</strong></label><br>
-        <select id="metode_alih_media" name="metode_alih_media" style="width: 100%; max-width: 300px;">
-            <?php $currentMetode = old('metode_alih_media', $arsip['metode_alih_media']); ?>
-            <option value="Scan"         <?= $currentMetode == 'Scan'         ? 'selected' : '' ?>>Scan</option>
-            <option value="Fotografi"    <?= $currentMetode == 'Fotografi'    ? 'selected' : '' ?>>Fotografi</option>
-            <option value="Digitalisasi" <?= $currentMetode == 'Digitalisasi' ? 'selected' : '' ?>>Digitalisasi</option>
-        </select>
-    </div>
 
-    <!-- Skor Prioritas -->
-    <div style="margin-bottom: 12px;">
-        <label for="skor_prioritas"><strong>Skor Prioritas</strong></label><br>
-        <input type="number"
-               id="skor_prioritas"
-               name="skor_prioritas"
-               value="<?= old('skor_prioritas', esc($arsip['skor_prioritas'])) ?>"
-               min="0"
-               max="100"
-               style="width: 100px;">
-    </div>
 
-    <!-- Status Autentikasi -->
-    <div style="margin-bottom: 12px;">
-        <label for="status_autentikasi"><strong>Status Autentikasi</strong></label><br>
-        <select id="status_autentikasi" name="status_autentikasi" style="width: 100%; max-width: 300px;">
-            <?php $currentAuth = old('status_autentikasi', $arsip['status_autentikasi']); ?>
-            <option value="Belum Watermark" <?= $currentAuth == 'Belum Watermark' ? 'selected' : '' ?>>Belum Watermark</option>
-            <option value="Sudah Watermark" <?= $currentAuth == 'Sudah Watermark' ? 'selected' : '' ?>>Sudah Watermark</option>
-            <option value="Terautentikasi"  <?= $currentAuth == 'Terautentikasi'  ? 'selected' : '' ?>>Terautentikasi</option>
-        </select>
-    </div>
 
-    <!-- Status Alih Media -->
+
+
+
+    <!-- Status Verifikasi -->
     <div style="margin-bottom: 12px;">
-        <label for="status_alih_media"><strong>Status Alih Media</strong></label><br>
-        <select id="status_alih_media" name="status_alih_media" style="width: 100%; max-width: 300px;">
-            <?php $currentAlih = old('status_alih_media', $arsip['status_alih_media']); ?>
+        <label for="status_verifikasi"><strong>Status Verifikasi</strong></label><br>
+        <select id="status_verifikasi" name="status_verifikasi" style="width: 100%; max-width: 300px;">
+            <?php $currentAlih = old('status_verifikasi', $arsip['status_verifikasi']); ?>
             <option value="Belum Diajukan" <?= $currentAlih == 'Belum Diajukan' ? 'selected' : '' ?>>Belum Diajukan</option>
             <option value="Diajukan"       <?= $currentAlih == 'Diajukan'       ? 'selected' : '' ?>>Diajukan</option>
             <option value="Disetujui"      <?= $currentAlih == 'Disetujui'      ? 'selected' : '' ?>>Disetujui</option>
@@ -172,12 +144,12 @@ Edit Data Arsip - SIAMA
                id="file_arsip"
                name="file_arsip"
                accept=".pdf,.jpg,.jpeg,.png,.tiff,.tif">
-        <?php if (! empty($arsip['file_digital'])) : ?>
+        <?php if (! empty($arsip['file_arsip'])) : ?>
             <br>
             <small>
                 File saat ini:
-                <a href="<?= base_url('uploads/arsip/' . $arsip['file_digital']) ?>" target="_blank">
-                    <?= esc($arsip['file_digital']) ?>
+                <a href="<?= base_url('uploads/arsip/' . $arsip['file_arsip']) ?>" target="_blank">
+                    <?= esc($arsip['file_arsip']) ?>
                 </a>
             </small>
         <?php endif; ?>

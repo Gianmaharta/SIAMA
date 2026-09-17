@@ -43,7 +43,7 @@ Detail Arsip - SIAMA
         <tr>
             <th style="text-align: left; background: #f2f2f2;">Kode Klasifikasi</th>
             <td>
-                <?= esc($arsip['kode_klasifikasi'] ?? '-') ?>
+                <?= esc($arsip['kode_klasifikasi_text'] ?? '-') ?>
                 <?php if (! empty($arsip['nama_klasifikasi'])) : ?>
                     — <?= esc($arsip['nama_klasifikasi']) ?>
                 <?php endif; ?>
@@ -55,31 +55,27 @@ Detail Arsip - SIAMA
         </tr>
         <tr>
             <th style="text-align: left; background: #f2f2f2;">Tahun Penciptaan</th>
-            <td><?= esc($arsip['tahun_penciptaan'] ?? '-') ?></td>
+            <td><?= esc($arsip['kurun_waktu'] ?? '-') ?></td>
         </tr>
         <tr>
-            <th style="text-align: left; background: #f2f2f2;">Kategori JRA</th>
-            <td><?= esc($arsip['kategori_jra'] ?: '-') ?></td>
+            <th style="text-align: left; background: #f2f2f2;">Tingkat Perkembangan</th>
+            <td><?= esc($arsip['tingkat_perkembangan'] ?: '-') ?></td>
         </tr>
         <tr>
             <th style="text-align: left; background: #f2f2f2;">Kondisi Fisik</th>
-            <td><?= esc($arsip['kondisi_fisik']) ?></td>
-        </tr>
-        <tr>
-            <th style="text-align: left; background: #f2f2f2;">Metode Alih Media</th>
-            <td><?= esc($arsip['metode_alih_media']) ?></td>
+            <td><?= esc($arsip['kondisi']) ?></td>
         </tr>
         <tr>
             <th style="text-align: left; background: #f2f2f2;">Skor Prioritas</th>
-            <td><?= esc($arsip['skor_prioritas']) ?></td>
+            <td><?= esc($arsip['skor_prioritas'] ?? 'Belum dinilai') ?></td>
         </tr>
         <tr>
             <th style="text-align: left; background: #f2f2f2;">Status Autentikasi</th>
             <td><?= esc($arsip['status_autentikasi']) ?></td>
         </tr>
         <tr>
-            <th style="text-align: left; background: #f2f2f2;">Status Alih Media</th>
-            <td><?= esc($arsip['status_alih_media']) ?></td>
+            <th style="text-align: left; background: #f2f2f2;">Status Verifikasi</th>
+            <td><?= esc($arsip['status_verifikasi']) ?></td>
         </tr>
         <tr>
             <th style="text-align: left; background: #f2f2f2;">Diinput oleh</th>
@@ -93,7 +89,7 @@ Detail Arsip - SIAMA
                         <button type="button">&#128196; Lihat / Download Berkas</button>
                     </a>
                     <br>
-                    <small>Nama file: <?= esc($arsip['file_digital']) ?></small>
+                    <small>Nama file: <?= esc($arsip['file_arsip']) ?></small>
                 <?php else : ?>
                     <em>Belum ada berkas digital yang diunggah.</em>
                 <?php endif; ?>

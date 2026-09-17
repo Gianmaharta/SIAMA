@@ -18,8 +18,8 @@ $routes->post('change-password/process', 'Auth::processChangePassword');
 $routes->get('dashboard', 'Dashboard::index', ['filter' => 'auth']);
 
 // --- Rute Terproteksi dengan Role Khusus ---
-// Contoh dummy rute untuk Admin_Pemkab (id_role = 1)
-$routes->group('admin', ['filter' => 'auth', 'filter' => 'role:1'], static function ($routes) {
+// Contoh dummy rute untuk Admin_Pemkab
+$routes->group('admin', ['filter' => ['auth', 'role:Admin_Pemkab']], static function ($routes) {
     $routes->get('dashboard', function() {
         return 'Selamat datang di Dashboard Admin Pemkab!';
     });
@@ -28,8 +28,8 @@ $routes->group('admin', ['filter' => 'auth', 'filter' => 'role:1'], static funct
     });
 });
 
-// Contoh dummy rute untuk Pimpinan (id_role = 2) dan Kepala Bidang (id_role = 4)
-$routes->group('approval', ['filter' => ['auth', 'role:2,4']], static function ($routes) {
+// Contoh dummy rute untuk Pimpinan dan Kepala Bidang
+$routes->group('approval', ['filter' => ['auth', 'role:Pimpinan,Kepala_Bidang']], static function ($routes) {
     $routes->get('berkas', function() {
         return 'Halaman Approval Berkas';
     });
@@ -40,43 +40,62 @@ $routes->get('swagger', 'Swagger::index');
 $routes->get('swagger/json', 'Swagger::json');
 
 // --- Master OPD (Khusus Admin_Pemkab) ---
-$routes->group('opd', ['filter' => ['auth', 'role:1']], static function ($routes) {
+$routes->group('opd', ['filter' => ['auth', 'role:Admin_Pemkab']], static function ($routes) {
     $routes->get('/', 'Opd::index');
     $routes->get('create', 'Opd::create');
     $routes->post('store', 'Opd::store');
-    $routes->get('edit/(:num)', 'Opd::edit/$1');
-    $routes->post('update/(:num)', 'Opd::update/$1');
-    $routes->get('delete/(:num)', 'Opd::delete/$1');
+    $routes->get('edit/(:segment)', 'Opd::edit/$1');
+    $routes->post('update/(:segment)', 'Opd::update/$1');
+    $routes->get('delete/(:segment)', 'Opd::delete/$1');
 });
 
 // --- Master Bidang (Admin_Pemkab & Admin_OPD) ---
-$routes->group('bidang', ['filter' => ['auth', 'role:1,3']], static function ($routes) {
+$routes->group('bidang', ['filter' => ['auth', 'role:Admin_Pemkab,Admin_OPD']], static function ($routes) {
     $routes->get('/', 'Bidang::index');
     $routes->get('create', 'Bidang::create');
     $routes->post('store', 'Bidang::store');
-    $routes->get('edit/(:num)', 'Bidang::edit/$1');
-    $routes->post('update/(:num)', 'Bidang::update/$1');
-    $routes->get('delete/(:num)', 'Bidang::delete/$1');
+    $routes->get('edit/(:segment)', 'Bidang::edit/$1');
+    $routes->post('update/(:segment)', 'Bidang::update/$1');
+    $routes->get('delete/(:segment)', 'Bidang::delete/$1');
+});
+
+// --- Modul Berita Acara ---
+$routes->group('berita-acara', ['filter' => 'auth'], function($routes) {
+    $routes->get('/', 'BeritaAcara::index');
+    $routes->get('create', 'BeritaAcara::create', ['filter' => 'role:Arsiparis']);
+    $routes->post('store', 'BeritaAcara::store', ['filter' => 'role:Arsiparis']);
+    $routes->get('detail/(:segment)', 'BeritaAcara::detail/$1');
+    $routes->post('verifikasi-kabid/(:segment)', 'BeritaAcara::verifikasiKabid/$1', ['filter' => 'role:Kepala_Bidang']);
+    $routes->post('ttd-pimpinan/(:segment)', 'BeritaAcara::ttdPimpinan/$1', ['filter' => 'role:Pimpinan']);
+    $routes->get('cetak/(:segment)', 'BeritaAcara::cetak/$1');
+});
+
+// --- Rute Penilaian Arsip (Hanya Admin Pemkab) ---
+$routes->group('penilaian', ['filter' => 'role:Admin_Pemkab'], function($routes) {
+    $routes->get('/', 'PenilaianArsip::index');
+    $routes->get('form/(:segment)', 'PenilaianArsip::form/$1');
+    $routes->post('store/(:segment)', 'PenilaianArsip::store/$1');
+    $routes->get('detail/(:segment)', 'PenilaianArsip::detail/$1');
 });
 
 // --- Modul Surat Perintah Tugas (SPT) ---
 $routes->group('spt', ['filter' => 'auth'], static function ($routes) {
     $routes->get('/', 'Spt::index');
-    $routes->get('create', 'Spt::create', ['filter' => 'role:2,3']);
-    $routes->post('store', 'Spt::store', ['filter' => 'role:2,3']);
-    $routes->get('detail/(:num)', 'Spt::detail/$1');
+    $routes->get('create', 'Spt::create', ['filter' => 'role:Pimpinan,Admin_OPD']);
+    $routes->post('store', 'Spt::store', ['filter' => 'role:Pimpinan,Admin_OPD']);
+    $routes->get('detail/(:segment)', 'Spt::detail/$1');
 });
 
 // --- Modul Pengelolaan Arsip Digital ---
 $routes->group('arsip', ['filter' => 'auth'], static function ($routes) {
     // Semua role yang sudah login dapat melihat daftar & detail arsip (filter role di Controller)
     $routes->get('/', 'Arsip::index');
-    $routes->get('detail/(:num)', 'Arsip::detail/$1');
+    $routes->get('detail/(:segment)', 'Arsip::detail/$1');
 
-    // Hanya Arsiparis (id_role: 5) yang boleh membuat, mengubah, dan menghapus arsip
-    $routes->get('create', 'Arsip::create', ['filter' => 'role:5']);
-    $routes->post('store', 'Arsip::store', ['filter' => 'role:5']);
-    $routes->get('edit/(:num)', 'Arsip::edit/$1', ['filter' => 'role:5']);
-    $routes->post('update/(:num)', 'Arsip::update/$1', ['filter' => 'role:5']);
-    $routes->get('delete/(:num)', 'Arsip::delete/$1', ['filter' => 'role:5']);
+    // Hanya Arsiparis (role: Arsiparis) yang boleh membuat, mengubah, dan menghapus arsip
+    $routes->get('create', 'Arsip::create', ['filter' => 'role:Arsiparis']);
+    $routes->post('store', 'Arsip::store', ['filter' => 'role:Arsiparis']);
+    $routes->get('edit/(:segment)', 'Arsip::edit/$1', ['filter' => 'role:Arsiparis']);
+    $routes->post('update/(:segment)', 'Arsip::update/$1', ['filter' => 'role:Arsiparis']);
+    $routes->get('delete/(:segment)', 'Arsip::delete/$1', ['filter' => 'role:Arsiparis']);
 });

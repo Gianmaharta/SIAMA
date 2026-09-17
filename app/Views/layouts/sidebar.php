@@ -6,7 +6,10 @@
         <li><a href="<?= base_url('/bidang') ?>">Master Bidang</a></li>
         <li><a href="<?= base_url('/spt') ?>">Surat Perintah Tugas (SPT)</a></li>
         <li><a href="<?= base_url('/arsip') ?>">Pengelolaan Arsip</a></li>
-        <li><a href="#">Berita Acara</a></li>
+        <?php if (session()->get('nama_role') === 'Admin_Pemkab') : ?>
+            <li><a href="<?= base_url('/penilaian') ?>">Penilaian Arsip</a></li>
+        <?php endif; ?>
+        <li><a href="<?= base_url('/berita-acara') ?>">Berita Acara</a></li>
         <li><a href="#">Audit Log</a></li>
     </ul>
 </nav>

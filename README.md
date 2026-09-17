@@ -6,6 +6,7 @@ Telah dilakukan pembaharuan sistem (Refactoring) yang meliputi:
 - **UUID Primary Key**: Seluruh ID kini menggunakan format string UUID v4 (36 karakter) alih-alih `INT AUTO_INCREMENT`.
 - **Kolom Audit Terstandar**: Terdapat 4 kolom audit di setiap tabel transaksi: `created_at`, `updated_at`, `created_by`, dan `updated_by`.
 - **Keamanan Akun (Force Password Change)**: Akun bawaan (*seeder*) sekarang menggunakan sandi *default* `Admin123!` dan pengguna diwajibkan untuk mengganti kata sandi setelah *login* perdana.
+- **Pemisahan Hak Akses Penilaian**: Modul Penilaian Arsip (Skor Prioritas & Autentikasi) dipisahkan secara eksklusif. Hanya **Admin Pemkab (Role 1)** yang memiliki akses (Write/Update), sedangkan Arsiparis hanya bersifat (Read-Only).
 
 ---
 
@@ -37,10 +38,12 @@ php spark migrate
 ```
 
 ### 2. Jalankan Seeder
-Mengisi data awal master hak akses (roles), OPD, Bidang, serta **5 Akun Testing**:
+Mengisi data awal untuk master hak akses (Roles), OPD, Bidang, **5 Akun Testing**, **Kode Klasifikasi**, **Data Dummy SPT Terkait**, serta **Data Dummy Arsip** untuk keperluan pengetesan sistem Penilaian Arsip.
 ```bash
 php spark db:seed SiamaSeeder
 ```
+
+> **CATATAN**: Mengingat sistem kita menggunakan UUID yang selalu digenerate secara acak pada setiap *run*, sangat disarankan untuk melakukan *reset* database (*drop* & *create*) terlebih dahulu sebelum menjalankan Seeder ini jika database Anda sudah pernah diisi. Ini demi mencegah konflik *Foreign Key* atau relasi arsip yang menggantung.
 
 ---
 

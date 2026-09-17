@@ -29,7 +29,7 @@ class RoleFilter implements FilterInterface
         }
 
         // Ambil role dari session
-        $userRole = session()->get('id_role');
+        $userRole = session()->get('nama_role');
 
         // Cek apakah role user ada di dalam daftar argumen (role yang diizinkan)
         if (! in_array((string)$userRole, $arguments)) {

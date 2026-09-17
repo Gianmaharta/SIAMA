@@ -41,14 +41,14 @@ Tambah Arsip Baru - SIAMA
     </div>
 
     <!-- Kode Klasifikasi -->
-    <div style="margin-bottom: 12px;">
-        <label for="id_klasifikasi"><strong>Kode Klasifikasi <span style="color:red;">*</span></strong></label><br>
-        <select id="id_klasifikasi" name="id_klasifikasi" required style="width: 100%; max-width: 400px;">
+    <div style="margin-bottom: 15px;">
+        <label for="id_kode_klasifikasi"><strong>Kode Klasifikasi <span style="color:red;">*</span></strong></label><br>
+        <select id="id_kode_klasifikasi" name="id_kode_klasifikasi" required style="width: 100%; max-width: 400px;">
             <option value="">-- Pilih Kode Klasifikasi --</option>
             <?php foreach ($klasifikasi_list as $klas) : ?>
-                <option value="<?= $klas['id_klasifikasi'] ?>"
-                    <?= old('id_klasifikasi') == $klas['id_klasifikasi'] ? 'selected' : '' ?>>
-                    <?= esc($klas['kode']) ?> — <?= esc($klas['nama_klasifikasi']) ?>
+                <option value="<?= $klas['id_kode_klasifikasi'] ?>"
+                    <?= old('id_kode_klasifikasi') == $klas['id_kode_klasifikasi'] ? 'selected' : '' ?>>
+                    <?= esc($klas['kode']) ?> - <?= esc($klas['nama_klasifikasi']) ?>
                 </option>
             <?php endforeach; ?>
         </select>
@@ -84,62 +84,41 @@ Tambah Arsip Baru - SIAMA
 
     <!-- Tahun Penciptaan -->
     <div style="margin-bottom: 12px;">
-        <label for="tahun_penciptaan"><strong>Tahun Penciptaan</strong></label><br>
+        <label for="kurun_waktu"><strong>Tahun Penciptaan</strong></label><br>
         <input type="number"
-               id="tahun_penciptaan"
-               name="tahun_penciptaan"
-               value="<?= old('tahun_penciptaan') ?>"
+               id="kurun_waktu"
+               name="kurun_waktu"
+               value="<?= old('kurun_waktu') ?>"
                min="1900"
                max="<?= date('Y') ?>"
                placeholder="Contoh: 2023"
                style="width: 150px;">
     </div>
 
-    <!-- Kategori JRA -->
+    <!-- Tingkat Perkembangan -->
     <div style="margin-bottom: 12px;">
-        <label for="kategori_jra"><strong>Kategori JRA</strong></label><br>
-        <select id="kategori_jra" name="kategori_jra" style="width: 100%; max-width: 300px;">
+        <label for="tingkat_perkembangan"><strong>Tingkat Perkembangan</strong></label><br>
+        <select id="tingkat_perkembangan" name="tingkat_perkembangan" style="width: 100%; max-width: 300px;">
             <option value="">-- Pilih Kategori --</option>
-            <option value="Permanen"    <?= old('kategori_jra') == 'Permanen'    ? 'selected' : '' ?>>Permanen</option>
-            <option value="Musnah"      <?= old('kategori_jra') == 'Musnah'      ? 'selected' : '' ?>>Musnah</option>
-            <option value="Diserahkan"  <?= old('kategori_jra') == 'Diserahkan'  ? 'selected' : '' ?>>Diserahkan</option>
+            <option value="Permanen"    <?= old('tingkat_perkembangan') == 'Permanen'    ? 'selected' : '' ?>>Permanen</option>
+            <option value="Musnah"      <?= old('tingkat_perkembangan') == 'Musnah'      ? 'selected' : '' ?>>Musnah</option>
+            <option value="Diserahkan"  <?= old('tingkat_perkembangan') == 'Diserahkan'  ? 'selected' : '' ?>>Diserahkan</option>
         </select>
     </div>
 
     <!-- Kondisi Fisik -->
     <div style="margin-bottom: 12px;">
-        <label for="kondisi_fisik"><strong>Kondisi Fisik</strong></label><br>
-        <select id="kondisi_fisik" name="kondisi_fisik" style="width: 100%; max-width: 300px;">
-            <option value="Baik"         <?= old('kondisi_fisik') == 'Baik'         ? 'selected' : '' ?>>Baik</option>
-            <option value="Rusak Ringan" <?= old('kondisi_fisik') == 'Rusak Ringan' ? 'selected' : '' ?>>Rusak Ringan</option>
-            <option value="Rusak Berat"  <?= old('kondisi_fisik') == 'Rusak Berat'  ? 'selected' : '' ?>>Rusak Berat</option>
+        <label for="kondisi"><strong>Kondisi Fisik</strong></label><br>
+        <select id="kondisi" name="kondisi" style="width: 100%; max-width: 300px;">
+            <option value="Baik"         <?= old('kondisi') == 'Baik'         ? 'selected' : '' ?>>Baik</option>
+            <option value="Rusak Ringan" <?= old('kondisi') == 'Rusak Ringan' ? 'selected' : '' ?>>Rusak Ringan</option>
+            <option value="Rusak Berat"  <?= old('kondisi') == 'Rusak Berat'  ? 'selected' : '' ?>>Rusak Berat</option>
         </select>
     </div>
 
-    <!-- Metode Alih Media -->
-    <div style="margin-bottom: 12px;">
-        <label for="metode_alih_media"><strong>Metode Alih Media</strong></label><br>
-        <select id="metode_alih_media" name="metode_alih_media" style="width: 100%; max-width: 300px;">
-            <option value="Scan"         <?= old('metode_alih_media') == 'Scan'         ? 'selected' : '' ?>>Scan</option>
-            <option value="Fotografi"    <?= old('metode_alih_media') == 'Fotografi'    ? 'selected' : '' ?>>Fotografi</option>
-            <option value="Digitalisasi" <?= old('metode_alih_media') == 'Digitalisasi' ? 'selected' : '' ?>>Digitalisasi</option>
-        </select>
-    </div>
 
-    <!-- Skor Prioritas -->
-    <div style="margin-bottom: 12px;">
-        <label for="skor_prioritas"><strong>Skor Prioritas</strong></label><br>
-        <input type="number"
-               id="skor_prioritas"
-               name="skor_prioritas"
-               value="<?= old('skor_prioritas', 0) ?>"
-               min="0"
-               max="100"
-               style="width: 100px;">
-        <small>(0 = terendah)</small>
-    </div>
 
-    <!-- File Digital Arsip -->
+    <!-- File Arsip -->
     <div style="margin-bottom: 12px;">
         <label for="file_arsip"><strong>Upload Berkas Digital</strong></label>
         <em>(PDF, JPG, JPEG, PNG, TIFF — maks. 10 MB)</em><br>

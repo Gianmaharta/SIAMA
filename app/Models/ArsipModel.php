@@ -28,7 +28,12 @@ class ArsipModel extends BaseModel
         'status_verifikasi',
         'id_berita_acara',
         'created_by',
-        'updated_by'
+        'updated_by',
+        'skor_prioritas',
+        'status_autentikasi',
+        'catatan_penilaian',
+        'tanggal_penilaian',
+        'id_penilai'
     ];
 
     protected $validationRules = [
@@ -90,5 +95,28 @@ class ArsipModel extends BaseModel
     public function countByBidang($id_bidang): int
     {
         return $this->where('id_bidang', $id_bidang)->countAllResults();
+    }
+
+    // --- METODE UNTUK PENILAIAN ARSIP ---
+
+    public function getArsipBelumDinilai()
+    {
+        return $this->where('status_autentikasi', 'Belum Dinilai')->findAll();
+    }
+
+    public function getArsipSudahDinilai()
+    {
+        return $this->where('status_autentikasi !=', 'Belum Dinilai')->findAll();
+    }
+
+    public function simpanPenilaian($id_arsip, $dataPenilaian)
+    {
+        return $this->update($id_arsip, [
+            'skor_prioritas'     => $dataPenilaian['skor_prioritas'],
+            'status_autentikasi' => $dataPenilaian['status_autentikasi'],
+            'catatan_penilaian'  => $dataPenilaian['catatan_penilaian'],
+            'tanggal_penilaian'  => date('Y-m-d H:i:s'),
+            'id_penilai'         => $dataPenilaian['id_penilai']
+        ]);
     }
 }
