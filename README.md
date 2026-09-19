@@ -70,6 +70,27 @@ Gunakan salah satu **Email** berikut dengan **Password Default**: `Admin123!`
 
 > **PERHATIAN:** Setelah login, Anda akan langsung diredirect ke halaman `/change-password` untuk **mengganti password default**. Sistem tidak akan mengizinkan Anda mengakses _Dashboard_ maupun modul lainnya sebelum password berhasil diubah (minimal 8 karakter).
 
+### C. Testing Alur Modul Berita Acara (3 Penandatangan)
+Modul ini memiliki alur persetujuan (Approval Workflow) berjenjang. Untuk mengujinya, lakukan simulasi login menggunakan 3 akun secara berurutan:
+
+1. **Tahap 1: Pembuatan Draf (Arsiparis)**
+   - **Login**: `arsiparis@siama.test`
+   - **Navigasi**: Buka menu **Berita Acara**, klik **Tambah Berita Acara**.
+   - **Aksi**: Isi formulir (Nomor BA, pilih SPT aktif) dan centang daftar arsip yang ingin dimasukkan ke dalam BA. Klik simpan.
+   - **Status**: Berita Acara akan berstatus **`Draf_Kabid`** (Menunggu Verifikasi Kepala Bidang).
+
+2. **Tahap 2: Verifikasi Bidang (Kepala Bidang)**
+   - **Login**: `kabid@siama.test`
+   - **Navigasi**: Buka menu **Berita Acara**, lalu klik **Detail** pada Draf Berita Acara tadi.
+   - **Aksi**: Tinjau rincian arsip, lalu klik tombol **Verifikasi (Teruskan ke Pimpinan)**.
+   - **Status**: Berita Acara akan berstatus **`Menunggu_Pimpinan`**.
+
+3. **Tahap 3: Pengesahan Akhir (Pimpinan)**
+   - **Login**: `pimpinan@siama.test`
+   - **Navigasi**: Buka menu **Berita Acara**, klik **Detail**.
+   - **Aksi**: Klik tombol **Tandatangani & Sahkan Berita Acara**.
+   - **Status**: Berita Acara selesai dengan status **`Selesai_Disahkan`**. Anda juga dapat mencoba fitur Cetak (PDF/Print) jika tersedia.
+
 ---
 
 ## 🔄 Perintah Pendukung

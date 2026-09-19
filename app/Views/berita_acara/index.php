@@ -62,6 +62,11 @@ Berita Acara - SIAMA
                         <?php if ($row['status_persetujuan'] === 'Selesai' || $row['status_persetujuan'] === 'Draf_Pimpinan' || $row['status_persetujuan'] === 'Draf_Kabid') : ?>
                             | <a href="<?= base_url('/berita-acara/cetak/' . $row['id_berita_acara']) ?>" target="_blank">Cetak PDF</a>
                         <?php endif; ?>
+                        
+                        <?php if (session()->get('nama_role') === 'Arsiparis' && ($row['status_persetujuan'] === 'Draf_Kabid' || $row['status_persetujuan'] === 'Revisi')) : ?>
+                            | <a href="<?= base_url('/berita-acara/edit/' . $row['id_berita_acara']) ?>">Edit</a>
+                            | <a href="<?= base_url('/berita-acara/delete/' . $row['id_berita_acara']) ?>" onclick="return confirm('Yakin ingin menghapus Berita Acara ini? Arsip yang terkait akan dikembalikan statusnya.')">Hapus</a>
+                        <?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>

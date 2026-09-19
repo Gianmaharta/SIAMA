@@ -48,7 +48,7 @@ class BeritaAcara extends BaseController
         
         // Ambil SPT aktif milik user (atau semua SPT milik OPD)
         $data['spt_list'] = $this->sptModel->where('id_opd', $id_opd)
-                                           ->where('status', 'Berjalan')
+                                           ->where('status', 'Aktif')
                                            ->findAll();
 
         // Ambil Arsip milik OPD yang belum punya id_berita_acara
@@ -74,8 +74,12 @@ class BeritaAcara extends BaseController
                 return redirect()->back()->with('error', 'Pilih minimal 1 arsip.');
             }
 
-            // Simpan Header
-            $id_ba = \App\Helpers\generate_uuidv4(); // Kita asumsikan model akan generate, tapi butuh ID-nya
+            // Generate UUID manually for the header to use it in details
+            $data_uuid = random_bytes(16);
+            $data_uuid[6] = chr(ord($data_uuid[6]) & 0x0f | 0x40);
+            $data_uuid[8] = chr(ord($data_uuid[8]) & 0x3f | 0x80);
+            $id_ba = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data_uuid), 4));
+            
             $headerData = [
                 'id_berita_acara' => $id_ba,
                 'id_opd' => session()->get('id_opd'),
@@ -90,10 +94,14 @@ class BeritaAcara extends BaseController
 
             // Simpan Detail
             foreach ($arsip_ids as $id_arsip) {
-                $this->beritaAcaraDetailModel->insert([
+                $insertRes = $this->beritaAcaraDetailModel->insert([
                     'id_berita_acara' => $id_ba,
                     'id_arsip' => $id_arsip
                 ]);
+                
+                if (!$insertRes) {
+                    throw new \Exception('Gagal menyimpan rincian arsip: ' . implode(', ', $this->beritaAcaraDetailModel->errors()));
+                }
 
                 // Update status di tabel arsip agar tak dipilih lagi
                 $this->arsipModel->update($id_arsip, ['id_berita_acara' => $id_ba]);
@@ -107,6 +115,83 @@ class BeritaAcara extends BaseController
         } catch (\Exception $e) {
             $db->transRollback();
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function edit($id)
+    {
+        $ba = $this->beritaAcaraModel->find($id);
+
+        if (!$ba || !in_array($ba['status_persetujuan'], ['Draf_Kabid', 'Revisi'])) {
+            return redirect()->to('/berita-acara')->with('error', 'Berita Acara ini tidak dapat diedit.');
+        }
+
+        $id_opd = session()->get('id_opd');
+        $data['ba'] = $ba;
+        $data['spt_list'] = $this->sptModel->where('id_opd', $id_opd)
+                                           ->where('status', 'Aktif')
+                                           ->findAll();
+
+        return view('berita_acara/edit', $data);
+    }
+
+    public function update($id)
+    {
+        $ba = $this->beritaAcaraModel->find($id);
+
+        if (!$ba || !in_array($ba['status_persetujuan'], ['Draf_Kabid', 'Revisi'])) {
+            return redirect()->to('/berita-acara')->with('error', 'Berita Acara ini tidak dapat diedit.');
+        }
+
+        $nomor_ba = $this->request->getPost('nomor_ba');
+        $tanggal_ba = $this->request->getPost('tanggal_ba');
+        $id_spt = $this->request->getPost('id_spt');
+
+        $this->beritaAcaraModel->update($id, [
+            'nomor_ba' => $nomor_ba,
+            'tanggal_ba' => $tanggal_ba,
+            'id_spt' => $id_spt ?: null,
+        ]);
+
+        log_activity('Berita Acara', 'update', 'Memperbarui draf Berita Acara nomor: ' . $nomor_ba);
+        
+        return redirect()->to('/berita-acara')->with('success', 'Draf Berita Acara berhasil diperbarui.');
+    }
+
+    public function delete($id)
+    {
+        $ba = $this->beritaAcaraModel->find($id);
+
+        if (!$ba || !in_array($ba['status_persetujuan'], ['Draf_Kabid', 'Revisi'])) {
+            return redirect()->to('/berita-acara')->with('error', 'Berita Acara ini tidak dapat dihapus.');
+        }
+
+        $db = \Config\Database::connect();
+        $db->transBegin();
+
+        try {
+            // 1. Kosongkan id_berita_acara di tabel arsip
+            $arsipTerkait = $this->beritaAcaraDetailModel->where('id_berita_acara', $id)->findAll();
+            foreach ($arsipTerkait as $detail) {
+                $upd = $this->arsipModel->update($detail['id_arsip'], ['id_berita_acara' => null]);
+                if (!$upd) {
+                    throw new \Exception('Gagal mereset status arsip: ' . implode(',', $this->arsipModel->errors()));
+                }
+            }
+
+            // 2. Hapus detail
+            $this->beritaAcaraDetailModel->where('id_berita_acara', $id)->delete();
+
+            // 3. Hapus header
+            $this->beritaAcaraModel->delete($id);
+
+            $db->transCommit();
+            log_activity('Berita Acara', 'delete', 'Menghapus Berita Acara nomor: ' . $ba['nomor_ba']);
+            
+            return redirect()->to('/berita-acara')->with('success', 'Berita Acara berhasil dihapus beserta seluruh kaitannya.');
+        } catch (\Exception $e) {
+            $db->transRollback();
+            return redirect()->back()->with('error', 'Gagal menghapus Berita Acara: ' . $e->getMessage());
         }
     }
 

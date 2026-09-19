@@ -10,6 +10,14 @@
             <li><a href="<?= base_url('/penilaian') ?>">Penilaian Arsip</a></li>
         <?php endif; ?>
         <li><a href="<?= base_url('/berita-acara') ?>">Berita Acara</a></li>
-        <li><a href="#">Audit Log</a></li>
+        <?php if (session()->get('nama_role') === 'Admin_Pemkab') : ?>
+            <li>
+                Audit Log:
+                <ul>
+                    <li><a href="<?= base_url('/audit-log/access') ?>">Access Log</a></li>
+                    <li><a href="<?= base_url('/audit-log/activity') ?>">Activity Log</a></li>
+                </ul>
+            </li>
+        <?php endif; ?>
     </ul>
 </nav>

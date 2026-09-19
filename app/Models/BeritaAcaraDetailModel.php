@@ -7,13 +7,15 @@ use App\Models\BaseModel;
 class BeritaAcaraDetailModel extends BaseModel
 {
     protected $table            = 'berita_acara_detail';
-    protected $primaryKey       = 'id_ba_detail'; // Tabel ini aslinya punya PK UUID tidak?
+    protected $primaryKey       = 'id_berita_acara'; // No single PK exists, using one of the composite keys
     protected $useAutoIncrement = false;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
+    protected $useTimestamps    = false; // Tabel ini tidak punya created_at & updated_at
     protected $protectFields    = true;
+    protected $beforeInsert     = []; // Tidak perlu generateUuid & setCreatedBy
+    protected $beforeUpdate     = []; // Tidak perlu setUpdatedBy
     protected $allowedFields    = [
-        'id_ba_detail',
         'id_berita_acara',
         'id_arsip'
     ];

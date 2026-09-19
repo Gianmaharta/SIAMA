@@ -64,6 +64,9 @@ $routes->group('berita-acara', ['filter' => 'auth'], function($routes) {
     $routes->get('/', 'BeritaAcara::index');
     $routes->get('create', 'BeritaAcara::create', ['filter' => 'role:Arsiparis']);
     $routes->post('store', 'BeritaAcara::store', ['filter' => 'role:Arsiparis']);
+    $routes->get('edit/(:segment)', 'BeritaAcara::edit/$1', ['filter' => 'role:Arsiparis']);
+    $routes->post('update/(:segment)', 'BeritaAcara::update/$1', ['filter' => 'role:Arsiparis']);
+    $routes->get('delete/(:segment)', 'BeritaAcara::delete/$1', ['filter' => 'role:Arsiparis']);
     $routes->get('detail/(:segment)', 'BeritaAcara::detail/$1');
     $routes->post('verifikasi-kabid/(:segment)', 'BeritaAcara::verifikasiKabid/$1', ['filter' => 'role:Kepala_Bidang']);
     $routes->post('ttd-pimpinan/(:segment)', 'BeritaAcara::ttdPimpinan/$1', ['filter' => 'role:Pimpinan']);
@@ -98,4 +101,10 @@ $routes->group('arsip', ['filter' => 'auth'], static function ($routes) {
     $routes->get('edit/(:segment)', 'Arsip::edit/$1', ['filter' => 'role:Arsiparis']);
     $routes->post('update/(:segment)', 'Arsip::update/$1', ['filter' => 'role:Arsiparis']);
     $routes->get('delete/(:segment)', 'Arsip::delete/$1', ['filter' => 'role:Arsiparis']);
+});
+
+// --- Modul Audit Log (Khusus Admin_Pemkab) ---
+$routes->group('audit-log', ['filter' => ['auth', 'role:Admin_Pemkab']], static function ($routes) {
+    $routes->get('access', 'AuditLog::accessLog');
+    $routes->get('activity', 'AuditLog::activityLog');
 });
