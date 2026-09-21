@@ -17,6 +17,8 @@ class UserRoleModel extends BaseModel
 
     // Dates
     protected $useTimestamps = false;
+    protected $beforeInsert = [];
+    protected $beforeUpdate = [];
 
     /**
      * Get user data with their role name

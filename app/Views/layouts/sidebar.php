@@ -10,6 +10,9 @@
             <li><a href="<?= base_url('/penilaian') ?>">Penilaian Arsip</a></li>
         <?php endif; ?>
         <li><a href="<?= base_url('/berita-acara') ?>">Berita Acara</a></li>
+        <?php if (in_array(session()->get('nama_role'), ['Admin_Pemkab', 'Admin_OPD'])) : ?>
+            <li><a href="<?= base_url('/users') ?>">Manajemen Pengguna</a></li>
+        <?php endif; ?>
         <?php if (session()->get('nama_role') === 'Admin_Pemkab') : ?>
             <li>
                 Audit Log:

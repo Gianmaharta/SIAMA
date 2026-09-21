@@ -17,7 +17,6 @@ class UserModel extends BaseModel
         'email', 
         'password', 
         'nama', 
-        'nip',
         'id_opd', 
         'id_bidang',
         'is_active',

@@ -20,14 +20,14 @@ class Bidang extends BaseController
     public function index()
     {
         $session = session();
-        $id_role = $session->get('id_role');
+        $nama_role = $session->get('nama_role');
         $id_opd  = $session->get('id_opd');
 
-        // Jika Admin_OPD (role 3), tampilkan hanya bidang di OPD-nya
-        if ($id_role == 3) {
+        // Jika Admin_OPD, tampilkan hanya bidang di OPD-nya
+        if ($nama_role === 'Admin_OPD') {
             $data['bidangs'] = $this->bidangModel->getBidangWithOpd($id_opd);
         } else {
-            // Jika Admin_Pemkab (role 1), tampilkan semua
+            // Jika Admin_Pemkab, tampilkan semua
             $data['bidangs'] = $this->bidangModel->getBidangWithOpd();
         }
 
@@ -37,10 +37,10 @@ class Bidang extends BaseController
     public function create()
     {
         $session = session();
-        $id_role = $session->get('id_role');
+        $nama_role = $session->get('nama_role');
         $id_opd  = $session->get('id_opd');
 
-        if ($id_role == 3) {
+        if ($nama_role === 'Admin_OPD') {
             // Kunci pada OPD user tersebut
             $data['opds'] = $this->opdModel->where('id_opd', $id_opd)->findAll();
             $data['id_opd_locked'] = $id_opd;
@@ -76,15 +76,15 @@ class Bidang extends BaseController
         }
 
         $session = session();
-        $id_role = $session->get('id_role');
+        $nama_role = $session->get('nama_role');
         $id_opd  = $session->get('id_opd');
 
         // Proteksi agar Admin_OPD tidak mengedit bidang di OPD lain
-        if ($id_role == 3 && $data['bidang']['id_opd'] != $id_opd) {
+        if ($nama_role === 'Admin_OPD' && $data['bidang']['id_opd'] != $id_opd) {
             return redirect()->to('/bidang')->with('error', 'Akses ditolak.');
         }
 
-        if ($id_role == 3) {
+        if ($nama_role === 'Admin_OPD') {
             $data['opds'] = $this->opdModel->where('id_opd', $id_opd)->findAll();
             $data['id_opd_locked'] = $id_opd;
         } else {
@@ -104,10 +104,10 @@ class Bidang extends BaseController
         }
 
         $session = session();
-        $id_role = $session->get('id_role');
+        $nama_role = $session->get('nama_role');
         $id_opd  = $session->get('id_opd');
 
-        if ($id_role == 3 && $bidangLama['id_opd'] != $id_opd) {
+        if ($nama_role === 'Admin_OPD' && $bidangLama['id_opd'] != $id_opd) {
              return redirect()->to('/bidang')->with('error', 'Akses ditolak.');
         }
 
@@ -132,10 +132,10 @@ class Bidang extends BaseController
         }
 
         $session = session();
-        $id_role = $session->get('id_role');
+        $nama_role = $session->get('nama_role');
         $id_opd  = $session->get('id_opd');
 
-        if ($id_role == 3 && $bidangLama['id_opd'] != $id_opd) {
+        if ($nama_role === 'Admin_OPD' && $bidangLama['id_opd'] != $id_opd) {
              return redirect()->to('/bidang')->with('error', 'Akses ditolak.');
         }
 

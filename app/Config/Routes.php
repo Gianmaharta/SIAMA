@@ -103,6 +103,17 @@ $routes->group('arsip', ['filter' => 'auth'], static function ($routes) {
     $routes->get('delete/(:segment)', 'Arsip::delete/$1', ['filter' => 'role:Arsiparis']);
 });
 
+// --- Modul Manajemen Pengguna ---
+$routes->group('users', ['filter' => ['auth', 'role:Admin_Pemkab,Admin_OPD']], static function ($routes) {
+    $routes->get('/', 'UserController::index');
+    $routes->get('create', 'UserController::create');
+    $routes->post('store', 'UserController::store');
+    $routes->get('edit/(:segment)', 'UserController::edit/$1');
+    $routes->post('update/(:segment)', 'UserController::update/$1');
+    $routes->get('reset-password/(:segment)', 'UserController::resetPassword/$1');
+    $routes->get('delete/(:segment)', 'UserController::delete/$1');
+});
+
 // --- Modul Audit Log (Khusus Admin_Pemkab) ---
 $routes->group('audit-log', ['filter' => ['auth', 'role:Admin_Pemkab']], static function ($routes) {
     $routes->get('access', 'AuditLog::accessLog');
