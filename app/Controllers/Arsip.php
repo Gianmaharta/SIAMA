@@ -65,7 +65,7 @@ class Arsip extends BaseController
         $nama_role = $session->get('nama_role');
         $id_opd   = $session->get('id_opd');
         $id_bidang = $session->get('id_bidang');
-        $user_id  = $session->get('user_id'); // user_id is also a string UUID
+        $user_id  = $session->get('user_id');
 
         switch ($nama_role) {
             case 'Admin_Pemkab': // Admin_Pemkab: semua arsip se-Kabupaten
@@ -116,13 +116,11 @@ class Arsip extends BaseController
     {
         $session = session();
         $id_opd  = $session->get('id_opd');
-        $user_id = (int) $session->get('user_id');
+        $user_id = $session->get('user_id');
 
-        // Ambil daftar SPT Aktif yang terkait dengan OPD user (atau SPT yang user terlibat sebagai pelaksana)
-        $spt_list = $this->sptModel
-            ->where('id_opd', $id_opd)
-            ->where('status', 'Aktif')
-            ->findAll();
+        // Ambil daftar SPT Aktif yang ditugaskan secara spesifik kepada Arsiparis yang sedang login
+        $spt_list = $this->sptModel->getSptByPelaksana($user_id);
+
 
         // Ambil daftar Bidang dalam OPD user (untuk dropdown)
         $bidang_list = $this->bidangModel
@@ -136,11 +134,18 @@ class Arsip extends BaseController
             ->get()
             ->getResultArray();
 
+        $id_spt_query = $this->request->getGet('id_spt');
+        $spt_terpilih = null;
+        if (!empty($id_spt_query)) {
+            $spt_terpilih = $this->sptModel->find($id_spt_query);
+        }
+
         return view('arsip/create', [
             'title'            => 'Tambah Arsip Baru',
             'spt_list'         => $spt_list,
             'bidang_list'      => $bidang_list,
             'klasifikasi_list' => $klasifikasi_list,
+            'spt_terpilih'     => $spt_terpilih,
         ]);
     }
 
@@ -155,9 +160,9 @@ class Arsip extends BaseController
     public function store()
     {
         $session   = session();
-        $id_opd    = (int) $session->get('id_opd');
-        $id_bidang = (int) $session->get('id_bidang');
-        $user_id   = (int) $session->get('user_id');
+        $id_opd    = $session->get('id_opd');
+        $id_bidang = $session->get('id_bidang');
+        $user_id   = $session->get('user_id');
 
         // ----- Validasi Input Form -----
         if (! $this->validate([
@@ -220,6 +225,20 @@ class Arsip extends BaseController
 
         if ($this->arsipModel->errors()) {
             return redirect()->back()->withInput()->with('error', 'Gagal menyimpan data arsip. ' . implode(', ', $this->arsipModel->errors()));
+        }
+
+        // Tandai SPT selesai jika terkait dengan penugasan
+        $id_spt_assigned = $this->request->getPost('id_spt');
+        if (!empty($id_spt_assigned)) {
+            $this->sptModel->update($id_spt_assigned, ['status_penugasan' => 'selesai']);
+            
+            $assignmentModel = new \App\Models\SptAssignmentModel();
+            $assignment = $assignmentModel->where('id_spt', $id_spt_assigned)
+                                          ->where('id_user', $user_id)
+                                          ->first();
+            if ($assignment) {
+                $assignmentModel->update($assignment['id_assignment'], ['status' => 'selesai']);
+            }
         }
 
         return redirect()->to('/arsip')->with('success', 'Arsip berhasil ditambahkan.');
@@ -412,6 +431,37 @@ class Arsip extends BaseController
         // Hapus record dari database
         $this->arsipModel->delete($id);
 
-        return redirect()->to('/arsip')->with('success', 'Data arsip berhasil dihapus.');
+        return redirect()->to('/arsip')->with('success', 'Data arsip berhasil dihapus secara permanen.');
+    }
+
+    // =========================================================================
+    // verify() — Verifikasi Arsip oleh Kepala Bidang
+    // =========================================================================
+
+    public function verify($id)
+    {
+        $session = session();
+        if ($session->get('nama_role') !== 'Kepala_Bidang') {
+            return redirect()->to('/arsip')->with('error', 'Akses ditolak. Hanya Kepala Bidang yang dapat memverifikasi arsip.');
+        }
+
+        $arsip = $this->arsipModel->find($id);
+
+        if (! $arsip) {
+            return redirect()->to('/arsip')->with('error', 'Arsip tidak ditemukan.');
+        }
+
+        if ($arsip['status_verifikasi'] !== 'Menunggu') {
+            return redirect()->to('/arsip')->with('error', 'Arsip ini sudah diverifikasi.');
+        }
+
+        // Pastikan Kabid hanya bisa memverifikasi arsip di OPD-nya
+        if ($arsip['id_opd'] != $session->get('id_opd')) {
+            return redirect()->to('/arsip')->with('error', 'Anda tidak berhak memverifikasi arsip dari OPD lain.');
+        }
+
+        $this->arsipModel->update($id, ['status_verifikasi' => 'Selesai']);
+
+        return redirect()->to('/arsip')->with('success', 'Arsip berhasil diverifikasi.');
     }
 }

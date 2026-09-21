@@ -15,6 +15,10 @@ class SptPelaksanaModel extends BaseModel
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     
+    protected $useTimestamps    = false;
+    protected $beforeInsert     = [];
+    protected $beforeUpdate     = [];
+
     // id_bidang juga ada di tabel berdasarkan migration 2026-01-01-000008_CreateSptPelaksanaTable.php
     protected $allowedFields    = ['id_spt', 'id_user', 'id_bidang']; 
 

@@ -79,6 +79,13 @@ Daftar Arsip Digital - SIAMA
                                 <button type="button">Hapus</button>
                             </a>
                         <?php endif; ?>
+                        
+                        <?php if ($nama_role === 'Kepala_Bidang' && $row['status_verifikasi'] === 'Menunggu') : ?>
+                            <form action="<?= base_url('/arsip/verify/' . $row['id_arsip']) ?>" method="POST" style="display:inline-block; margin-left: 5px;">
+                                <?= csrf_field() ?>
+                                <button type="submit" style="background-color: #27ae60; color: white; border: none; padding: 4px 8px; cursor: pointer; border-radius: 3px;" onclick="return confirm('Verifikasi arsip ini sebagai Selesai?')">Verifikasi</button>
+                            </form>
+                        <?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>

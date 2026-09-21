@@ -58,7 +58,8 @@ class Auth extends BaseController
                     'nama_lengkap'        => $user['nama'],
                     'id_role'             => $user['id_role'],
                     'nama_role'           => $user['nama_role'],
-                    'id_opd'              => $user['id_opd'] ?? null, 
+                    'id_opd'              => $user['id_opd'] ?? null,
+                    'id_bidang'           => $user['id_bidang'] ?? null,
                     'isLoggedIn'          => true,
                     'is_default_password' => $user['is_default_password'] ?? 0
                 ];

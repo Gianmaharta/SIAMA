@@ -15,9 +15,16 @@ Detail SPT - SIAMA
     
     <hr>
     <p><strong>Perihal Penugasan:</strong></p>
-    <div style="padding: 10px; background-color: #fff; border: 1px dashed #999;">
+    <div style="padding: 10px; background-color: #fff; border: 1px dashed #999; margin-bottom: 15px;">
         <?= nl2br(esc($spt['perihal'])) ?>
     </div>
+
+    <?php if (!empty($spt['file_spt'])) : ?>
+        <p><strong>Dokumen Fisik SPT:</strong></p>
+        <a href="<?= base_url('uploads/spt/' . $spt['file_spt']) ?>" target="_blank" style="display: inline-block; background-color: #e74c3c; color: white; padding: 10px 20px; text-decoration: none; font-weight: bold; border-radius: 4px;">
+            📄 Lihat Dokumen SPT (PDF)
+        </a>
+    <?php endif; ?>
 </div>
 
 <h3>Daftar Pelaksana Tugas (Arsiparis):</h3>
@@ -32,7 +39,11 @@ Detail SPT - SIAMA
 <?php endif; ?>
 
 <div style="margin-top: 20px;">
-    <a href="<?= base_url('/spt') ?>"><button type="button">Kembali ke Daftar SPT</button></a>
+    <?php $nama_role = session()->get('nama_role'); ?>
+    <?php if (in_array($nama_role, ['Kepala_Bidang', 'Admin_OPD']) && $spt['status_penugasan'] === 'belum_ditugaskan') : ?>
+        <a href="<?= base_url('/spt/assign/' . $spt['id_spt']) ?>"><button type="button" style="background-color: #3498db; color: white; border: none; padding: 8px 15px; cursor: pointer; margin-right: 10px;">Tugaskan Arsiparis</button></a>
+    <?php endif; ?>
+    <a href="<?= base_url('/spt') ?>"><button type="button" style="padding: 8px 15px;">Kembali ke Daftar SPT</button></a>
 </div>
 
 <?= $this->endSection() ?>

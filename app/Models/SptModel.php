@@ -13,6 +13,10 @@ class SptModel extends BaseModel
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     
+    protected $useTimestamps    = false;
+    protected $beforeInsert     = ['generateUuid'];
+    protected $beforeUpdate     = [];
+
     protected $allowedFields    = [
         'id_spt',
         'nomor_spt', 
@@ -22,6 +26,7 @@ class SptModel extends BaseModel
         'tanggal_mulai', 
         'tanggal_selesai', 
         'status', 
+        'status_penugasan',
         'id_pimpinan',
         'file_spt',
         'created_by',
@@ -76,20 +81,21 @@ class SptModel extends BaseModel
         return $this->where('id_opd', $id_opd)->findAll();
     }
 
-    // Mendapatkan daftar SPT dimana user tersebut ditugaskan
     public function getSptByPelaksana($user_id)
     {
-        return $this->select('spt.*')
-                    ->join('spt_pelaksana', 'spt_pelaksana.id_spt = spt.id_spt')
-                    ->where('spt_pelaksana.id_user', $user_id)
+        return $this->select('spt.*, spt_assignments.status as assignment_status')
+                    ->join('spt_assignments', 'spt_assignments.id_spt = spt.id_spt')
+                    ->where('spt_assignments.id_user', $user_id)
+                    ->where('spt_assignments.status !=', 'selesai')
+                    ->where('spt.status', 'Aktif')
                     ->findAll();
     }
 
     // Untuk perhitungan dashboard pelaksana
     public function countByPelaksana($id_user)
     {
-        return $this->join('spt_pelaksana', 'spt.id_spt = spt_pelaksana.id_spt')
-                    ->where('spt_pelaksana.id_user', $id_user)
+        return $this->join('spt_assignments', 'spt.id_spt = spt_assignments.id_spt')
+                    ->where('spt_assignments.id_user', $id_user)
                     ->countAllResults();
     }
 }

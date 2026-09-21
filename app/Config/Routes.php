@@ -84,9 +84,17 @@ $routes->group('penilaian', ['filter' => 'role:Admin_Pemkab'], function($routes)
 // --- Modul Surat Perintah Tugas (SPT) ---
 $routes->group('spt', ['filter' => 'auth'], static function ($routes) {
     $routes->get('/', 'Spt::index');
-    $routes->get('create', 'Spt::create', ['filter' => 'role:Pimpinan,Admin_OPD']);
-    $routes->post('store', 'Spt::store', ['filter' => 'role:Pimpinan,Admin_OPD']);
+    $routes->get('create', 'Spt::create', ['filter' => 'role:Pimpinan']);
+    $routes->post('store', 'Spt::store', ['filter' => 'role:Pimpinan']);
     $routes->get('detail/(:segment)', 'Spt::detail/$1');
+    $routes->post('delete/(:segment)', 'Spt::delete/$1', ['filter' => 'role:Pimpinan']);
+    
+    // Penugasan Arsiparis oleh Kabid / Admin OPD
+    $routes->get('assign/(:segment)', 'Spt::assign/$1', ['filter' => 'role:Kepala_Bidang,Admin_OPD']);
+    $routes->post('process-assign/(:segment)', 'Spt::processAssign/$1', ['filter' => 'role:Kepala_Bidang,Admin_OPD']);
+    
+    // Mulai proses (Arsiparis)
+    $routes->post('start-process/(:segment)', 'Spt::startProcess/$1', ['filter' => 'role:Arsiparis']);
 });
 
 // --- Modul Pengelolaan Arsip Digital ---
@@ -101,6 +109,9 @@ $routes->group('arsip', ['filter' => 'auth'], static function ($routes) {
     $routes->get('edit/(:segment)', 'Arsip::edit/$1', ['filter' => 'role:Arsiparis']);
     $routes->post('update/(:segment)', 'Arsip::update/$1', ['filter' => 'role:Arsiparis']);
     $routes->get('delete/(:segment)', 'Arsip::delete/$1', ['filter' => 'role:Arsiparis']);
+
+    // Khusus Kepala Bidang: Verifikasi Arsip
+    $routes->post('verify/(:segment)', 'Arsip::verify/$1', ['filter' => 'role:Kepala_Bidang']);
 });
 
 // --- Modul Manajemen Pengguna ---

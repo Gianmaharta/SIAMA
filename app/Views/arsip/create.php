@@ -16,6 +16,15 @@ Tambah Arsip Baru - SIAMA
 <form action="<?= base_url('/arsip/store') ?>" method="post" enctype="multipart/form-data">
     <?= csrf_field() ?>
 
+    <?php if (!empty($spt_terpilih)) : ?>
+        <div style="background-color: #d1ecf1; border-left: 4px solid #0c5460; padding: 10px; margin-bottom: 15px;">
+            <strong>ℹ️ Arsip ini terhubung dengan SPT:</strong><br>
+            Nomor SPT: <?= esc($spt_terpilih['nomor_spt']) ?><br>
+            Perihal: <?= esc($spt_terpilih['perihal']) ?>
+        </div>
+        <input type="hidden" name="id_spt" value="<?= esc($spt_terpilih['id_spt']) ?>">
+    <?php endif; ?>
+
     <!-- Nomor Arsip -->
     <div style="margin-bottom: 12px;">
         <label for="nomor_arsip"><strong>Nomor Arsip <span style="color:red;">*</span></strong></label><br>
