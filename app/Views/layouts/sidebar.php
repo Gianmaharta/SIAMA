@@ -22,5 +22,22 @@
                 </ul>
             </li>
         <?php endif; ?>
+        <?php if (in_array(session()->get('nama_role'), ['Admin_Pemkab', 'Admin_OPD'])) : ?>
+            <li><a href="<?= base_url('/jra') ?>">Master JRA</a></li>
+        <?php endif; ?>
+        <?php if (in_array(session()->get('nama_role'), ['Admin_Pemkab', 'Admin_OPD', 'Pimpinan', 'Kepala_Bidang', 'Arsiparis'])) : ?>
+            <li>
+                <?php
+                    $notifModel = new \App\Models\NotificationModel();
+                    $unread = $notifModel->getUnreadCount(session()->get('user_id'));
+                ?>
+                <a href="<?= base_url('/notification') ?>">
+                    Notifikasi 
+                    <?php if ($unread > 0): ?>
+                        <span style="background-color: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 12px;"><?= $unread ?></span>
+                    <?php endif; ?>
+                </a>
+            </li>
+        <?php endif; ?>
     </ul>
 </nav>

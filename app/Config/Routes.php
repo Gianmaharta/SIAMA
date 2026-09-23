@@ -59,6 +59,34 @@ $routes->group('bidang', ['filter' => ['auth', 'role:Admin_Pemkab,Admin_OPD']], 
     $routes->get('delete/(:segment)', 'Bidang::delete/$1');
 });
 
+// --- Modul Master Kode Klasifikasi ---
+$routes->group('kode-klasifikasi', ['filter' => 'auth'], static function ($routes) {
+    $routes->get('/', 'KodeKlasifikasi::index');
+    $routes->get('create', 'KodeKlasifikasi::create', ['filter' => 'role:Admin_Pemkab']);
+    $routes->post('store', 'KodeKlasifikasi::store', ['filter' => 'role:Admin_Pemkab']);
+    $routes->get('edit/(:segment)', 'KodeKlasifikasi::edit/$1', ['filter' => 'role:Admin_Pemkab']);
+    $routes->post('update/(:segment)', 'KodeKlasifikasi::update/$1', ['filter' => 'role:Admin_Pemkab']);
+    $routes->get('delete/(:segment)', 'KodeKlasifikasi::delete/$1', ['filter' => 'role:Admin_Pemkab']);
+});
+
+// --- Modul Master JRA ---
+$routes->group('jra', ['filter' => 'auth'], static function ($routes) {
+    $routes->get('/', 'Jra::index', ['filter' => 'role:Admin_Pemkab,Admin_OPD']);
+    $routes->get('create', 'Jra::create', ['filter' => 'role:Admin_Pemkab,Admin_OPD']);
+    $routes->post('store', 'Jra::store', ['filter' => 'role:Admin_Pemkab,Admin_OPD']);
+    $routes->get('edit/(:segment)', 'Jra::edit/$1', ['filter' => 'role:Admin_Pemkab,Admin_OPD']);
+    $routes->post('update/(:segment)', 'Jra::update/$1', ['filter' => 'role:Admin_Pemkab,Admin_OPD']);
+    $routes->get('delete/(:segment)', 'Jra::delete/$1', ['filter' => 'role:Admin_Pemkab,Admin_OPD']);
+    // API untuk dropdown (Bisa diakses oleh Arsiparis saat create arsip)
+    $routes->get('get_by_klasifikasi/(:segment)', 'Jra::get_by_klasifikasi/$1');
+});
+
+// --- Notifikasi ---
+$routes->group('notification', ['filter' => 'auth'], static function ($routes) {
+    $routes->get('/', 'Notification::index');
+    $routes->post('action/(:segment)', 'Notification::action/$1');
+});
+
 // --- Modul Berita Acara ---
 $routes->group('berita-acara', ['filter' => 'auth'], function($routes) {
     $routes->get('/', 'BeritaAcara::index');

@@ -54,6 +54,32 @@ Edit Data Arsip - SIAMA
         </select>
     </div>
 
+    <!-- Info JRA (Auto-fill) -->
+    <div id="jra_info_box" style="margin-bottom: 15px; padding: 10px; border: 1px solid #ccc; background-color: #f9f9f9; display: none; max-width: 400px;">
+        <strong>Informasi Jadwal Retensi Arsip (JRA)</strong><br>
+        <span style="font-size: 12px; color: #555;">(Terisi otomatis berdasarkan Kode Klasifikasi)</span>
+        <div style="margin-top: 10px;">
+            <label>Retensi Aktif (Tahun):</label>
+            <input type="text" id="jra_retensi_aktif" name="retensi_aktif" readonly style="width: 100%; background: #eee; border: 1px solid #ddd;">
+        </div>
+        <div style="margin-top: 10px;">
+            <label>Retensi Inaktif (Tahun):</label>
+            <input type="text" id="jra_retensi_inaktif" name="retensi_inaktif" readonly style="width: 100%; background: #eee; border: 1px solid #ddd;">
+        </div>
+        <div style="margin-top: 10px;">
+            <label>Keterangan Retensi:</label>
+            <input type="text" id="jra_keterangan" name="keterangan_retensi" readonly style="width: 100%; background: #eee; border: 1px solid #ddd;">
+        </div>
+        <div style="margin-top: 10px;">
+            <label>Tingkat Keamanan:</label>
+            <input type="text" id="jra_keamanan" name="klasifikasi_keamanan" readonly style="width: 100%; background: #eee; border: 1px solid #ddd;">
+        </div>
+        <div style="margin-top: 10px;">
+            <label>Dasar Pertimbangan:</label>
+            <input type="text" id="jra_dasar" name="dasar_pertimbangan" readonly style="width: 100%; background: #eee; border: 1px solid #ddd;">
+        </div>
+    </div>
+
     <!-- Bidang -->
     <div style="margin-bottom: 12px;">
         <label for="id_bidang"><strong>Bidang <span style="color:red;">*</span></strong></label><br>
@@ -94,18 +120,6 @@ Edit Data Arsip - SIAMA
                style="width: 150px;">
     </div>
 
-    <!-- Tingkat Perkembangan -->
-    <div style="margin-bottom: 12px;">
-        <label for="tingkat_perkembangan"><strong>Tingkat Perkembangan</strong></label><br>
-        <select id="tingkat_perkembangan" name="tingkat_perkembangan" style="width: 100%; max-width: 300px;">
-            <option value="">-- Pilih Kategori --</option>
-            <?php $currentJra = old('tingkat_perkembangan', $arsip['tingkat_perkembangan']); ?>
-            <option value="Permanen"    <?= $currentJra == 'Permanen'    ? 'selected' : '' ?>>Permanen</option>
-            <option value="Musnah"      <?= $currentJra == 'Musnah'      ? 'selected' : '' ?>>Musnah</option>
-            <option value="Diserahkan"  <?= $currentJra == 'Diserahkan'  ? 'selected' : '' ?>>Diserahkan</option>
-        </select>
-    </div>
-
     <!-- Kondisi Fisik -->
     <div style="margin-bottom: 12px;">
         <label for="kondisi"><strong>Kondisi Fisik</strong></label><br>
@@ -144,6 +158,24 @@ Edit Data Arsip - SIAMA
                id="file_arsip"
                name="file_arsip"
                accept=".pdf,.jpg,.jpeg,.png,.tiff,.tif">
+        
+        <!-- Opsi Watermark -->
+        <?php if ($arsip['is_watermarked'] == 0) : ?>
+            <div style="margin-top: 15px; padding: 10px; border: 1px solid #ccc; background-color: #f0f8ff; max-width: 400px;">
+                <label><strong>Opsi Keamanan PDF (Watermark)</strong></label><br>
+                <label style="font-weight: normal; font-size: 14px;">
+                    <input type="checkbox" name="generate_watermark" value="1">
+                    Generate Watermark Sistem (Khusus PDF)
+                </label>
+                <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                    Centang untuk menimpa PDF saat ini (atau PDF baru yang diupload) dengan Watermark Sistem.
+                </div>
+            </div>
+        <?php else: ?>
+            <div style="margin-top: 15px; padding: 10px; border: 1px solid #c3e6cb; background-color: #d4edda; max-width: 400px; color: #155724;">
+                <strong>✔ Berkas sudah memiliki Watermark Sistem.</strong>
+            </div>
+        <?php endif; ?>
         <?php if (! empty($arsip['file_arsip'])) : ?>
             <br>
             <small>
@@ -164,4 +196,49 @@ Edit Data Arsip - SIAMA
         </a>
     </div>
 </form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const klasifikasiSelect = document.getElementById('id_kode_klasifikasi');
+    const jraBox = document.getElementById('jra_info_box');
+    
+    function fetchJra(id) {
+        if (!id) {
+            jraBox.style.display = 'none';
+            return;
+        }
+        
+        fetch('<?= base_url('jra/get_by_klasifikasi/') ?>' + id)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    jraBox.style.display = 'block';
+                    document.getElementById('jra_retensi_aktif').value = data.data.retensi_aktif;
+                    document.getElementById('jra_retensi_inaktif').value = data.data.retensi_inaktif;
+                    document.getElementById('jra_keterangan').value = data.data.keterangan_retensi;
+                    document.getElementById('jra_keamanan').value = data.data.klasifikasi_keamanan;
+                    document.getElementById('jra_dasar').value = data.data.dasar_pertimbangan || '-';
+                } else {
+                    jraBox.style.display = 'block';
+                    document.getElementById('jra_retensi_aktif').value = 'Tidak ada JRA';
+                    document.getElementById('jra_retensi_inaktif').value = 'Tidak ada JRA';
+                    document.getElementById('jra_keterangan').value = 'Tidak ada JRA';
+                    document.getElementById('jra_keamanan').value = 'Tidak ada JRA';
+                    document.getElementById('jra_dasar').value = 'Tidak ada JRA';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching JRA:', error);
+            });
+    }
+
+    klasifikasiSelect.addEventListener('change', function() {
+        fetchJra(this.value);
+    });
+
+    if (klasifikasiSelect.value) {
+        fetchJra(klasifikasiSelect.value);
+    }
+});
+</script>
 <?= $this->endSection() ?>

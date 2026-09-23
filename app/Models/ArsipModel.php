@@ -33,7 +33,12 @@ class ArsipModel extends BaseModel
         'status_autentikasi',
         'catatan_penilaian',
         'tanggal_penilaian',
-        'id_penilai'
+        'id_penilai',
+        'tanggal_retensi_aktif_berakhir',
+        'status_retensi_aktif',
+        'tanggal_retensi_inaktif_berakhir',
+        'is_watermarked',
+        'watermark_source'
     ];
 
     protected $validationRules = [

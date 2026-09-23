@@ -58,13 +58,32 @@ Detail Arsip - SIAMA
             <td><?= esc($arsip['kurun_waktu'] ?? '-') ?></td>
         </tr>
         <tr>
-            <th style="text-align: left; background: #f2f2f2;">Tingkat Perkembangan</th>
-            <td><?= esc($arsip['tingkat_perkembangan'] ?: '-') ?></td>
-        </tr>
-        <tr>
             <th style="text-align: left; background: #f2f2f2;">Kondisi Fisik</th>
             <td><?= esc($arsip['kondisi']) ?></td>
         </tr>
+        <tr>
+            <th style="text-align: left; background: #f2f2f2;">Status Retensi</th>
+            <td>
+                <?php 
+                    $status = esc($arsip['status_retensi_aktif'] ?? 'Aktif');
+                    if ($status === 'Aktif') {
+                        echo '<span style="background-color: #28a745; color: white; padding: 2px 5px; border-radius: 3px;">Aktif</span>';
+                    } elseif ($status === 'Inaktif') {
+                        echo '<span style="background-color: #ffc107; color: black; padding: 2px 5px; border-radius: 3px;">Inaktif</span>';
+                    } elseif ($status === 'Musnah' || $status === 'Permanen') {
+                        echo '<span style="background-color: ' . ($status === 'Musnah' ? '#dc3545' : '#17a2b8') . '; color: white; padding: 2px 5px; border-radius: 3px;">' . $status . '</span>';
+                    } else {
+                        echo esc($status);
+                    }
+                ?>
+            </td>
+        </tr>
+        <?php if (!empty($arsip['tanggal_retensi_inaktif_berakhir'])): ?>
+        <tr>
+            <th style="text-align: left; background: #f2f2f2;">Berakhir Inaktif</th>
+            <td><?= date('d M Y', strtotime($arsip['tanggal_retensi_inaktif_berakhir'])) ?></td>
+        </tr>
+        <?php endif; ?>
         <tr>
             <th style="text-align: left; background: #f2f2f2;">Skor Prioritas</th>
             <td><?= esc($arsip['skor_prioritas'] ?? 'Belum dinilai') ?></td>
@@ -84,7 +103,9 @@ Detail Arsip - SIAMA
         <tr>
             <th style="text-align: left; background: #f2f2f2;">Berkas Digital</th>
             <td>
-                <?php if ($file_url !== null) : ?>
+                <?php if (isset($arsip['status_retensi_aktif']) && $arsip['status_retensi_aktif'] === 'Musnah') : ?>
+                    <em>Berkas telah dimusnahkan secara sistem.</em>
+                <?php elseif ($file_url !== null) : ?>
                     <a href="<?= $file_url ?>" target="_blank">
                         <button type="button">&#128196; Lihat / Download Berkas</button>
                     </a>

@@ -51,9 +51,18 @@ Surat Perintah Tugas (SPT) - SIAMA
                     <td><?= esc($row['status']) ?></td>
                     <td><?= esc($row['status_penugasan']) ?></td>
                     <td>
-                        <a href="<?= base_url('/spt/detail/' . $row['id_spt']) ?>"><button type="button">Detail</button></a>
+
                         <?php if (!empty($row['file_spt'])) : ?>
-                            <a href="<?= base_url('uploads/spt/' . $row['file_spt']) ?>" target="_blank" style="margin-left: 5px; text-decoration: none; font-size: 14px;">📄 PDF</a>
+                            <button type="button" onclick="document.getElementById('modal_pdf_<?= $row['id_spt'] ?>').style.display='block'" style="background-color: #f39c12; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; margin-left: 5px;">Lihat Dokumen</button>
+                            
+                            <!-- Modal PDF -->
+                            <div id="modal_pdf_<?= $row['id_spt'] ?>" style="display:none; position:fixed; z-index:999; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.8);">
+                                <div style="background-color:#fff; margin: 5% auto; padding: 20px; border: 1px solid #888; width: 80%; height: 80%; position:relative;">
+                                    <span onclick="document.getElementById('modal_pdf_<?= $row['id_spt'] ?>').style.display='none'" style="position:absolute; top:10px; right:20px; color:#aaa; font-size:28px; font-weight:bold; cursor:pointer;">&times;</span>
+                                    <h3>Viewer Dokumen SPT: <?= esc($row['nomor_spt']) ?></h3>
+                                    <iframe src="<?= base_url('uploads/spt/' . $row['file_spt']) ?>" width="100%" height="90%" style="border:none;"></iframe>
+                                </div>
+                            </div>
                         <?php endif; ?>
                         
                         <?php if ($nama_role === 'Pimpinan') : ?>

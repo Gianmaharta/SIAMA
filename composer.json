@@ -13,6 +13,8 @@
         "php": "^8.2",
         "codeigniter4/framework": "^4.7",
         "dompdf/dompdf": "^3.1",
+        "setasign/fpdf": "^1.9",
+        "setasign/fpdi": "^2.6",
         "zircote/swagger-php": "^6.8"
     },
     "require-dev": {

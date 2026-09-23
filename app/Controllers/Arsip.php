@@ -171,7 +171,6 @@ class Arsip extends BaseController
             'id_kode_klasifikasi' => 'required',
             'id_bidang'        => 'required',
             'kurun_waktu'      => 'permit_empty|max_length[50]',
-            'tingkat_perkembangan' => 'permit_empty|max_length[50]',
             'jumlah'           => 'permit_empty|numeric',
             'kondisi'          => 'permit_empty|max_length[50]',
         ])) {
@@ -199,6 +198,39 @@ class Arsip extends BaseController
             // Generate nama file unik & pindahkan ke folder upload
             $fileDigitalName = $fileObj->getRandomName();
             $fileObj->move(self::UPLOAD_PATH, $fileDigitalName);
+            
+            // Proses Watermark jika dicentang dan file adalah PDF
+            if ($this->request->getPost('generate_watermark') && $ext === 'pdf') {
+                $watermarkService = new \App\Services\WatermarkService();
+                $opd_name = 'DINAS/OPD TERKAIT'; // Default
+                // Cari nama OPD dari database
+                $db = \Config\Database::connect();
+                $opd_row = $db->table('opd')->where('id_opd', $id_opd)->get()->getRow();
+                if ($opd_row) {
+                    $opd_name = $opd_row->nama_opd;
+                }
+                
+                $fullPath = self::UPLOAD_PATH . '/' . $fileDigitalName;
+                $watermarkedPath = self::UPLOAD_PATH . '/wm_' . $fileDigitalName;
+                
+                if ($watermarkService->generateWatermark($fullPath, $watermarkedPath, $opd_name)) {
+                    // Hapus file asli dan ganti nama file
+                    unlink($fullPath);
+                    $fileDigitalName = 'wm_' . $fileDigitalName;
+                    $is_watermarked = 1;
+                    $watermark_source = 'system';
+                }
+            }
+        }
+
+        $is_watermarked = $is_watermarked ?? 0;
+        $watermark_source = $watermark_source ?? 'none';
+        
+        // Hitung JRA
+        $retensi_aktif = (int) $this->request->getPost('retensi_aktif');
+        $tanggal_retensi_aktif_berakhir = null;
+        if ($retensi_aktif > 0) {
+            $tanggal_retensi_aktif_berakhir = date('Y-m-d', strtotime("+$retensi_aktif years"));
         }
 
         // ----- Susun Data untuk Disimpan -----
@@ -210,7 +242,6 @@ class Arsip extends BaseController
             'nomor_arsip'       => $this->request->getPost('nomor_arsip'),
             'nama_arsip'        => $this->request->getPost('nama_arsip'),
             'kurun_waktu'       => $this->request->getPost('kurun_waktu') ?: null,
-            'tingkat_perkembangan' => $this->request->getPost('tingkat_perkembangan') ?: null,
             'jumlah'            => (int) ($this->request->getPost('jumlah') ?: 0),
             'kondisi'           => $this->request->getPost('kondisi') ?: 'Baik',
             'file_arsip'        => $fileDigitalName,
@@ -218,6 +249,10 @@ class Arsip extends BaseController
             'status_autentikasi' => 'Belum Dinilai',
             'created_by'        => $user_id,
             'id_user_upload'    => $user_id,
+            'tanggal_retensi_aktif_berakhir' => $tanggal_retensi_aktif_berakhir,
+            'status_retensi_aktif'           => 'Aktif',
+            'is_watermarked'                 => $is_watermarked,
+            'watermark_source'               => $watermark_source,
         ];
 
         // Nonaktifkan validasi model sementara (sudah divalidasi manual di atas)
@@ -346,7 +381,6 @@ class Arsip extends BaseController
             'id_kode_klasifikasi' => 'required',
             'id_bidang'        => 'required',
             'kurun_waktu'      => 'permit_empty|max_length[50]',
-            'tingkat_perkembangan' => 'permit_empty|max_length[50]',
             'jumlah'           => 'permit_empty|numeric',
             'kondisi'          => 'permit_empty|max_length[50]',
         ])) {
@@ -381,6 +415,42 @@ class Arsip extends BaseController
             $fileDigitalName = $fileObj->getRandomName();
             $fileObj->move(self::UPLOAD_PATH, $fileDigitalName);
         }
+        
+        $is_watermarked = $arsip['is_watermarked'];
+        $watermark_source = $arsip['watermark_source'];
+
+        // Proses Watermark jika dicentang dan file adalah PDF
+        if ($this->request->getPost('generate_watermark')) {
+            $ext = pathinfo($fileDigitalName, PATHINFO_EXTENSION);
+            if (strtolower($ext) === 'pdf' && $is_watermarked == 0) {
+                $watermarkService = new \App\Services\WatermarkService();
+                $opd_name = 'DINAS/OPD TERKAIT';
+                $db = \Config\Database::connect();
+                $opd_row = $db->table('opd')->where('id_opd', $arsip['id_opd'])->get()->getRow();
+                if ($opd_row) {
+                    $opd_name = $opd_row->nama_opd;
+                }
+                
+                $fullPath = self::UPLOAD_PATH . '/' . $fileDigitalName;
+                $watermarkedPath = self::UPLOAD_PATH . '/wm_' . basename($fileDigitalName);
+                
+                if ($watermarkService->generateWatermark($fullPath, $watermarkedPath, $opd_name)) {
+                    if (file_exists($fullPath)) {
+                        unlink($fullPath);
+                    }
+                    $fileDigitalName = 'wm_' . basename($fileDigitalName);
+                    $is_watermarked = 1;
+                    $watermark_source = 'system';
+                }
+            }
+        }
+        
+        // Hitung JRA
+        $retensi_aktif = (int) $this->request->getPost('retensi_aktif');
+        $tanggal_retensi_aktif_berakhir = $arsip['tanggal_retensi_aktif_berakhir'];
+        if ($retensi_aktif > 0) {
+            $tanggal_retensi_aktif_berakhir = date('Y-m-d', strtotime("+$retensi_aktif years"));
+        }
 
         // ----- Susun Data Update -----
         $data = [
@@ -390,11 +460,13 @@ class Arsip extends BaseController
             'nomor_arsip'        => $this->request->getPost('nomor_arsip'),
             'nama_arsip'         => $this->request->getPost('nama_arsip'),
             'kurun_waktu'        => $this->request->getPost('kurun_waktu') ?: null,
-            'tingkat_perkembangan' => $this->request->getPost('tingkat_perkembangan') ?: null,
             'jumlah'             => (int) ($this->request->getPost('jumlah') ?: 0),
             'kondisi'            => $this->request->getPost('kondisi') ?: 'Baik',
             'file_arsip'         => $fileDigitalName,
             'status_verifikasi'  => $this->request->getPost('status_verifikasi') ?: $arsip['status_verifikasi'],
+            'tanggal_retensi_aktif_berakhir' => $tanggal_retensi_aktif_berakhir,
+            'is_watermarked'     => $is_watermarked,
+            'watermark_source'   => $watermark_source,
         ];
 
         $this->arsipModel->skipValidation(true)->update($id, $data);
@@ -425,6 +497,23 @@ class Arsip extends BaseController
             $filePath = self::UPLOAD_PATH . $arsip['file_arsip'];
             if (file_exists($filePath)) {
                 unlink($filePath);
+            }
+        }
+
+        // Cek jika terkait SPT, kembalikan status penugasannya
+        if (!empty($arsip['id_spt'])) {
+            $sptModel = new \App\Models\SptModel();
+            $sptAssignmentModel = new \App\Models\SptAssignmentModel();
+            
+            // Kembalikan SPT ke status ditugaskan (sehingga muncul lagi di dropdown)
+            $sptModel->update($arsip['id_spt'], ['status_penugasan' => 'ditugaskan']);
+            
+            // Kembalikan status penugasan user ke pending
+            $assignment = $sptAssignmentModel->where('id_spt', $arsip['id_spt'])
+                                             ->where('id_user', $arsip['created_by'])
+                                             ->first();
+            if ($assignment) {
+                $sptAssignmentModel->update($assignment['id_assignment'], ['status' => 'pending']);
             }
         }
 

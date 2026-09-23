@@ -38,6 +38,7 @@ Daftar Arsip Digital - SIAMA
             <th>Kode Klasifikasi</th>
             <th>Bidang</th>
             <th>Skor Prioritas</th>
+            <th>Status Retensi</th>
             <th>Status Verifikasi</th>
             <th>Berkas File</th>
             <th>Aksi</th>
@@ -58,9 +59,25 @@ Daftar Arsip Digital - SIAMA
                     </td>
                     <td><?= esc($row['nama_bidang'] ?? '-') ?></td>
                     <td><?= (! empty($row['skor_prioritas'])) ? esc($row['skor_prioritas']) : 'Belum Dinilai' ?></td>
+                    <td>
+                        <?php 
+                            $status = esc($row['status_retensi_aktif'] ?? 'Aktif');
+                            if ($status === 'Aktif') {
+                                echo '<span style="background-color: #28a745; color: white; padding: 2px 5px; border-radius: 3px;">Aktif</span>';
+                            } elseif ($status === 'Inaktif') {
+                                echo '<span style="background-color: #ffc107; color: black; padding: 2px 5px; border-radius: 3px;">Inaktif</span>';
+                            } elseif ($status === 'Musnah' || $status === 'Permanen') {
+                                echo '<span style="background-color: ' . ($status === 'Musnah' ? '#dc3545' : '#17a2b8') . '; color: white; padding: 2px 5px; border-radius: 3px;">' . $status . '</span>';
+                            } else {
+                                echo esc($status);
+                            }
+                        ?>
+                    </td>
                     <td><?= esc($row['status_verifikasi']) ?></td>
                     <td>
-                        <?php if (! empty($row['file_arsip'])) : ?>
+                        <?php if (isset($row['status_retensi_aktif']) && $row['status_retensi_aktif'] === 'Musnah') : ?>
+                            <em>Telah Dimusnahkan</em>
+                        <?php elseif (! empty($row['file_arsip'])) : ?>
                             <a href="<?= base_url('uploads/arsip/' . $row['file_arsip']) ?>" target="_blank">Lihat Berkas</a>
                         <?php else : ?>
                             <em>Belum ada</em>
