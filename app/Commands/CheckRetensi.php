@@ -31,7 +31,9 @@ class CheckRetensi extends BaseCommand
                                    ->findAll();
 
         if (empty($expiredArsip)) {
-            CLI::write('Tidak ada arsip yang melewati masa retensi aktif hari ini.', 'green');
+            CLI::write('Tidak ada arsip AKTIF yang melewati masa retensi hari ini.', 'green');
+        } else {
+            CLI::write('Ditemukan ' . count($expiredArsip) . ' arsip aktif yang kedaluwarsa. Memproses notifikasi...', 'yellow');
         }
 
         $count = 0;
@@ -68,6 +70,12 @@ class CheckRetensi extends BaseCommand
                                    ->where('tanggal_retensi_inaktif_berakhir !=', null)
                                    ->where('status_retensi_aktif', 'Inaktif')
                                    ->findAll();
+
+        if (empty($expiredInaktif)) {
+            CLI::write('Tidak ada arsip INAKTIF yang melewati masa retensi inaktif hari ini.', 'green');
+        } else {
+            CLI::write('Ditemukan ' . count($expiredInaktif) . ' arsip inaktif yang kedaluwarsa. Memproses notifikasi...', 'yellow');
+        }
 
         foreach ($expiredInaktif as $arsip) {
             $adminOpd = $userModel->select('users.*')

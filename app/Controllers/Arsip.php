@@ -210,8 +210,8 @@ class Arsip extends BaseController
                     $opd_name = $opd_row->nama_opd;
                 }
                 
-                $fullPath = self::UPLOAD_PATH . '/' . $fileDigitalName;
-                $watermarkedPath = self::UPLOAD_PATH . '/wm_' . $fileDigitalName;
+                $fullPath = self::UPLOAD_PATH . $fileDigitalName;
+                $watermarkedPath = self::UPLOAD_PATH . 'wm_' . $fileDigitalName;
                 
                 if ($watermarkService->generateWatermark($fullPath, $watermarkedPath, $opd_name)) {
                     // Hapus file asli dan ganti nama file
@@ -431,8 +431,8 @@ class Arsip extends BaseController
                     $opd_name = $opd_row->nama_opd;
                 }
                 
-                $fullPath = self::UPLOAD_PATH . '/' . $fileDigitalName;
-                $watermarkedPath = self::UPLOAD_PATH . '/wm_' . basename($fileDigitalName);
+                $fullPath = self::UPLOAD_PATH . $fileDigitalName;
+                $watermarkedPath = self::UPLOAD_PATH . 'wm_' . basename($fileDigitalName);
                 
                 if ($watermarkService->generateWatermark($fullPath, $watermarkedPath, $opd_name)) {
                     if (file_exists($fullPath)) {
@@ -492,13 +492,9 @@ class Arsip extends BaseController
             return redirect()->to('/arsip')->with('error', 'Data arsip tidak ditemukan.');
         }
 
-        // Hapus file fisik dari server (jika ada)
-        if (! empty($arsip['file_arsip'])) {
-            $filePath = self::UPLOAD_PATH . $arsip['file_arsip'];
-            if (file_exists($filePath)) {
-                unlink($filePath);
-            }
-        }
+        // Catatan: Sesuai aturan sistem, file PDF fisik TIDAK dihapus dari server
+        // untuk menjaga jejak audit dan pelestarian berkas digital.
+        // Hanya record di database yang akan dihapus.
 
         // Cek jika terkait SPT, kembalikan status penugasannya
         if (!empty($arsip['id_spt'])) {

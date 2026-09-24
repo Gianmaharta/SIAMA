@@ -9,6 +9,7 @@ class Jra extends BaseController
 {
     protected $jraModel;
     protected $klasifikasiModel;
+    protected $db;
 
     public function __construct()
     {

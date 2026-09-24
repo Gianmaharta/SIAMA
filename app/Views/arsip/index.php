@@ -108,7 +108,7 @@ Daftar Arsip Digital - SIAMA
             <?php endforeach; ?>
         <?php else : ?>
             <tr>
-                <td colspan="8" style="text-align: center;">
+                <td colspan="10" style="text-align: center;">
                     Belum ada data arsip.
                 </td>
             </tr>

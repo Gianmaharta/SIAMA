@@ -25,8 +25,9 @@ class Notification extends BaseController
         $data['title'] = 'Notifikasi Sistem';
         $data['notifications'] = $this->notifModel->getByUser($user_id);
 
-        // Tandai semua sebagai dibaca saat dibuka
-        $this->notifModel->where('id_user', $user_id)->set(['is_read' => 1])->update();
+        // Catatan: Notifikasi TIDAK langsung ditandai dibaca di sini.
+        // Notifikasi hanya ditandai dibaca setelah user mengambil aksi (di method action()).
+        // Ini memastikan badge notifikasi tetap aktif sampai user benar-benar menindaklanjuti.
 
         return view('notification/index', $data);
     }
@@ -49,6 +50,12 @@ class Notification extends BaseController
         $arsip = $this->arsipModel->find($id_arsip);
         if (!$arsip) {
             return redirect()->back()->with('error', 'Arsip tidak ditemukan.');
+        }
+
+        // Guard: Cegah perubahan pada arsip yang sudah dalam status final
+        if (in_array($arsip['status_retensi_aktif'], ['Musnah', 'Permanen'])) {
+            $this->notifModel->delete($id_notif); // Hapus notifikasi basi
+            return redirect()->back()->with('error', 'Arsip ini sudah dalam status final (Musnah/Permanen) dan tidak dapat diubah lagi.');
         }
 
         if ($action === 'musnahkan') {
@@ -81,7 +88,8 @@ class Notification extends BaseController
             return redirect()->back()->with('error', 'Aksi tidak dikenal.');
         }
 
-        // Hapus notifikasi setelah ditindaklanjuti
+        // Tandai notifikasi sebagai dibaca dan hapus setelah ditindaklanjuti
+        $this->notifModel->update($id_notif, ['is_read' => 1]);
         $this->notifModel->delete($id_notif);
 
         return redirect()->back()->with('success', $msg);

@@ -71,6 +71,7 @@ class BeritaAcara extends BaseController
             $arsip_ids = $this->request->getPost('arsip_ids'); // array
 
             if (empty($arsip_ids)) {
+                $db->transRollback();
                 return redirect()->back()->with('error', 'Pilih minimal 1 arsip.');
             }
 

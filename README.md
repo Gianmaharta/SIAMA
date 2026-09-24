@@ -91,6 +91,37 @@ Modul ini memiliki alur persetujuan (Approval Workflow) berjenjang. Untuk menguj
    - **Aksi**: Klik tombol **Tandatangani & Sahkan Berita Acara**.
    - **Status**: Berita Acara selesai dengan status **`Selesai_Disahkan`**. Anda juga dapat mencoba fitur Cetak (PDF/Print) jika tersedia.
 
+### D. Testing Notifikasi Retensi (Cronjob)
+Untuk mempermudah Frontend dalam melakukan *testing* fitur Push Notification terkait retensi arsip, gunakan perintah SQL berikut ke dalam database `db_siama` Anda untuk memanipulasi waktu dan status arsip, kemudian jalankan script Cronjob-nya.
+
+**1. Testing Arsip Inaktif Push Notif**
+Memanipulasi arsip inaktif agar kedaluwarsa hari ini:
+```sql
+UPDATE arsip SET tanggal_retensi_inaktif_berakhir = DATE_SUB(CURDATE(), INTERVAL 1 DAY) WHERE status_retensi_aktif = 'Inaktif' LIMIT 1;
+```
+
+**2. Testing Arsip Aktif Push Notif**
+Memanipulasi arsip aktif agar kedaluwarsa hari ini (Ganti UUID `id_opd` dengan ID OPD yang valid di database Anda):
+```sql
+UPDATE arsip 
+SET tanggal_retensi_aktif_berakhir = DATE_SUB(CURDATE(), INTERVAL 1 DAY) 
+WHERE status_retensi_aktif = 'Aktif' AND id_opd = '97fc0593-6170-4182-b31b-464e1d9390aa' 
+LIMIT 1;
+```
+
+**3. Arsip Musnah jadi Aktif (Reset Testing)**
+Mengembalikan arsip yang sudah terlanjur Musnah menjadi Aktif kembali untuk keperluan re-testing:
+```sql
+UPDATE arsip SET status_retensi_aktif = 'Aktif' WHERE status_retensi_aktif = 'Musnah';
+```
+
+**4. Menjalankan Cronjob Notifikasi**
+Setelah menjalankan query manipulasi waktu di atas, jalankan *command* berikut di terminal proyek untuk memicu sistem agar membuat notifikasi:
+```bash
+php spark check:retensi
+```
+Setelah script berhasil mengirim notifikasi, Anda bisa login menggunakan akun **Admin OPD** untuk mengecek kemunculan *Push Notification* tersebut.
+
 ---
 
 ## 🔄 Perintah Pendukung
