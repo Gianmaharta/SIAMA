@@ -37,7 +37,7 @@ Edit Draf Berita Acara - SIAMA
             <?php if (!empty($spt_list)) : ?>
                 <?php foreach ($spt_list as $spt) : ?>
                     <option value="<?= $spt['id_spt'] ?>" <?= old('id_spt', $ba['id_spt']) == $spt['id_spt'] ? 'selected' : '' ?>>
-                        <?= esc($spt['nomor_spt']) ?> - <?= esc($spt['nama_kegiatan']) ?>
+                        <?= esc($spt['nomor_spt']) ?> - <?= esc($spt['perihal']) ?>
                     </option>
                 <?php endforeach; ?>
             <?php endif; ?>
