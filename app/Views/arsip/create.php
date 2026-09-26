@@ -153,14 +153,24 @@ Tambah Arsip Baru - SIAMA
     </div>
 
     <!-- Opsi Watermark -->
-    <div style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; background-color: #f0f8ff; max-width: 400px;">
+    <div style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; background-color: #f0f8ff; max-width: 500px;">
         <label><strong>Opsi Keamanan PDF (Watermark)</strong></label><br>
-        <label style="font-weight: normal; font-size: 14px;">
-            <input type="checkbox" name="generate_watermark" value="1">
-            Generate Watermark Sistem (Khusus PDF)
-        </label>
+        <div style="margin-top: 8px;">
+            <label style="display: block; margin-bottom: 6px; font-weight: normal; font-size: 14px;">
+                <input type="radio" name="watermark_source" value="system" <?= old('watermark_source') == 'system' ? 'checked' : '' ?>>
+                🔒 Tambahkan Watermark Otomatis Sistem (Nama OPD)
+            </label>
+            <label style="display: block; margin-bottom: 6px; font-weight: normal; font-size: 14px;">
+                <input type="radio" name="watermark_source" value="offline" <?= old('watermark_source') == 'offline' ? 'checked' : '' ?>>
+                📄 Berkas sudah memiliki Watermark Fisik/Offline
+            </label>
+            <label style="display: block; margin-bottom: 6px; font-weight: normal; font-size: 14px;">
+                <input type="radio" name="watermark_source" value="none" <?= old('watermark_source', 'none') == 'none' ? 'checked' : '' ?>>
+                ❌ Tanpa Watermark
+            </label>
+        </div>
         <div style="font-size: 12px; color: #666; margin-top: 5px;">
-            Sistem akan secara otomatis menambahkan watermark miring bertuliskan nama instansi/OPD Anda pada berkas PDF yang diunggah.
+            Pilih "Sistem" untuk menambahkan watermark bertuliskan nama OPD secara otomatis pada PDF. Pilih "Offline" jika berkas sudah di-watermark secara fisik.
         </div>
     </div>
 

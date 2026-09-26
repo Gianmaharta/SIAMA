@@ -56,6 +56,9 @@ Manajemen Pengguna - SIAMA
                         <?php endif; ?>
                     </td>
                     <td style="text-align: center;">
+                        <?php if (session()->get('nama_role') === 'Admin_Pemkab' || session()->has('original_admin_id')) : ?>
+                            <a href="<?= base_url('/users/switch/' . $user['id_user']) ?>" style="color: #8e44ad; text-decoration: none; font-weight: bold;" onclick="return confirm('Anda akan menyamar sebagai <?= esc($user['nama']) ?>. Lanjutkan?')">🔀 Masuk Sebagai</a> |
+                        <?php endif; ?>
                         <a href="<?= base_url('/users/edit/' . $user['id_user']) ?>" style="color: #d68910; text-decoration: none;">Edit</a> | 
                         <a href="<?= base_url('/users/delete/' . $user['id_user']) ?>" style="color: #c0392b; text-decoration: none;" onclick="return confirm('Apakah Anda yakin ingin menghapus pengguna ini?')">Hapus</a>
                     </td>

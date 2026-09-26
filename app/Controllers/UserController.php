@@ -294,4 +294,116 @@ class UserController extends BaseController
         log_activity('Users', 'UPDATE', 'Mereset password pengguna ke default: ' . $user['nama']);
         return redirect()->back()->with('success', 'Password berhasil di-reset ke default (Admin123!). Pengguna akan diminta untuk mengganti password saat login.');
     }
+
+    // =========================================================================
+    // Switch Role / User Impersonation (Khusus Admin Pemkab)
+    // =========================================================================
+
+    /**
+     * Admin Pemkab "menyamar" sebagai user lain untuk inspeksi.
+     * Menyimpan data session asli Admin ke `original_admin_*`.
+     */
+    public function switchUser($userId)
+    {
+        $session = session();
+
+        // Hanya Admin_Pemkab asli yang bisa switch (cek role asli atau role saat ini)
+        $currentRole = $session->get('nama_role');
+        $isAlreadySwitched = $session->has('original_admin_id');
+
+        if ($currentRole !== 'Admin_Pemkab' && !$isAlreadySwitched) {
+            return redirect()->to('/dashboard')->with('error', 'Akses Ditolak. Hanya Admin Pemkab yang bisa menggunakan fitur ini.');
+        }
+
+        // Cari user target
+        $targetUser = $this->userModel->find($userId);
+        if (!$targetUser) {
+            return redirect()->to('/users')->with('error', 'Pengguna tidak ditemukan.');
+        }
+
+        // Ambil role target
+        $targetUserRole = $this->userRoleModel->where('id_user', $userId)->first();
+        if (!$targetUserRole) {
+            return redirect()->to('/users')->with('error', 'Role pengguna tidak ditemukan.');
+        }
+        $roleInfo = $this->userModel->db->table('roles')->where('id_role', $targetUserRole['id_role'])->get()->getRowArray();
+
+        // Jangan izinkan switch ke sesama Admin Pemkab
+        if ($roleInfo['nama_role'] === 'Admin_Pemkab') {
+            return redirect()->to('/users')->with('error', 'Tidak dapat menyamar sebagai Admin Pemkab lain.');
+        }
+
+        // Simpan data admin asli (hanya jika belum pernah switch sebelumnya)
+        if (!$isAlreadySwitched) {
+            $session->set([
+                'original_admin_id'    => $session->get('user_id'),
+                'original_admin_email' => $session->get('email'),
+                'original_admin_nama'  => $session->get('nama_lengkap'),
+                'original_admin_role'  => $session->get('nama_role'),
+                'original_admin_id_role' => $session->get('id_role'),
+                'original_admin_id_opd'  => $session->get('id_opd'),
+                'original_admin_id_bidang' => $session->get('id_bidang'),
+            ]);
+        }
+
+        // Ambil nama OPD untuk banner
+        $namaOpd = '-';
+        if ($targetUser['id_opd']) {
+            $opd = $this->opdModel->find($targetUser['id_opd']);
+            $namaOpd = $opd ? $opd['nama_opd'] : '-';
+        }
+
+        // Switch session ke user target
+        $session->set([
+            'user_id'             => $targetUser['id_user'],
+            'email'               => $targetUser['email'],
+            'nama_lengkap'        => $targetUser['nama'],
+            'id_role'             => $targetUserRole['id_role'],
+            'nama_role'           => $roleInfo['nama_role'],
+            'id_opd'              => $targetUser['id_opd'],
+            'id_bidang'           => $targetUser['id_bidang'],
+            'is_default_password' => 0, // Admin tidak perlu ganti password saat impersonation
+            'impersonated_opd_nama' => $namaOpd,
+        ]);
+
+        log_activity('Users', 'SWITCH_ROLE', 'Admin Pemkab menyamar sebagai: ' . $targetUser['nama'] . ' (' . $roleInfo['nama_role'] . ')');
+
+        return redirect()->to('/dashboard')->with('success', 'Anda sekarang menyamar sebagai: ' . $targetUser['nama'] . ' (' . $roleInfo['nama_role'] . ')');
+    }
+
+    /**
+     * Mengembalikan session Admin Pemkab ke akun aslinya.
+     */
+    public function switchBack()
+    {
+        $session = session();
+
+        if (!$session->has('original_admin_id')) {
+            return redirect()->to('/dashboard')->with('error', 'Anda tidak sedang dalam mode penyamaran.');
+        }
+
+        // Kembalikan session ke data admin asli
+        $session->set([
+            'user_id'             => $session->get('original_admin_id'),
+            'email'               => $session->get('original_admin_email'),
+            'nama_lengkap'        => $session->get('original_admin_nama'),
+            'nama_role'           => $session->get('original_admin_role'),
+            'id_role'             => $session->get('original_admin_id_role'),
+            'id_opd'              => $session->get('original_admin_id_opd'),
+            'id_bidang'           => $session->get('original_admin_id_bidang'),
+            'is_default_password' => 0,
+        ]);
+
+        // Hapus data impersonation dari session
+        $session->remove([
+            'original_admin_id', 'original_admin_email', 'original_admin_nama',
+            'original_admin_role', 'original_admin_id_role',
+            'original_admin_id_opd', 'original_admin_id_bidang',
+            'impersonated_opd_nama',
+        ]);
+
+        log_activity('Users', 'SWITCH_BACK', 'Admin Pemkab kembali ke akun asli.');
+
+        return redirect()->to('/dashboard')->with('success', 'Anda telah kembali ke akun Admin Pemkab.');
+    }
 }

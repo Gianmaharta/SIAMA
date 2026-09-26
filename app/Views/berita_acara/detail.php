@@ -106,4 +106,15 @@ $status = $ba['status_persetujuan'];
     </div>
 <?php endif; ?>
 
+<?php if ($status === 'Selesai') : ?>
+    <div style="border: 1px solid #27ae60; padding: 15px; background-color: #d5f5e3; margin-top: 15px;">
+        <h3>✅ Berita Acara Telah Disahkan</h3>
+        <p>Dokumen ini telah ditandatangani dan disahkan secara resmi. Anda dapat mengunduh salinan PDF-nya.</p>
+        <a href="<?= base_url('/berita-acara/cetak/' . $ba['id_berita_acara']) ?>" target="_blank"
+           style="display: inline-block; background: #27ae60; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold;">
+            📄 Unduh Berita Acara (PDF)
+        </a>
+    </div>
+<?php endif; ?>
+
 <?= $this->endSection() ?>

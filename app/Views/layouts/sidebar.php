@@ -8,6 +8,7 @@
         <li><a href="<?= base_url('/arsip') ?>">Pengelolaan Arsip</a></li>
         <?php if (session()->get('nama_role') === 'Admin_Pemkab') : ?>
             <li><a href="<?= base_url('/penilaian') ?>">Penilaian Arsip</a></li>
+            <li><a href="<?= base_url('/pengawasan') ?>"><strong>📊 Pengawasan OPD</strong></a></li>
         <?php endif; ?>
         <li><a href="<?= base_url('/berita-acara') ?>">Berita Acara</a></li>
         <?php if (in_array(session()->get('nama_role'), ['Admin_Pemkab', 'Admin_OPD'])) : ?>

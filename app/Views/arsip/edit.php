@@ -160,22 +160,29 @@ Edit Data Arsip - SIAMA
                accept=".pdf,.jpg,.jpeg,.png,.tiff,.tif">
         
         <!-- Opsi Watermark -->
-        <?php if ($arsip['is_watermarked'] == 0) : ?>
-            <div style="margin-top: 15px; padding: 10px; border: 1px solid #ccc; background-color: #f0f8ff; max-width: 400px;">
-                <label><strong>Opsi Keamanan PDF (Watermark)</strong></label><br>
-                <label style="font-weight: normal; font-size: 14px;">
-                    <input type="checkbox" name="generate_watermark" value="1">
-                    Generate Watermark Sistem (Khusus PDF)
+        <div style="margin-top: 15px; padding: 10px; border: 1px solid #ccc; background-color: #f0f8ff; max-width: 500px;">
+            <label><strong>Opsi Keamanan PDF (Watermark)</strong></label><br>
+            <?php $currentWm = old('watermark_source', $arsip['watermark_source'] ?? 'none'); ?>
+            <div style="margin-top: 8px;">
+                <label style="display: block; margin-bottom: 6px; font-weight: normal; font-size: 14px;">
+                    <input type="radio" name="watermark_source" value="system" <?= $currentWm == 'system' ? 'checked' : '' ?>>
+                    🔒 Tambahkan Watermark Otomatis Sistem (Nama OPD)
                 </label>
-                <div style="font-size: 12px; color: #666; margin-top: 5px;">
-                    Centang untuk menimpa PDF saat ini (atau PDF baru yang diupload) dengan Watermark Sistem.
+                <label style="display: block; margin-bottom: 6px; font-weight: normal; font-size: 14px;">
+                    <input type="radio" name="watermark_source" value="offline" <?= $currentWm == 'offline' ? 'checked' : '' ?>>
+                    📄 Berkas sudah memiliki Watermark Fisik/Offline
+                </label>
+                <label style="display: block; margin-bottom: 6px; font-weight: normal; font-size: 14px;">
+                    <input type="radio" name="watermark_source" value="none" <?= $currentWm == 'none' ? 'checked' : '' ?>>
+                    ❌ Tanpa Watermark
+                </label>
+            </div>
+            <?php if ($arsip['is_watermarked']) : ?>
+                <div style="font-size: 12px; color: #155724; margin-top: 5px; padding: 5px; background: #d4edda; border-radius: 3px;">
+                    ✔ Berkas saat ini sudah memiliki Watermark Sistem.
                 </div>
-            </div>
-        <?php else: ?>
-            <div style="margin-top: 15px; padding: 10px; border: 1px solid #c3e6cb; background-color: #d4edda; max-width: 400px; color: #155724;">
-                <strong>✔ Berkas sudah memiliki Watermark Sistem.</strong>
-            </div>
-        <?php endif; ?>
+            <?php endif; ?>
+        </div>
         <?php if (! empty($arsip['file_arsip'])) : ?>
             <br>
             <small>

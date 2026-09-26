@@ -109,6 +109,9 @@ $routes->group('penilaian', ['filter' => 'role:Admin_Pemkab'], function($routes)
     $routes->get('detail/(:segment)', 'PenilaianArsip::detail/$1');
 });
 
+// --- Dashboard Pengawasan Capaian Alih Media OPD (Hanya Admin Pemkab) ---
+$routes->get('pengawasan', 'PengawasanOpd::index', ['filter' => ['auth', 'role:Admin_Pemkab']]);
+
 // --- Modul Surat Perintah Tugas (SPT) ---
 $routes->group('spt', ['filter' => 'auth'], static function ($routes) {
     $routes->get('/', 'Spt::index');
@@ -152,6 +155,10 @@ $routes->group('users', ['filter' => ['auth', 'role:Admin_Pemkab,Admin_OPD']], s
     $routes->get('reset-password/(:segment)', 'UserController::resetPassword/$1');
     $routes->get('delete/(:segment)', 'UserController::delete/$1');
 });
+
+// --- Switch Role / User Impersonation (Khusus Admin Pemkab) ---
+$routes->get('users/switch/(:segment)', 'UserController::switchUser/$1', ['filter' => 'auth']);
+$routes->get('users/switch-back', 'UserController::switchBack', ['filter' => 'auth']);
 
 // --- Modul Audit Log (Khusus Admin_Pemkab) ---
 $routes->group('audit-log', ['filter' => ['auth', 'role:Admin_Pemkab']], static function ($routes) {

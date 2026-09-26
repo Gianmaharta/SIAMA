@@ -199,8 +199,9 @@ class Arsip extends BaseController
             $fileDigitalName = $fileObj->getRandomName();
             $fileObj->move(self::UPLOAD_PATH, $fileDigitalName);
             
-            // Proses Watermark jika dicentang dan file adalah PDF
-            if ($this->request->getPost('generate_watermark') && $ext === 'pdf') {
+            // Proses Watermark berdasarkan pilihan radio button
+            $watermarkChoice = $this->request->getPost('watermark_source') ?? 'none';
+            if ($watermarkChoice === 'system' && $ext === 'pdf') {
                 $watermarkService = new \App\Services\WatermarkService();
                 $opd_name = 'DINAS/OPD TERKAIT'; // Default
                 // Cari nama OPD dari database
@@ -220,11 +221,13 @@ class Arsip extends BaseController
                     $is_watermarked = 1;
                     $watermark_source = 'system';
                 }
+            } elseif ($watermarkChoice === 'offline') {
+                $watermark_source = 'offline';
             }
         }
 
         $is_watermarked = $is_watermarked ?? 0;
-        $watermark_source = $watermark_source ?? 'none';
+        $watermark_source = $watermark_source ?? ($this->request->getPost('watermark_source') ?? 'none');
         
         // Hitung JRA
         $retensi_aktif = (int) $this->request->getPost('retensi_aktif');
@@ -417,12 +420,12 @@ class Arsip extends BaseController
         }
         
         $is_watermarked = $arsip['is_watermarked'];
-        $watermark_source = $arsip['watermark_source'];
+        $watermark_source = $this->request->getPost('watermark_source') ?? ($arsip['watermark_source'] ?? 'none');
 
-        // Proses Watermark jika dicentang dan file adalah PDF
-        if ($this->request->getPost('generate_watermark')) {
+        // Proses Watermark berdasarkan pilihan radio button
+        if ($watermark_source === 'system') {
             $ext = pathinfo($fileDigitalName, PATHINFO_EXTENSION);
-            if (strtolower($ext) === 'pdf' && $is_watermarked == 0) {
+            if (strtolower($ext) === 'pdf') {
                 $watermarkService = new \App\Services\WatermarkService();
                 $opd_name = 'DINAS/OPD TERKAIT';
                 $db = \Config\Database::connect();
@@ -440,9 +443,12 @@ class Arsip extends BaseController
                     }
                     $fileDigitalName = 'wm_' . basename($fileDigitalName);
                     $is_watermarked = 1;
-                    $watermark_source = 'system';
                 }
             }
+        } elseif ($watermark_source === 'offline') {
+            // Tandai sebagai offline watermark (tidak generate watermark sistem)
+        } elseif ($watermark_source === 'none') {
+            $is_watermarked = 0;
         }
         
         // Hitung JRA
