@@ -37,8 +37,7 @@ class UserController extends BaseController
             ->join('bidang', 'bidang.id_bidang = users.id_bidang', 'left');
 
         if ($role === 'Admin_Pemkab') {
-            // Admin Pemkab hanya mengelola Admin OPD
-            $builder->where('roles.nama_role', 'Admin_OPD');
+            // Admin Pemkab adalah super admin, bisa melihat semua user
         } elseif ($role === 'Admin_OPD') {
             // Admin OPD mengelola user di OPD yang sama, kecuali Admin_Pemkab dan Admin_OPD
             $builder->where('users.id_opd', $idOpd);
@@ -59,7 +58,7 @@ class UserController extends BaseController
         // Ambil data role yang unik untuk dropdown
         $rolesBuilder = $this->userModel->db->table('roles')->select('MAX(id_role) as id_role, nama_role')->groupBy('nama_role');
         if ($role === 'Admin_Pemkab') {
-            $rolesBuilder->where('nama_role', 'Admin_OPD');
+            // Admin Pemkab bisa membuat akun dengan role apapun
         } elseif ($role === 'Admin_OPD') {
             $rolesBuilder->whereNotIn('nama_role', ['Admin_Pemkab', 'Admin_OPD']);
             $data['bidangs'] = $this->bidangModel->where('id_opd', session()->get('id_opd'))->findAll();
@@ -82,7 +81,10 @@ class UserController extends BaseController
         ];
 
         if ($roleLogin === 'Admin_Pemkab') {
-            $rules['id_opd'] = 'required';
+            $roleTarget = $this->userModel->db->table('roles')->where('id_role', $this->request->getPost('id_role'))->get()->getRow();
+            if ($roleTarget && $roleTarget->nama_role !== 'Admin_Pemkab') {
+                $rules['id_opd'] = 'required';
+            }
         }
 
         if (! $this->validate($rules)) {
@@ -138,9 +140,7 @@ class UserController extends BaseController
         $roleInfo = $this->userModel->db->table('roles')->where('id_role', $editedUserRole['id_role'])->get()->getRowArray();
 
         if ($role === 'Admin_Pemkab') {
-            if ($roleInfo['nama_role'] !== 'Admin_OPD') {
-                return redirect()->to('/users')->with('error', 'Akses Ditolak.');
-            }
+            // Admin Pemkab bebas edit semua user
         } elseif ($role === 'Admin_OPD') {
             if ($user['id_opd'] !== $idOpd || in_array($roleInfo['nama_role'], ['Admin_Pemkab', 'Admin_OPD'])) {
                 return redirect()->to('/users')->with('error', 'Akses Ditolak.');
@@ -153,7 +153,7 @@ class UserController extends BaseController
         
         $rolesBuilder = $this->userModel->db->table('roles')->select('MAX(id_role) as id_role, nama_role')->groupBy('nama_role');
         if ($role === 'Admin_Pemkab') {
-            $rolesBuilder->where('nama_role', 'Admin_OPD');
+            // Admin Pemkab bisa mengganti user ke role apapun
         } elseif ($role === 'Admin_OPD') {
             $rolesBuilder->whereNotIn('nama_role', ['Admin_Pemkab', 'Admin_OPD']);
             $data['bidangs'] = $this->bidangModel->where('id_opd', session()->get('id_opd'))->findAll();
@@ -180,7 +180,10 @@ class UserController extends BaseController
         ];
 
         if ($roleLogin === 'Admin_Pemkab') {
-            $rules['id_opd'] = 'required';
+            $roleTarget = $this->userModel->db->table('roles')->where('id_role', $this->request->getPost('id_role'))->get()->getRow();
+            if ($roleTarget && $roleTarget->nama_role !== 'Admin_Pemkab') {
+                $rules['id_opd'] = 'required';
+            }
         }
 
         if (! $this->validate($rules)) {
@@ -239,10 +242,12 @@ class UserController extends BaseController
         $editedUserRole = $this->userRoleModel->where('id_user', $id)->first();
         $roleInfo = $this->userModel->db->table('roles')->where('id_role', $editedUserRole['id_role'])->get()->getRowArray();
 
+        if ($id === session()->get('user_id') || (session()->has('original_admin_id') && $id === session()->get('original_admin_id'))) {
+            return redirect()->to('/users')->with('error', 'Keamanan Tingkat Tinggi: Anda tidak dapat menghapus akun Anda sendiri.');
+        }
+
         if ($roleLogin === 'Admin_Pemkab') {
-            if ($roleInfo['nama_role'] !== 'Admin_OPD') {
-                return redirect()->to('/users')->with('error', 'Akses Ditolak.');
-            }
+            // Admin Pemkab bebas menghapus user mana saja
         } elseif ($roleLogin === 'Admin_OPD') {
             if ($user['id_opd'] !== $idOpd || in_array($roleInfo['nama_role'], ['Admin_Pemkab', 'Admin_OPD'])) {
                 return redirect()->to('/users')->with('error', 'Akses Ditolak.');

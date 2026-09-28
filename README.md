@@ -12,9 +12,16 @@ Telah dilakukan pembaharuan sistem (Refactoring) yang meliputi:
 
 ## 🛠️ Prasyarat
 
-1. Pastikan service MySQL/MariaDB sudah berjalan (Laragon / XAMPP).
-2. Buat database baru di MySQL bernama: `db_siama`.
-3. Pastikan konfigurasi berkas `.env` sudah sesuai dengan database lokal.
+1. **PHP >= 8.1**: Pastikan ekstensi `intl`, `mbstring`, `json`, dan `dom` sudah aktif di `php.ini`.
+2. **Composer**: Diperlukan untuk mengunduh seluruh *library* / dependensi sistem.
+3. **Database**: Pastikan service MySQL/MariaDB sudah berjalan (Laragon / XAMPP). Buat database baru bernama `db_siama`.
+4. **Konfigurasi Lingkungan**: Pastikan konfigurasi berkas `.env` sudah sesuai dengan database lokal.
+
+### Instalasi Dependensi (Composer)
+Sebelum menjalankan aplikasi, Anda WAJIB mengunduh seluruh ekstensi pihak ketiga (termasuk *Dompdf* untuk cetak Berita Acara dan modul CodeIgniter lainnya) dengan menjalankan perintah berikut di terminal:
+```bash
+composer install
+```
 
 ### Konfigurasi `.env`
 ```env
@@ -121,6 +128,36 @@ Setelah menjalankan query manipulasi waktu di atas, jalankan *command* berikut d
 php spark check:retensi
 ```
 Setelah script berhasil mengirim notifikasi, Anda bisa login menggunakan akun **Admin OPD** untuk mengecek kemunculan *Push Notification* tersebut.
+
+### E. Testing Fitur Baru (Batch Terakhir)
+Berikut adalah panduan untuk menguji 5 fitur terbaru yang baru saja diimplementasikan:
+
+**1. Fitur Switch Role (Admin Pemkab)**
+   - **Login**: `admin.pemkab@siama.test` (Admin Pemkab)
+   - Buka menu **Manajemen Pengguna**. Anda kini memiliki akses super admin dan bisa melihat serta mengedit semua *user* (termasuk Kabid, Pimpinan, dll).
+   - Klik aksi **🔀 Masuk Sebagai** pada user apa saja. 
+   - Anda akan dialihkan (*impersonate*) ke sesi pengguna tersebut, dan *banner* "Mode Penyamaran Aktif" akan muncul di atas halaman. Klik tombol "Kembali ke Admin Pemkab" untuk mengakhiri sesi penyamaran.
+
+**2. Fitur Watermark Fleksibel (Radio Button)**
+   - Saat membuat atau mengedit arsip, pada bagian bawah *form* kini terdapat *Radio Button* untuk memilih opsi Watermark.
+   - Pilih **Sistem** untuk *generate* watermark nama OPD secara otomatis, **Offline** jika berkas sudah ada cap fisik, atau **Tanpa Watermark**. 
+
+**3. Dashboard Pengawasan OPD**
+   - **Login**: `admin.pemkab@siama.test` (Hanya untuk Admin Pemkab)
+   - Buka menu **📊 Pengawasan OPD** di navigasi sisi kiri.
+   - Anda akan melihat visualisasi berupa tabel dan *progress bar* yang menunjukkan persentase capaian target arsip yang sudah diselesaikan oleh masing-masing OPD berdasarkan tahun (Total SPT vs Berkas Target vs Berkas Selesai).
+
+**4. Pengesahan Pimpinan & Unduh Berita Acara (PDF)**
+   - Pastikan Anda sudah login sebagai **Pimpinan** dan membuka Draf Berita Acara yang siap disahkan.
+   - Klik tombol pengesahan. Status BA akan berubah menjadi **Selesai** dan terekam di sistem Audit Log.
+   - Setelah status menjadi Selesai, tombol **📄 Unduh Berita Acara (PDF)** akan otomatis muncul.
+
+**5. Menjalankan Automated Testing (PHPUnit)**
+   - Seluruh logika untuk perhitungan _Switch Role_ dan _Pengawasan OPD_ sudah di-_cover_ menggunakan _automated feature testing_.
+   - Jalankan perintah berikut untuk mengeksekusi semua tes:
+     ```bash
+     vendor\bin\phpunit
+     ```
 
 ---
 

@@ -100,3 +100,103 @@ class DashboardApiDocs
     )]
     public function getDashboard(): void {}
 }
+
+class UserApiDocs
+{
+    #[OA\Get(
+        path: '/users',
+        operationId: 'getUsers',
+        summary: 'Daftar Pengguna',
+        description: 'Mendapatkan daftar seluruh pengguna SIAMA (Akses dibatasi sesuai Role).',
+        tags: ['Users'],
+        security: [['sessionAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Menampilkan halaman tabel pengguna'),
+        ]
+    )]
+    public function getUsers(): void {}
+
+    #[OA\Post(
+        path: '/users/store',
+        operationId: 'storeUser',
+        summary: 'Tambah Pengguna Baru',
+        tags: ['Users'],
+        security: [['sessionAuth' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\MediaType(
+                mediaType: 'application/x-www-form-urlencoded',
+                schema: new OA\Schema(
+                    required: ['nama', 'email', 'id_role'],
+                    properties: [
+                        new OA\Property(property: 'nama', type: 'string'),
+                        new OA\Property(property: 'email', type: 'string'),
+                        new OA\Property(property: 'id_role', type: 'integer'),
+                        new OA\Property(property: 'id_opd', type: 'string'),
+                    ]
+                )
+            )
+        ),
+        responses: [
+            new OA\Response(response: 302, description: 'Redirect setelah sukses menyimpan'),
+        ]
+    )]
+    public function storeUser(): void {}
+}
+
+class ArsipApiDocs
+{
+    #[OA\Get(
+        path: '/arsip',
+        operationId: 'getArsip',
+        summary: 'Daftar Arsip',
+        tags: ['Arsip'],
+        security: [['sessionAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Halaman daftar arsip'),
+        ]
+    )]
+    public function getArsip(): void {}
+    
+    #[OA\Post(
+        path: '/arsip/store',
+        operationId: 'storeArsip',
+        summary: 'Upload Arsip Baru',
+        tags: ['Arsip'],
+        security: [['sessionAuth' => []]],
+        responses: [
+            new OA\Response(response: 302, description: 'Redirect setelah sukses upload'),
+        ]
+    )]
+    public function storeArsip(): void {}
+}
+
+class BeritaAcaraApiDocs
+{
+    #[OA\Get(
+        path: '/berita-acara',
+        operationId: 'getBA',
+        summary: 'Daftar Berita Acara',
+        tags: ['Berita Acara'],
+        security: [['sessionAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Halaman Berita Acara'),
+        ]
+    )]
+    public function getBA(): void {}
+}
+
+class PengawasanOpdApiDocs
+{
+    #[OA\Get(
+        path: '/pengawasan',
+        operationId: 'getPengawasan',
+        summary: 'Dashboard Pengawasan OPD',
+        tags: ['Pengawasan OPD'],
+        security: [['sessionAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Menampilkan persentase capaian OPD'),
+        ]
+    )]
+    public function getPengawasan(): void {}
+}
