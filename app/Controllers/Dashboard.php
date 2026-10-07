@@ -7,6 +7,7 @@ use App\Models\UserModel;
 use App\Models\ArsipModel;
 use App\Models\SptModel;
 use App\Models\BeritaAcaraModel;
+use App\Models\ActivityLogModel;
 
 class Dashboard extends BaseController
 {
@@ -27,8 +28,6 @@ class Dashboard extends BaseController
         $arsipModel       = new ArsipModel();
         $sptModel         = new SptModel();
         $beritaAcaraModel = new BeritaAcaraModel();
-        // (Opsional jika butuh count OPD/Bidang secara spesifik, namun tidak diminta secara eksplisit, 
-        // Admin_OPD butuh count Bidang di OPD tersebut, kita gunakan UserModel atau query builder sederhana)
         $db = \Config\Database::connect();
 
         $stats = [];
@@ -70,6 +69,42 @@ class Dashboard extends BaseController
         }
 
         $data['stats'] = $stats;
+
+        // Data Grafik: Distribusi Arsip Per OPD
+        $chartQuery = $db->table('opd o')
+            ->select('o.nama_opd, o.kode_opd, COUNT(a.id_arsip) AS total_arsip')
+            ->join('arsip a', 'a.id_opd = o.id_opd', 'left')
+            ->groupBy('o.id_opd, o.nama_opd, o.kode_opd')
+            ->orderBy('total_arsip', 'DESC')
+            ->limit(6)
+            ->get()
+            ->getResultArray();
+
+        if (!empty($chartQuery)) {
+            $data['chart_labels'] = array_map(function($item) {
+                // Sederhanakan nama label (contoh: "Dinas Komunikasi..." -> "Kominfo" atau potongan nama)
+                $nama = $item['nama_opd'];
+                if (stripos($nama, 'Komunikasi') !== false) return 'Kominfo';
+                if (stripos($nama, 'Pendidikan') !== false) return 'Disdik';
+                if (stripos($nama, 'Arsip') !== false) return 'Arsip';
+                if (stripos($nama, 'Kesehatan') !== false) return 'Dinkes';
+                if (stripos($nama, 'Pertanian') !== false) return 'Dispertan';
+                return strlen($nama) > 10 ? substr($nama, 0, 8) . '..' : $nama;
+            }, $chartQuery);
+            $data['chart_values'] = array_map('intval', array_column($chartQuery, 'total_arsip'));
+        } else {
+            $data['chart_labels'] = ['Kominfo', 'Disdik', 'Arsip', 'Dinkes'];
+            $data['chart_values'] = [0, 0, 0, 0];
+        }
+
+        // Data Aktivitas Terbaru
+        $activityLogModel = new ActivityLogModel();
+        $recentActivities = $activityLogModel->getActivityLogsWithFilter()
+            ->limit(5)
+            ->get()
+            ->getResultArray();
+
+        $data['recent_activities'] = $recentActivities;
 
         return view('dashboard/index', $data);
     }
