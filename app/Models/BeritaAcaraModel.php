@@ -50,7 +50,7 @@ class BeritaAcaraModel extends BaseModel
                     ->countAllResults();
     }
 
-    public function getBeritaAcaraWithRelations($id = null, $id_opd = null)
+    public function getBeritaAcaraWithRelations($id = null, $id_opd = null, $filters = [])
     {
         $builder = $this->db->table('berita_acara');
         $builder->select('berita_acara.*, 
@@ -72,6 +72,22 @@ class BeritaAcaraModel extends BaseModel
 
         if ($id_opd) {
             $builder->where('berita_acara.id_opd', $id_opd);
+        }
+
+        if (!empty($filters['search'])) {
+            $builder->groupStart()
+                    ->like('berita_acara.nomor_ba', $filters['search'])
+                    ->orLike('pelaksana.nama', $filters['search'])
+                    ->orLike('spt.nomor_spt', $filters['search'])
+                    ->groupEnd();
+        }
+
+        if (!empty($filters['tanggal'])) {
+            $builder->where('berita_acara.tanggal_ba', $filters['tanggal']);
+        }
+
+        if (!empty($filters['status'])) {
+            $builder->where('berita_acara.status_persetujuan', $filters['status']);
         }
 
         $builder->orderBy('berita_acara.created_at', 'DESC');

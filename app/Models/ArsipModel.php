@@ -83,7 +83,8 @@ class ArsipModel extends BaseModel
             $builder->where('arsip.id_bidang', $id_bidang);
         }
 
-        $builder->orderBy('arsip.id_arsip', 'DESC');
+        $builder->orderBy('arsip.nomor_arsip', 'ASC');
+        $builder->orderBy('arsip.created_at', 'ASC');
         return $builder->get()->getResultArray();
     }
 

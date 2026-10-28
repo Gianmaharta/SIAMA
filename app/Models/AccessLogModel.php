@@ -11,7 +11,7 @@ class AccessLogModel extends Model
 
     // Tidak menggunakan BaseModel karena log bersifat read-only dari UI
     // dan tabel ini tidak memiliki kolom updated_at / created_by
-    public function getAccessLogsWithFilter($startDate = null, $endDate = null, $search = null)
+    public function getAccessLogsWithFilter($startDate = null, $endDate = null, $search = null, $action = null)
     {
         $builder = $this->db->table('access_log al');
         $builder->select([
@@ -21,6 +21,7 @@ class AccessLogModel extends Model
             'al.user_agent',
             'al.created_at',
             'u.nama AS nama_user',
+            'u.email',
             'o.nama_opd',
         ]);
         $builder->join('users u', 'u.id_user = al.user_id', 'left');
@@ -32,9 +33,15 @@ class AccessLogModel extends Model
         if ($endDate) {
             $builder->where('al.created_at <=', $endDate . ' 23:59:59');
         }
+        if ($action) {
+            $builder->like('al.event', $action);
+        }
         if ($search) {
+            $searchNormalized = str_replace(['.', '_'], ' ', $search);
             $builder->groupStart()
                 ->like('u.nama', $search)
+                ->orLike('u.nama', $searchNormalized)
+                ->orLike('u.email', $search)
                 ->orLike('al.ip_address', $search)
                 ->orLike('al.event', $search)
                 ->orLike('o.nama_opd', $search)

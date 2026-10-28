@@ -40,11 +40,14 @@ class BidangModel extends BaseModel
     {
         $builder = $this->builder();
         $builder->select('bidang.*, opd.nama_opd');
-        $builder->join('opd', 'opd.id_opd = bidang.id_opd');
+        $builder->join('opd', 'opd.id_opd = bidang.id_opd', 'left');
 
         if ($id_opd !== null) {
             $builder->where('bidang.id_opd', $id_opd);
         }
+
+        $builder->orderBy('opd.nama_opd', 'ASC');
+        $builder->orderBy('bidang.nama_bidang', 'ASC');
 
         return $builder->get()->getResultArray();
     }

@@ -37,15 +37,54 @@ if (!function_exists('log_access')) {
 if (!function_exists('log_activity')) {
     /**
      * Mencatat activity log (create, update, delete)
+     * Hanya mencatat jika ada perubahan data aktual (tidak mencatat jika hanya menekan simpan tanpa mengubah data).
      *
      * @param string $module
      * @param string $action
      * @param string $description
      * @param array|null $oldData
      * @param array|null $newData
+     * @return bool True jika log berhasil dicatat, false jika diabaikan karena tidak ada perubahan data
      */
-    function log_activity($module, $action, $description, $oldData = null, $newData = null)
+    function log_activity($module, $action, $description, $oldData = null, $newData = null): bool
     {
+        // Validasi perubahan data aktual untuk aksi UPDATE / EDIT
+        if (in_array(strtolower($action), ['update', 'edit']) && is_array($oldData) && is_array($newData)) {
+            $hasChanged = false;
+            $ignoredKeys = [
+                'updated_at', 'created_at', 'deleted_at', 
+                'id', 'id_user', 'id_opd', 'id_bidang', 'id_arsip', 'id_spt', 'id_berita_acara', 'id_assignment',
+                'csrf_test_name'
+            ];
+
+            foreach ($newData as $key => $newVal) {
+                if (in_array($key, $ignoredKeys, true)) {
+                    continue;
+                }
+
+                if (array_key_exists($key, $oldData)) {
+                    $oldVal = $oldData[$key];
+                    $strOld = is_null($oldVal) ? '' : trim((string)$oldVal);
+                    $strNew = is_null($newVal) ? '' : trim((string)$newVal);
+                    if ($strOld !== $strNew) {
+                        $hasChanged = true;
+                        break;
+                    }
+                } else {
+                    // Ada field baru di newData yang tidak kosong
+                    if (!is_null($newVal) && trim((string)$newVal) !== '') {
+                        $hasChanged = true;
+                        break;
+                    }
+                }
+            }
+
+            // Jika tidak ada perubahan data sama sekali (hanya klik tombol tanpa ubah apapun), jangan catat ke log!
+            if (!$hasChanged) {
+                return false;
+            }
+        }
+
         $db = \Config\Database::connect();
         $userId = session()->has('user_id') ? session()->get('user_id') : null;
         
@@ -61,5 +100,6 @@ if (!function_exists('log_activity')) {
         ];
         
         $db->table('activity_log')->insert($data);
+        return true;
     }
 }

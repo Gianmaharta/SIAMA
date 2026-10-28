@@ -16,38 +16,51 @@ class PenilaianArsip extends BaseController
 
     public function index()
     {
-        // Status filter: semua, belum, sudah
         $filter = $this->request->getGet('status') ?? 'semua';
-
-        if ($filter == 'belum') {
-            $data['arsip'] = $this->arsipModel->getArsipBelumDinilai();
-        } elseif ($filter == 'sudah') {
-            $data['arsip'] = $this->arsipModel->getArsipSudahDinilai();
-        } else {
-            // Kita butuh getArsipWithRelations tanpa parameter untuk mendapatkan semua arsip (admin pemkab role)
-            $data['arsip'] = $this->arsipModel->getArsipWithRelations();
-        }
-        
-        // Manual relations mapping for 'belum' and 'sudah' methods
-        // Since getArsipBelumDinilai and getArsipSudahDinilai only use findAll(), they don't have relations.
-        // It's better to fetch all with relations and then filter, or update the model methods. 
-        // For simplicity and to reuse the join logic, we'll fetch all and filter in PHP or rewrite the query here.
-        // Actually, getArsipWithRelations() can fetch all. We can just filter the array.
         $semuaArsip = $this->arsipModel->getArsipWithRelations();
-        
-        if ($filter == 'belum') {
-            $data['arsip'] = array_filter($semuaArsip, function($item) {
-                return $item['status_autentikasi'] === 'Belum Dinilai';
-            });
-        } elseif ($filter == 'sudah') {
-            $data['arsip'] = array_filter($semuaArsip, function($item) {
-                return $item['status_autentikasi'] !== 'Belum Dinilai';
-            });
-        } else {
-            $data['arsip'] = $semuaArsip;
+
+        $totalArsip = count($semuaArsip);
+        $belumDinilai = 0;
+        $sudahDinilai = 0;
+        $revisiMetadata = 0;
+        $ditolak = 0;
+
+        foreach ($semuaArsip as $row) {
+            $status = trim($row['status_autentikasi'] ?? '');
+            if ($status === 'Belum Dinilai' || empty($status)) {
+                $belumDinilai++;
+            } elseif ($status === 'Revisi Metadata' || $status === 'Perlu Revisi') {
+                $revisiMetadata++;
+            } elseif ($status === 'Ditolak') {
+                $ditolak++;
+            } else {
+                // Lolos Evaluasi / Autentik / Sudah Dinilai
+                $sudahDinilai++;
+            }
         }
 
-        $data['filter'] = $filter;
+        if ($filter == 'belum') {
+            $filteredArsip = array_values(array_filter($semuaArsip, function($item) {
+                return ($item['status_autentikasi'] ?? '') === 'Belum Dinilai';
+            }));
+        } elseif ($filter == 'sudah') {
+            $filteredArsip = array_values(array_filter($semuaArsip, function($item) {
+                return ($item['status_autentikasi'] ?? '') !== 'Belum Dinilai';
+            }));
+        } else {
+            $filteredArsip = $semuaArsip;
+        }
+
+        $data = [
+            'arsip'          => $filteredArsip,
+            'semuaArsip'     => $semuaArsip,
+            'totalArsip'     => $totalArsip,
+            'belumDinilai'   => $belumDinilai,
+            'sudahDinilai'   => $sudahDinilai,
+            'revisiMetadata' => $revisiMetadata,
+            'ditolak'        => $ditolak,
+            'filter'         => $filter,
+        ];
 
         return view('penilaian/index', $data);
     }
@@ -95,8 +108,8 @@ class PenilaianArsip extends BaseController
         // Save
         $this->arsipModel->simpanPenilaian($id_arsip, $dataPenilaian);
 
-        // Log Activity
-        log_activity('Penilaian Arsip', 'update', "Memberikan penilaian (Skor: $skor_prioritas) pada Arsip: " . $arsip['nomor_arsip']);
+        // Log Activity (hanya tercatat jika nilai / status berubah)
+        log_activity('Penilaian Arsip', 'UPDATE', "Memberikan penilaian (Skor: $skor_prioritas) pada Arsip: " . $arsip['nomor_arsip'], $arsip, $dataPenilaian);
 
         return redirect()->to('/penilaian')->with('success', 'Penilaian arsip berhasil disimpan.');
     }

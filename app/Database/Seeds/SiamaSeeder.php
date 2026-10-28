@@ -44,7 +44,28 @@ class SiamaSeeder extends Seeder
         // 1. SEED TABEL: opd & bidang (Untuk referensi Foreign Key)
         // ============================================================
         $opd = [
-            ['id_opd' => $idOpdKominfo, 'kode_opd' => 'OPD-001', 'nama_opd' => 'Dinas Komunikasi dan Informatika'],
+            ['id_opd' => $idOpdKominfo, 'kode_opd' => 'OPD-001', 'nama_opd' => 'Dinas Komunikasi, Informatika, Persandian dan Statistik'],
+            ['id_opd' => $this->uuidv4(), 'kode_opd' => 'OPD-002', 'nama_opd' => 'Dinas Pendidikan, Pemuda dan Olahraga'],
+            ['id_opd' => $this->uuidv4(), 'kode_opd' => 'OPD-003', 'nama_opd' => 'Dinas Kesehatan'],
+            ['id_opd' => $this->uuidv4(), 'kode_opd' => 'OPD-004', 'nama_opd' => 'Dinas Pekerjaan Umum, Penataan Ruang, Perumahan dan Kawasan Permukiman'],
+            ['id_opd' => $this->uuidv4(), 'kode_opd' => 'OPD-005', 'nama_opd' => 'Dinas Arsip dan Perpustakaan Daerah'],
+            ['id_opd' => $this->uuidv4(), 'kode_opd' => 'OPD-006', 'nama_opd' => 'Dinas Lingkungan Hidup'],
+            ['id_opd' => $this->uuidv4(), 'kode_opd' => 'OPD-007', 'nama_opd' => 'Dinas Sosial, Pemberdayaan Perempuan dan Perlindungan Anak'],
+            ['id_opd' => $this->uuidv4(), 'kode_opd' => 'OPD-008', 'nama_opd' => 'Dinas Pertanian, Ketahanan Pangan dan Perikanan'],
+            ['id_opd' => $this->uuidv4(), 'kode_opd' => 'OPD-009', 'nama_opd' => 'Dinas Perhubungan'],
+            ['id_opd' => $this->uuidv4(), 'kode_opd' => 'OPD-010', 'nama_opd' => 'Dinas Pariwisata'],
+            ['id_opd' => $this->uuidv4(), 'kode_opd' => 'OPD-011', 'nama_opd' => 'Dinas Kebudayaan'],
+            ['id_opd' => $this->uuidv4(), 'kode_opd' => 'OPD-012', 'nama_opd' => 'Dinas Perdagangan, Perindustrian dan Koperasi, UKM'],
+            ['id_opd' => $this->uuidv4(), 'kode_opd' => 'OPD-013', 'nama_opd' => 'Dinas Tenaga Kerja'],
+            ['id_opd' => $this->uuidv4(), 'kode_opd' => 'OPD-014', 'nama_opd' => 'Dinas Kependudukan dan Pencatatan Sipil'],
+            ['id_opd' => $this->uuidv4(), 'kode_opd' => 'OPD-015', 'nama_opd' => 'Dinas Pemadam Kebakaran dan Penyelamatan'],
+            ['id_opd' => $this->uuidv4(), 'kode_opd' => 'OPD-016', 'nama_opd' => 'Badan Perencanaan Pembangunan Daerah'],
+            ['id_opd' => $this->uuidv4(), 'kode_opd' => 'OPD-017', 'nama_opd' => 'Badan Pengelolaan Keuangan dan Pendapatan Daerah'],
+            ['id_opd' => $this->uuidv4(), 'kode_opd' => 'OPD-018', 'nama_opd' => 'Badan Kepegawaian dan Pengembangan Sumber Daya Manusia'],
+            ['id_opd' => $this->uuidv4(), 'kode_opd' => 'OPD-019', 'nama_opd' => 'Badan Penanggulangan Bencana Daerah'],
+            ['id_opd' => $this->uuidv4(), 'kode_opd' => 'OPD-020', 'nama_opd' => 'Satuan Polisi Pamong Praja'],
+            ['id_opd' => $this->uuidv4(), 'kode_opd' => 'OPD-021', 'nama_opd' => 'Inspektorat Daerah'],
+            ['id_opd' => $this->uuidv4(), 'kode_opd' => 'OPD-022', 'nama_opd' => 'Sekretariat Daerah'],
         ];
         $this->db->table('opd')->ignore(true)->insertBatch($opd);
 
@@ -53,9 +74,6 @@ class SiamaSeeder extends Seeder
         ];
         $this->db->table('bidang')->ignore(true)->insertBatch($bidang);
 
-        // ============================================================
-        // 2. SEED TABEL: roles
-        // ============================================================
         $roles = [
             ['id_role' => $idRole1, 'nama_role' => 'Admin_Pemkab'],
             ['id_role' => $idRole2, 'nama_role' => 'Pimpinan'],
@@ -65,9 +83,6 @@ class SiamaSeeder extends Seeder
         ];
         $this->db->table('roles')->ignore(true)->insertBatch($roles);
 
-        // ============================================================
-        // 2.5 SEED TABEL: kode_klasifikasi
-        // ============================================================
         $klasifikasi = [
             ['id_kode_klasifikasi' => $idKlasifikasi1, 'kode' => '000', 'nama_klasifikasi' => 'Umum', 'deskripsi' => 'Arsip Fasilitatif Umum', 'created_at' => date('Y-m-d H:i:s')],
             ['id_kode_klasifikasi' => $idKlasifikasi2, 'kode' => '100', 'nama_klasifikasi' => 'Pemerintahan', 'deskripsi' => 'Arsip Pemerintahan', 'created_at' => date('Y-m-d H:i:s')],
@@ -75,9 +90,6 @@ class SiamaSeeder extends Seeder
         ];
         $this->db->table('kode_klasifikasi')->ignore(true)->insertBatch($klasifikasi);
         
-        // ============================================================
-        // 3. SEED TABEL: users
-        // ============================================================
         $hashedPassword = password_hash('Admin123!', PASSWORD_DEFAULT);
 
         $users = [
@@ -134,9 +146,6 @@ class SiamaSeeder extends Seeder
         ];
         $this->db->table('users')->ignore(true)->insertBatch($users);
 
-        // ============================================================
-        // 4. SEED TABEL: user_roles
-        // ============================================================
         $userRoles = [
             ['id_user' => $idUser1, 'id_role' => $idRole1],
             ['id_user' => $idUser2, 'id_role' => $idRole2],
@@ -146,9 +155,6 @@ class SiamaSeeder extends Seeder
         ];
         $this->db->table('user_roles')->ignore(true)->insertBatch($userRoles);
 
-        // ============================================================
-        // 4.5 SEED TABEL: spt
-        // ============================================================
         $spt = [
             [
                 'id_spt' => $idSpt1,
@@ -177,9 +183,6 @@ class SiamaSeeder extends Seeder
         ];
         $this->db->table('spt')->ignore(true)->insertBatch($spt);
 
-        // ============================================================
-        // 5. SEED TABEL: arsip (Data Dummy untuk testing Penilaian)
-        // ============================================================
         $arsip = [
             [
                 'id_arsip' => $this->uuidv4(),

@@ -23,7 +23,7 @@ class BeritaAcaraDetailModel extends BaseModel
     public function getDetailArsipByBaId($id_berita_acara)
     {
         $builder = $this->db->table('berita_acara_detail');
-        $builder->select('berita_acara_detail.*, arsip.nomor_arsip, arsip.nama_arsip, arsip.kurun_waktu, arsip.kondisi');
+        $builder->select('berita_acara_detail.*, arsip.*');
         $builder->join('arsip', 'arsip.id_arsip = berita_acara_detail.id_arsip');
         $builder->where('berita_acara_detail.id_berita_acara', $id_berita_acara);
         

@@ -94,7 +94,7 @@
                     </div>
 
                     <button type="submit" class="btn btn-primary btn-login w-100 rounded-pill py-2 fw-semibold">
-                        <span>Login &rarr;</span>
+                        <span>Login</span>
                     </button>
                 </form>
             </div>

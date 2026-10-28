@@ -16,6 +16,8 @@ $routes->post('change-password/process', 'Auth::processChangePassword');
 
 // --- Rute Terproteksi (Hanya yang sudah login) ---
 $routes->get('dashboard', 'Dashboard::index', ['filter' => 'auth']);
+$routes->get('dashboard/chart-data', 'Dashboard::chartData', ['filter' => 'auth']);
+$routes->get('dashboard/kabid-chart-data', 'Dashboard::kabidChartData', ['filter' => 'auth']);
 
 // --- Rute Terproteksi dengan Role Khusus ---
 // Contoh dummy rute untuk Admin_Pemkab
@@ -46,7 +48,7 @@ $routes->group('opd', ['filter' => ['auth', 'role:Admin_Pemkab']], static functi
     $routes->post('store', 'Opd::store');
     $routes->get('edit/(:segment)', 'Opd::edit/$1');
     $routes->post('update/(:segment)', 'Opd::update/$1');
-    $routes->get('delete/(:segment)', 'Opd::delete/$1');
+    $routes->match(['get', 'post'], 'delete/(:segment)', 'Opd::delete/$1');
 });
 
 // --- Master Bidang (Admin_Pemkab & Admin_OPD) ---
@@ -56,7 +58,7 @@ $routes->group('bidang', ['filter' => ['auth', 'role:Admin_Pemkab,Admin_OPD']], 
     $routes->post('store', 'Bidang::store');
     $routes->get('edit/(:segment)', 'Bidang::edit/$1');
     $routes->post('update/(:segment)', 'Bidang::update/$1');
-    $routes->get('delete/(:segment)', 'Bidang::delete/$1');
+    $routes->match(['get', 'post'], 'delete/(:segment)', 'Bidang::delete/$1');
 });
 
 // --- Modul Master Kode Klasifikasi ---
@@ -71,12 +73,12 @@ $routes->group('kode-klasifikasi', ['filter' => 'auth'], static function ($route
 
 // --- Modul Master JRA ---
 $routes->group('jra', ['filter' => 'auth'], static function ($routes) {
-    $routes->get('/', 'Jra::index', ['filter' => 'role:Admin_Pemkab,Admin_OPD']);
-    $routes->get('create', 'Jra::create', ['filter' => 'role:Admin_Pemkab,Admin_OPD']);
-    $routes->post('store', 'Jra::store', ['filter' => 'role:Admin_Pemkab,Admin_OPD']);
-    $routes->get('edit/(:segment)', 'Jra::edit/$1', ['filter' => 'role:Admin_Pemkab,Admin_OPD']);
-    $routes->post('update/(:segment)', 'Jra::update/$1', ['filter' => 'role:Admin_Pemkab,Admin_OPD']);
-    $routes->get('delete/(:segment)', 'Jra::delete/$1', ['filter' => 'role:Admin_Pemkab,Admin_OPD']);
+    $routes->get('/', 'Jra::index', ['filter' => 'role:Admin_Pemkab,Admin_OPD,Administrator OPD']);
+    $routes->get('create', 'Jra::create', ['filter' => 'role:Admin_Pemkab,Admin_OPD,Administrator OPD']);
+    $routes->post('store', 'Jra::store', ['filter' => 'role:Admin_Pemkab,Admin_OPD,Administrator OPD']);
+    $routes->get('edit/(:segment)', 'Jra::edit/$1', ['filter' => 'role:Admin_Pemkab,Admin_OPD,Administrator OPD']);
+    $routes->post('update/(:segment)', 'Jra::update/$1', ['filter' => 'role:Admin_Pemkab,Admin_OPD,Administrator OPD']);
+    $routes->get('delete/(:segment)', 'Jra::delete/$1', ['filter' => 'role:Admin_Pemkab,Admin_OPD,Administrator OPD']);
     // API untuk dropdown (Bisa diakses oleh Arsiparis saat create arsip)
     $routes->get('get_by_klasifikasi/(:segment)', 'Jra::get_by_klasifikasi/$1');
 });
@@ -90,11 +92,11 @@ $routes->group('notification', ['filter' => 'auth'], static function ($routes) {
 // --- Modul Berita Acara ---
 $routes->group('berita-acara', ['filter' => 'auth'], function($routes) {
     $routes->get('/', 'BeritaAcara::index');
-    $routes->get('create', 'BeritaAcara::create', ['filter' => 'role:Arsiparis']);
-    $routes->post('store', 'BeritaAcara::store', ['filter' => 'role:Arsiparis']);
-    $routes->get('edit/(:segment)', 'BeritaAcara::edit/$1', ['filter' => 'role:Arsiparis']);
-    $routes->post('update/(:segment)', 'BeritaAcara::update/$1', ['filter' => 'role:Arsiparis']);
-    $routes->get('delete/(:segment)', 'BeritaAcara::delete/$1', ['filter' => 'role:Arsiparis']);
+    $routes->get('create', 'BeritaAcara::create', ['filter' => 'role:Arsiparis,Admin_Pemkab,Admin_OPD']);
+    $routes->post('store', 'BeritaAcara::store', ['filter' => 'role:Arsiparis,Admin_Pemkab,Admin_OPD']);
+    $routes->get('edit/(:segment)', 'BeritaAcara::edit/$1', ['filter' => 'role:Arsiparis,Admin_Pemkab,Admin_OPD']);
+    $routes->post('update/(:segment)', 'BeritaAcara::update/$1', ['filter' => 'role:Arsiparis,Admin_Pemkab,Admin_OPD']);
+    $routes->get('delete/(:segment)', 'BeritaAcara::delete/$1', ['filter' => 'role:Arsiparis,Admin_Pemkab,Admin_OPD']);
     $routes->get('detail/(:segment)', 'BeritaAcara::detail/$1');
     $routes->post('verifikasi-kabid/(:segment)', 'BeritaAcara::verifikasiKabid/$1', ['filter' => 'role:Kepala_Bidang']);
     $routes->post('ttd-pimpinan/(:segment)', 'BeritaAcara::ttdPimpinan/$1', ['filter' => 'role:Pimpinan']);
@@ -120,9 +122,9 @@ $routes->group('spt', ['filter' => 'auth'], static function ($routes) {
     $routes->get('detail/(:segment)', 'Spt::detail/$1');
     $routes->post('delete/(:segment)', 'Spt::delete/$1', ['filter' => 'role:Pimpinan']);
     
-    // Penugasan Arsiparis oleh Kabid / Admin OPD
-    $routes->get('assign/(:segment)', 'Spt::assign/$1', ['filter' => 'role:Kepala_Bidang,Admin_OPD']);
-    $routes->post('process-assign/(:segment)', 'Spt::processAssign/$1', ['filter' => 'role:Kepala_Bidang,Admin_OPD']);
+    // Penugasan Arsiparis HANYA oleh Kepala Bidang
+    $routes->get('assign/(:segment)', 'Spt::assign/$1', ['filter' => 'role:Kepala_Bidang']);
+    $routes->post('process-assign/(:segment)', 'Spt::processAssign/$1', ['filter' => 'role:Kepala_Bidang']);
     
     // Mulai proses (Arsiparis)
     $routes->post('start-process/(:segment)', 'Spt::startProcess/$1', ['filter' => 'role:Arsiparis']);
@@ -153,7 +155,7 @@ $routes->group('users', ['filter' => ['auth', 'role:Admin_Pemkab,Admin_OPD']], s
     $routes->get('edit/(:segment)', 'UserController::edit/$1');
     $routes->post('update/(:segment)', 'UserController::update/$1');
     $routes->get('reset-password/(:segment)', 'UserController::resetPassword/$1');
-    $routes->get('delete/(:segment)', 'UserController::delete/$1');
+    $routes->match(['get', 'post'], 'delete/(:segment)', 'UserController::delete/$1');
 });
 
 // --- Switch Role / User Impersonation (Khusus Admin Pemkab) ---
@@ -163,5 +165,7 @@ $routes->get('users/switch-back', 'UserController::switchBack', ['filter' => 'au
 // --- Modul Audit Log (Khusus Admin_Pemkab) ---
 $routes->group('audit-log', ['filter' => ['auth', 'role:Admin_Pemkab']], static function ($routes) {
     $routes->get('access', 'AuditLog::accessLog');
+    $routes->get('access/export', 'AuditLog::exportAccessCsv');
     $routes->get('activity', 'AuditLog::activityLog');
+    $routes->get('activity/export', 'AuditLog::exportActivityCsv');
 });

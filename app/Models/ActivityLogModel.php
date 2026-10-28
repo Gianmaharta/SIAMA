@@ -23,6 +23,7 @@ class ActivityLogModel extends Model
             'al.new_data',
             'al.created_at',
             'u.nama AS nama_user',
+            'u.email',
             'o.nama_opd',
         ]);
         $builder->join('users u', 'u.id_user = al.user_id', 'left');

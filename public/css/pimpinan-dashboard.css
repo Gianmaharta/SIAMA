@@ -1,0 +1,328 @@
+:root {
+    --pimpinan-primary-blue: #1E60EC;
+    --pimpinan-primary-blue-hover: #1752CE;
+    --pimpinan-blue-bg: #EFF6FF;
+    --pimpinan-purple: #8B5CF6;
+    --pimpinan-purple-bg: #F5F3FF;
+    --pimpinan-bg-card: #FFFFFF;
+    --pimpinan-border: #E5E7EB;
+    --pimpinan-border-light: #F1F5F9;
+    --pimpinan-border-subtle: #F8FAFC;
+    --pimpinan-row-hover: #FBFDFF;
+    --pimpinan-text-main: #0F172A;
+    --pimpinan-text-muted: #64748B;
+    --pimpinan-text-sub: #334155;
+
+    /* Status Badge */
+    --pimpinan-badge-orange-bg: #FFF7ED;
+    --pimpinan-badge-orange-text: #C2410C;
+    --pimpinan-badge-orange-dot: #EA580C;
+}
+
+.pimpinan-dashboard {
+    padding: 0 0 16px;
+}
+
+.pimpinan-header-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--pimpinan-text-main);
+    letter-spacing: -0.3px;
+    line-height: 1.25;
+    margin-bottom: 4px;
+}
+
+.pimpinan-header-desc {
+    font-size: 13.5px;
+    color: var(--pimpinan-text-muted);
+    margin-bottom: 20px;
+}
+
+/* Stat Cards */
+.pimpinan-stat-card {
+    border-radius: 12px;
+    border: 1px solid var(--pimpinan-border);
+    background-color: var(--pimpinan-bg-card);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pimpinan-stat-card .card-body {
+    padding: 16px 20px !important;
+}
+
+.pimpinan-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+}
+
+.pimpinan-stat-icon-blue {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background-color: var(--pimpinan-blue-bg);
+    color: var(--pimpinan-primary-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.pimpinan-stat-icon-purple {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background-color: var(--pimpinan-purple-bg);
+    color: var(--pimpinan-purple);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.pimpinan-stat-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--pimpinan-text-muted);
+    margin-bottom: 3px;
+}
+
+.pimpinan-stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--pimpinan-text-main);
+    line-height: 1;
+    letter-spacing: -0.5px;
+}
+
+/* Table Cards */
+.pimpinan-table-card {
+    border-radius: 12px;
+    border: 1px solid var(--pimpinan-border);
+    background-color: var(--pimpinan-bg-card);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    overflow: hidden;
+}
+
+.pimpinan-table-header {
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--pimpinan-border-light);
+}
+
+.pimpinan-table-title-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pimpinan-table-icon-blue {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background-color: var(--pimpinan-blue-bg);
+    color: var(--pimpinan-primary-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.pimpinan-table-icon-purple {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background-color: var(--pimpinan-purple-bg);
+    color: var(--pimpinan-purple);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.pimpinan-table-title {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--pimpinan-text-main);
+    margin-bottom: 0;
+}
+
+.pimpinan-link-all {
+    color: var(--pimpinan-primary-blue);
+    font-size: 12.5px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.pimpinan-link-all:hover {
+    color: var(--pimpinan-primary-blue-hover);
+    transform: translateX(2px);
+}
+
+.pimpinan-nomor-spt {
+    color: var(--pimpinan-primary-blue) !important;
+    font-weight: 600;
+    font-size: 12px;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    transition: color 0.15s ease, text-decoration 0.15s ease;
+}
+
+.pimpinan-nomor-spt:hover {
+    color: var(--pimpinan-primary-blue-hover) !important;
+    text-decoration: underline !important;
+}
+
+.pimpinan-nomor-ba {
+    color: var(--pimpinan-text-main);
+    font-weight: 600;
+    font-size: 12px;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    transition: color 0.15s ease;
+}
+
+.pimpinan-nomor-ba:hover {
+    color: var(--pimpinan-primary-blue);
+}
+
+.sidebar-menu-pimpinan {
+    padding-top: 20px !important;
+    gap: 8px !important;
+}
+
+.sidebar-menu-pimpinan .nav-link {
+    padding: 11px 16px;
+    font-size: 14px;
+}
+
+/* Compact Table Layout */
+.pimpinan-table {
+    margin-bottom: 0;
+    font-size: 12px;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.pimpinan-table thead th {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--pimpinan-text-muted);
+    background-color: var(--pimpinan-bg-card);
+    border-bottom: 1px solid var(--pimpinan-border-light);
+    padding: 8px 6px;
+    white-space: nowrap;
+}
+
+.pimpinan-table thead th:first-child {
+    padding-left: 14px;
+}
+
+.pimpinan-table thead th:last-child {
+    padding-right: 14px;
+}
+
+.pimpinan-table tbody td {
+    padding: 8px 6px;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--pimpinan-border-subtle);
+    color: var(--pimpinan-text-sub);
+    font-size: 12px;
+}
+
+.pimpinan-table tbody td:first-child {
+    padding-left: 14px;
+}
+
+.pimpinan-table tbody td:last-child {
+    padding-right: 14px;
+}
+
+.pimpinan-table tbody tr:hover td {
+    background-color: var(--pimpinan-row-hover);
+}
+
+.pimpinan-table .text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 0;
+}
+
+/* Badge Draf_Kabid */
+.badge-draf-kabid {
+    background-color: var(--pimpinan-badge-orange-bg);
+    color: var(--pimpinan-badge-orange-text);
+    border-radius: 50px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+.badge-draf-kabid .dot-orange {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: var(--pimpinan-badge-orange-dot);
+    display: inline-block;
+}
+
+/* Button Terbitkan SPT di Dashboard */
+.spt-btn-create {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: #1E60EC;
+    color: #FFFFFF !important;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 1px 3px rgba(30, 96, 236, 0.25);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    height: 38px;
+}
+
+.spt-btn-create:hover {
+    background-color: #1752CE;
+    color: #FFFFFF !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(30, 96, 236, 0.35);
+}
+
+.spt-btn-create:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(30, 96, 236, 0.2);
+}
+
+.spt-btn-create i {
+    font-size: 15px;
+    line-height: 1;
+}
+

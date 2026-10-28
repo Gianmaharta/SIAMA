@@ -1,7 +1,23 @@
 <?php
 $userName = session()->get('nama_lengkap') ?? 'Administrator';
 $userRole = session()->get('nama_role') ?? 'Admin_Pemkab';
-$userInitial = strtoupper(substr($userName, 0, 1));
+$opdId = session()->get('id_opd');
+$userInitial = !empty($userName) ? strtoupper(mb_substr(trim($userName), 0, 1)) : 'U';
+
+// Mapping nama role yang rapi dan profesional
+$roleDisplayMap = [
+    'Admin_Pemkab'      => 'Admin Pemkab',
+    'Admin_OPD'         => 'Admin OPD',
+    'Administrator OPD' => 'Admin OPD',
+    'Pimpinan'          => 'Kepala Dinas',
+    'Kepala_Dinas'      => 'Kepala Dinas',
+    'Kepala Dinas'      => 'Kepala Dinas',
+    'Kepala_Bidang'     => 'Kepala Bidang',
+    'Kepala Bidang'     => 'Kepala Bidang',
+    'Kabid'             => 'Kepala Bidang',
+    'Arsiparis'         => 'Arsiparis',
+];
+$roleDisplay = $roleDisplayMap[$userRole] ?? str_replace('_', ' ', $userRole);
 
 $notifModel = new \App\Models\NotificationModel();
 $unread = 0;
@@ -24,15 +40,21 @@ if (session()->get('user_id')) {
 <?php endif; ?>
 
 <header class="top-navbar">
-    <!-- Left: Search Box -->
-    <div class="search-box">
-        <i class="bi bi-search search-icon"></i>
-        <input 
-            type="text" 
-            class="search-input" 
-            placeholder="Cari menu, arsip, OPD, atau kata kunci..."
-            aria-label="Cari"
-        >
+    <div class="d-flex align-items-center">
+        <!-- Mobile Sidebar Toggle -->
+        <button class="btn btn-link text-secondary p-0 me-3 d-lg-none border-0 shadow-none" id="sidebarToggleBtn" type="button" aria-label="Buka Menu Sidebar">
+            <i class="bi bi-list fs-2" style="line-height: 1;"></i>
+        </button>
+        <!-- Left: Search Box -->
+        <div class="search-box">
+            <i class="bi bi-search search-icon"></i>
+            <input 
+                type="text" 
+                class="search-input" 
+                placeholder="Cari menu, arsip, OPD, atau kata kunci..." 
+                aria-label="Cari"
+            >
+        </div>
     </div>
 
     <!-- Right: User Area -->
@@ -40,7 +62,7 @@ if (session()->get('user_id')) {
         <!-- Notification Button -->
         <a href="<?= base_url('/notification') ?>" class="nav-notif-btn" title="Notifikasi">
             <i class="bi bi-bell"></i>
-            <?php if ($unread > 0) : ?>
+            <?php if ($unread > 0 || in_array($userRole, ['Pimpinan', 'Kepala_Dinas', 'Kepala Dinas', 'Kepala_Bidang', 'Kepala Bidang', 'Kabid'])) : ?>
                 <span class="notif-dot"></span>
             <?php endif; ?>
         </a>
@@ -53,7 +75,7 @@ if (session()->get('user_id')) {
                 </div>
                 <div class="user-info d-none d-sm-flex">
                     <span class="user-name"><?= esc($userName) ?></span>
-                    <span class="user-role"><?= esc($userRole) ?></span>
+                    <span class="user-role"><?= esc($roleDisplay) ?></span>
                 </div>
                 <i class="bi bi-chevron-down dropdown-arrow ms-1"></i>
             </div>
@@ -70,7 +92,7 @@ if (session()->get('user_id')) {
                 </li>
                 <li><hr class="dropdown-divider my-1"></li>
                 <li>
-                    <a class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 text-danger" href="<?= base_url('/logout') ?>">
+                    <a href="javascript:void(0)" class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 text-danger" data-bs-toggle="modal" data-bs-target="#modalLogout" role="button">
                         <i class="bi bi-box-arrow-right"></i> Logout
                     </a>
                 </li>
@@ -78,3 +100,4 @@ if (session()->get('user_id')) {
         </div>
     </div>
 </header>
+

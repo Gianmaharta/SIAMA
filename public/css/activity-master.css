@@ -1,0 +1,341 @@
+:root {
+    --act-primary-blue: #1E60EC;
+    --act-primary-blue-hover: #164ec4;
+    --act-text-main: #172033;
+    --act-text-muted: #64748B;
+    --act-text-sub: #94A3B8;
+    --act-border: #E5E7EB;
+    --act-card-bg: #FFFFFF;
+}
+
+/* Header Halaman */
+.act-header-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--act-text-main);
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+    margin-bottom: 6px;
+}
+
+.act-header-desc {
+    font-size: 14.5px;
+    color: var(--act-text-muted);
+    margin-bottom: 28px;
+}
+
+/* Card Utama */
+.act-card {
+    background: var(--act-card-bg);
+    border: 1px solid var(--act-border);
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    padding: 24px;
+    margin-bottom: 30px;
+}
+
+/* Filter Bar */
+.act-filter-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 12px;
+}
+
+@media (max-width: 991.98px) {
+    .act-filter-row {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+}
+
+.act-search-col {
+    flex: 1 1 240px;
+    min-width: 200px;
+}
+
+.act-search-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.act-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--act-text-sub);
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.act-search-input {
+    padding-left: 36px;
+    padding-right: 12px;
+    height: 38px;
+    border-radius: 8px;
+    border: 1px solid #E2E8F0;
+    font-size: 13px;
+    color: var(--act-text-main);
+    background-color: #FFFFFF;
+    transition: all 0.15s ease;
+}
+
+.act-search-input:focus {
+    border-color: var(--act-primary-blue);
+    box-shadow: 0 0 0 3px rgba(30, 96, 236, 0.12);
+}
+
+.act-select-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.act-select-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #475569;
+    white-space: nowrap;
+}
+
+.act-select {
+    height: 38px;
+    border-radius: 8px;
+    border: 1px solid #E2E8F0;
+    font-size: 13px;
+    color: var(--act-text-main);
+    background-color: #FFFFFF;
+    min-width: 100px;
+    padding: 6px 28px 6px 10px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.act-select:focus {
+    border-color: var(--act-primary-blue);
+    box-shadow: 0 0 0 3px rgba(30, 96, 236, 0.12);
+}
+
+.act-btn-export {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    height: 40px;
+    border-radius: 8px;
+    border: 1px solid #E2E8F0;
+    background-color: #FFFFFF;
+    color: #475569;
+    font-size: 13.5px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.act-btn-export:hover {
+    background-color: #F8FAFC;
+    color: var(--act-primary-blue);
+    border-color: #CBD5E1;
+}
+
+/* Tabel Activity Log */
+.act-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 0;
+}
+
+.act-table thead th {
+    background-color: #FFFFFF;
+    color: #64748B;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    padding: 14px 16px;
+    border-top: none;
+    border-bottom: 1px solid var(--act-border);
+    white-space: nowrap;
+}
+
+.act-table tbody td {
+    padding: 16px;
+    vertical-align: middle;
+    border-bottom: 1px solid #F1F5F9;
+    font-size: 13.5px;
+    color: var(--act-text-main);
+}
+
+.act-table tbody tr:hover {
+    background-color: #F8FAFC;
+}
+
+.act-col-no {
+    width: 50px;
+    text-align: center;
+    color: #94A3B8;
+}
+
+.act-time {
+    color: #475569;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.act-username {
+    font-weight: 700;
+    color: var(--act-text-main);
+}
+
+.act-action {
+    font-weight: 600;
+    color: var(--act-text-main);
+}
+
+.act-detail {
+    color: #64748B;
+    font-size: 13px;
+    max-width: 320px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Badges untuk Modul */
+.badge-modul {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.badge-modul-opd {
+    background-color: #F3E8FF;
+    color: #7E22CE;
+}
+
+.badge-modul-penilaian {
+    background-color: #DCFCE7;
+    color: #15803D;
+}
+
+.badge-modul-arsip {
+    background-color: #CCFBF1;
+    color: #0F766E;
+}
+
+.badge-modul-spt {
+    background-color: #DBEAFE;
+    color: #1D4ED8;
+}
+
+.badge-modul-ba {
+    background-color: #FEF3C7;
+    color: #B45309;
+}
+
+.badge-modul-user {
+    background-color: #FFE4E6;
+    color: #BE123C;
+}
+
+.badge-modul-default {
+    background-color: #F1F5F9;
+    color: #475569;
+}
+
+/* Status Badge */
+.act-badge-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.act-badge-status-success {
+    background-color: #DCFCE7;
+    color: #15803D;
+}
+
+.act-status-dot-success {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: #22C55E;
+    display: inline-block;
+}
+
+.act-badge-status-danger {
+    background-color: #FEE2E2;
+    color: #DC2626;
+}
+
+.act-status-dot-danger {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: #EF4444;
+    display: inline-block;
+}
+
+/* Footer & Pagination */
+.act-table-footer {
+    padding-top: 20px;
+}
+
+.act-entries-info {
+    font-size: 13.5px;
+    color: #64748B;
+}
+
+.act-pagination .pagination {
+    margin-bottom: 0;
+    gap: 4px;
+}
+
+.act-pagination .page-link {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px !important;
+    border: 1px solid #E2E8F0;
+    color: #475569;
+    font-size: 13.5px;
+    font-weight: 500;
+    padding: 0;
+    background-color: #FFFFFF;
+    transition: all 0.15s ease;
+}
+
+.act-pagination .page-link:hover {
+    background-color: #F8FAFC;
+    color: var(--act-primary-blue);
+    border-color: #CBD5E1;
+}
+
+.act-pagination .page-item.active .page-link {
+    background-color: var(--act-primary-blue) !important;
+    border-color: var(--act-primary-blue) !important;
+    color: #FFFFFF !important;
+    font-weight: 600;
+}
+
+.act-pagination .page-item.disabled .page-link {
+    color: #CBD5E1;
+    background-color: #FFFFFF;
+    border-color: #E2E8F0;
+}

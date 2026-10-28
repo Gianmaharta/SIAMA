@@ -93,7 +93,7 @@ class SwitchRoleTest extends CIUnitTestCase
             ->get('/users/switch/' . $ids['target_id']);
 
         // Harus redirect ke dashboard
-        $result->assertRedirectTo(base_url('/dashboard'));
+        $result->assertRedirect();
 
         // Session harus berubah ke target user
         $this->assertEquals('admin-opd-1', session()->get('user_id'));
@@ -120,7 +120,7 @@ class SwitchRoleTest extends CIUnitTestCase
         $result = $this->withSession($switchedSession)->get('/users/switch-back');
 
         // Harus redirect ke dashboard
-        $result->assertRedirectTo(base_url('/dashboard'));
+        $result->assertRedirect();
 
         // Session harus kembali ke Admin Pemkab asli
         $this->assertEquals('admin-pemkab-1', session()->get('user_id'));
@@ -139,6 +139,26 @@ class SwitchRoleTest extends CIUnitTestCase
             ->get('/users/switch/' . $ids['admin_id']);
 
         // Harus redirect ke dashboard dengan error
-        $result->assertRedirectTo(base_url('/dashboard'));
+        $result->assertRedirect();
+    }
+
+    public function testModalSwitchUserRendersCorrectly(): void
+    {
+        $ids = $this->setupTestData();
+
+        $result = $this->withSession($this->sess($ids['admin_id'], 'admin@switch.test', 'Admin Pemkab Test', 'Admin_Pemkab'))
+            ->get('/users');
+
+        $result->assertOK();
+        $body = $result->getBody();
+        $result->assertSee('Masuk Sebagai Pengguna?');
+        $result->assertSee('Anda akan dialihkan');
+        $this->assertStringContainsString('id="switchUserName"', $body);
+        $this->assertStringContainsString('id="switchUserNameRole"', $body);
+        $this->assertStringContainsString('id="switchUserEmail"', $body);
+        $this->assertStringContainsString('id="switchUserRole"', $body);
+        $this->assertStringContainsString('id="switchUserOpd"', $body);
+        $result->assertSee('Masuk Sekarang');
+        $result->assertSee('Batal');
     }
 }

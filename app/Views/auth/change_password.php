@@ -103,10 +103,10 @@ Ganti Password Default - SIAMA
                     <i class="bi bi-check2"></i>
                     <span>Simpan Password</span>
                 </button>
-                <a href="<?= base_url('/logout') ?>" class="btn-logout-action">
+                <button type="button" class="btn-logout-action border-0" data-bs-toggle="modal" data-bs-target="#modalLogout">
                     <i class="bi bi-box-arrow-right"></i>
                     <span>Logout</span>
-                </a>
+                </button>
             </div>
         </form>
 

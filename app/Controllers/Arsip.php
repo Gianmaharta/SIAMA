@@ -45,6 +45,7 @@ class Arsip extends BaseController
         $this->arsipModel  = new ArsipModel();
         $this->bidangModel = new BidangModel();
         $this->sptModel    = new SptModel();
+        helper('logger');
 
         // Pastikan folder upload tersedia
         if (! is_dir(self::UPLOAD_PATH)) {
@@ -81,16 +82,19 @@ class Arsip extends BaseController
                 $arsip_list = $this->arsipModel->getArsipWithRelations(null, $id_opd, $id_bidang);
                 break;
 
-            case 'Arsiparis': // Arsiparis: hanya arsip yang dia buat (created_by)
-                $arsip_list = $this->arsipModel
+            case 'Arsiparis': // Arsiparis: arsip miliknya atau yang ditugaskan kepadanya melalui SPT
+                $builder = $this->arsipModel
                     ->select('arsip.*, opd.nama_opd, bidang.nama_bidang, kode_klasifikasi.kode AS kode_klasifikasi_text, kode_klasifikasi.nama_klasifikasi, spt.nomor_spt')
                     ->join('opd',              'opd.id_opd = arsip.id_opd',                             'left')
                     ->join('bidang',           'bidang.id_bidang = arsip.id_bidang',                    'left')
-                    ->join('kode_klasifikasi', 'kode_klasifikasi.id_kode_klasifikasi = arsip.id_kode_klasifikasi', 'left') // fix join condition while we're at it
-                    ->join('spt',              'spt.id_spt = arsip.id_spt',                              'left')
-                    ->where('arsip.created_by', $user_id)
-                    ->orderBy('arsip.created_at', 'DESC')
-                    ->findAll();
+                    ->join('kode_klasifikasi', 'kode_klasifikasi.id_kode_klasifikasi = arsip.id_kode_klasifikasi', 'left')
+                    ->join('spt',              'spt.id_spt = arsip.id_spt',                              'left');
+
+                if ($user_id) {
+                    $escapedUser = $this->db->escape($user_id);
+                    $builder->where("(arsip.created_by = {$escapedUser} OR arsip.id_user_upload = {$escapedUser} OR arsip.id_spt IN (SELECT id_spt FROM spt_assignments WHERE id_user = {$escapedUser}))");
+                }
+                $arsip_list = $builder->orderBy('arsip.created_at', 'DESC')->findAll();
                 break;
 
             default:
@@ -98,9 +102,51 @@ class Arsip extends BaseController
                 break;
         }
 
+        // Ambil data master bidang untuk dropdown filter (sesuai OPD user bila tersedia)
+        if (!empty($id_opd)) {
+            $bidang_list = $this->bidangModel->where('id_opd', $id_opd)->orderBy('nama_bidang', 'ASC')->findAll();
+        } else {
+            $bidang_list = $this->bidangModel->orderBy('nama_bidang', 'ASC')->findAll();
+        }
+
+        // Hitung statistik untuk informasi kartu arsip
+        $totalArsip         = count($arsip_list);
+        $sudahDiverifikasi  = 0;
+        $menungguVerifikasi = 0;
+        $sudahDinilai       = 0;
+        $belumDinilai       = 0;
+        $draft              = 0;
+
+        foreach ($arsip_list as $item) {
+            $statusVerif = strtolower(trim((string)($item['status_verifikasi'] ?? '')));
+            if ($statusVerif === 'selesai') {
+                $sudahDiverifikasi++;
+            } elseif ($statusVerif === 'menunggu') {
+                $menungguVerifikasi++;
+            } elseif ($statusVerif === 'draft') {
+                $draft++;
+            }
+
+            $skor = $item['skor_prioritas'] ?? null;
+            if ($skor !== null && $skor !== '' && is_numeric($skor)) {
+                $sudahDinilai++;
+            } else {
+                $belumDinilai++;
+            }
+        }
+
         return view('arsip/index', [
-            'arsip_list' => $arsip_list,
-            'title'      => 'Daftar Arsip Digital',
+            'arsip_list'         => $arsip_list,
+            'bidang_list'        => $bidang_list,
+            'user_role'          => $nama_role,
+            'user_id'            => $user_id,
+            'totalArsip'         => $totalArsip,
+            'sudahDiverifikasi'  => $sudahDiverifikasi,
+            'menungguVerifikasi' => $menungguVerifikasi,
+            'sudahDinilai'       => $sudahDinilai,
+            'belumDinilai'       => $belumDinilai,
+            'draft'              => $draft,
+            'title'              => 'Pengelolaan Arsip - SIAMA',
         ]);
     }
 
@@ -119,13 +165,14 @@ class Arsip extends BaseController
         $user_id = $session->get('user_id');
 
         // Ambil daftar SPT Aktif yang ditugaskan secara spesifik kepada Arsiparis yang sedang login
-        $spt_list = $this->sptModel->getSptByPelaksana($user_id);
-
+        $spt_list = $user_id ? $this->sptModel->getSptByPelaksana($user_id) : [];
 
         // Ambil daftar Bidang dalam OPD user (untuk dropdown)
-        $bidang_list = $this->bidangModel
-            ->where('id_opd', $id_opd)
-            ->findAll();
+        $bidangQuery = $this->bidangModel;
+        if (!empty($id_opd)) {
+            $bidangQuery = $bidangQuery->where('id_opd', $id_opd);
+        }
+        $bidang_list = $bidangQuery->orderBy('nama_bidang', 'ASC')->findAll();
 
         // Ambil seluruh Kode Klasifikasi (master data)
         $klasifikasi_list = $this->db->table('kode_klasifikasi')
@@ -138,14 +185,27 @@ class Arsip extends BaseController
         $spt_terpilih = null;
         if (!empty($id_spt_query)) {
             $spt_terpilih = $this->sptModel->find($id_spt_query);
+            if ($spt_terpilih) {
+                $exists = false;
+                foreach ($spt_list as $s) {
+                    if ($s['id_spt'] === $spt_terpilih['id_spt']) {
+                        $exists = true;
+                        break;
+                    }
+                }
+                if (!$exists) {
+                    $spt_list[] = $spt_terpilih;
+                }
+            }
         }
 
         return view('arsip/create', [
-            'title'            => 'Tambah Arsip Baru',
+            'title'            => 'Tambah Arsip',
             'spt_list'         => $spt_list,
             'bidang_list'      => $bidang_list,
             'klasifikasi_list' => $klasifikasi_list,
             'spt_terpilih'     => $spt_terpilih,
+            'user_role'        => $session->get('nama_role'),
         ]);
     }
 
@@ -199,8 +259,14 @@ class Arsip extends BaseController
             $fileDigitalName = $fileObj->getRandomName();
             $fileObj->move(self::UPLOAD_PATH, $fileDigitalName);
             
-            // Proses Watermark berdasarkan pilihan radio button
-            $watermarkChoice = $this->request->getPost('watermark_source') ?? 'none';
+            // Proses Watermark berdasarkan checkbox generate_watermark atau radio watermark_source
+            $generateWm = $this->request->getPost('generate_watermark');
+            if ($generateWm !== null) {
+                $watermarkChoice = ($generateWm == '1' || $generateWm === 'on') ? 'system' : 'none';
+            } else {
+                $watermarkChoice = $this->request->getPost('watermark_source') ?? 'none';
+            }
+
             if ($watermarkChoice === 'system' && $ext === 'pdf') {
                 $watermarkService = new \App\Services\WatermarkService();
                 $opd_name = 'DINAS/OPD TERKAIT'; // Default
@@ -227,7 +293,7 @@ class Arsip extends BaseController
         }
 
         $is_watermarked = $is_watermarked ?? 0;
-        $watermark_source = $watermark_source ?? ($this->request->getPost('watermark_source') ?? 'none');
+        $watermark_source = $watermark_source ?? ($watermarkChoice ?? 'none');
         
         // Hitung JRA
         $retensi_aktif = (int) $this->request->getPost('retensi_aktif');
@@ -279,6 +345,8 @@ class Arsip extends BaseController
             }
         }
 
+        log_activity('Arsip', 'CREATE', 'Mengunggah berkas arsip alih media: ' . ($data['nomor_arsip'] ?? '') . ' - ' . ($data['nama_arsip'] ?? ''));
+
         return redirect()->to('/arsip')->with('success', 'Arsip berhasil ditambahkan.');
     }
 
@@ -324,8 +392,9 @@ class Arsip extends BaseController
      */
     public function edit($id)
     {
-        $session = session();
-        $id_opd  = $session->get('id_opd');
+        $session   = session();
+        $id_opd    = $session->get('id_opd');
+        $nama_role = $session->get('nama_role');
 
         $arsip = $this->arsipModel->find($id);
 
@@ -333,28 +402,73 @@ class Arsip extends BaseController
             return redirect()->to('/arsip')->with('error', 'Data arsip tidak ditemukan.');
         }
 
-        // Ambil data dropdown (sama dengan create)
-        $spt_list = $this->sptModel
-            ->where('id_opd', $id_opd)
-            ->where('status', 'Aktif')
-            ->findAll();
+        $opd_id = $id_opd ?: ($arsip['id_opd'] ?? null);
 
-        $bidang_list = $this->bidangModel
-            ->where('id_opd', $id_opd)
-            ->findAll();
+        // Ambil data dropdown SPT (OPD terkait atau yang terikat pada arsip ini)
+        $sptQuery = $this->sptModel;
+        if (!empty($opd_id)) {
+            $sptQuery = $sptQuery->where('id_opd', $opd_id);
+        }
+        $spt_list = $sptQuery->orderBy('created_at', 'DESC')->findAll();
 
+        // Ambil data dropdown Bidang dalam OPD
+        $bidangQuery = $this->bidangModel;
+        if (!empty($opd_id)) {
+            $bidangQuery = $bidangQuery->where('id_opd', $opd_id);
+        }
+        $bidang_list = $bidangQuery->orderBy('nama_bidang', 'ASC')->findAll();
+
+        // Ambil master Kode Klasifikasi
         $klasifikasi_list = $this->db->table('kode_klasifikasi')
             ->select('id_kode_klasifikasi, kode, nama_klasifikasi')
             ->orderBy('kode', 'ASC')
             ->get()
             ->getResultArray();
 
+        // Ambil data JRA existing untuk klasifikasi arsip ini
+        $jraModel = new \App\Models\JraModel();
+        $initial_jra = null;
+        if (!empty($arsip['id_kode_klasifikasi'])) {
+            $initial_jra = $jraModel->getByKlasifikasi($arsip['id_kode_klasifikasi']);
+        }
+
+        // Informasi berkas file saat ini
+        $file_info = null;
+        if (!empty($arsip['file_arsip'])) {
+            $filePath = self::UPLOAD_PATH . $arsip['file_arsip'];
+            $fileSize = file_exists($filePath) ? filesize($filePath) : null;
+            $fileExt = strtoupper(pathinfo($arsip['file_arsip'], PATHINFO_EXTENSION));
+
+            $formattedSize = '-';
+            if ($fileSize !== null) {
+                if ($fileSize >= 1048576) {
+                    $formattedSize = round($fileSize / 1048576, 2) . ' MB';
+                } elseif ($fileSize >= 1024) {
+                    $formattedSize = round($fileSize / 1024, 2) . ' KB';
+                } else {
+                    $formattedSize = $fileSize . ' Bytes';
+                }
+            }
+
+            $file_info = [
+                'name'      => $arsip['file_arsip'],
+                'format'    => $fileExt,
+                'size'      => $formattedSize,
+                'url'       => base_url(self::UPLOAD_URL . $arsip['file_arsip']),
+                'is_wm'     => !empty($arsip['is_watermarked']),
+                'wm_source' => $arsip['watermark_source'] ?? 'none',
+            ];
+        }
+
         return view('arsip/edit', [
-            'title'            => 'Edit Data Arsip',
+            'title'            => 'Edit Arsip',
             'arsip'            => $arsip,
             'spt_list'         => $spt_list,
             'bidang_list'      => $bidang_list,
             'klasifikasi_list' => $klasifikasi_list,
+            'initial_jra'      => $initial_jra,
+            'file_info'        => $file_info,
+            'user_role'        => $nama_role,
         ]);
     }
 
@@ -364,7 +478,7 @@ class Arsip extends BaseController
 
     /**
      * Memproses pembaruan data arsip.
-     * Jika ada file baru yang diunggah, file lama akan dihapus dan diganti.
+     * Jika ada file baru yang diunggah, file lama akan diganti.
      * Hanya untuk Arsiparis (id_role: 5) — dijaga filter route.
      *
      * @param int $id id_arsip
@@ -379,13 +493,13 @@ class Arsip extends BaseController
 
         // ----- Validasi Input Form -----
         if (! $this->validate([
-            'nomor_arsip'      => 'required|max_length[100]',
-            'nama_arsip'       => 'required|max_length[255]',
+            'nomor_arsip'         => 'required|max_length[100]',
+            'nama_arsip'          => 'required|max_length[255]',
             'id_kode_klasifikasi' => 'required',
-            'id_bidang'        => 'required',
-            'kurun_waktu'      => 'permit_empty|max_length[50]',
-            'jumlah'           => 'permit_empty|numeric',
-            'kondisi'          => 'permit_empty|max_length[50]',
+            'id_bidang'           => 'required',
+            'kurun_waktu'         => 'permit_empty|max_length[50]',
+            'jumlah'              => 'permit_empty|numeric',
+            'kondisi'             => 'permit_empty|max_length[50]',
         ])) {
             return redirect()->back()->withInput()->with('error', implode('<br>', $this->validator->getErrors()));
         }
@@ -420,7 +534,12 @@ class Arsip extends BaseController
         }
         
         $is_watermarked = $arsip['is_watermarked'];
-        $watermark_source = $this->request->getPost('watermark_source') ?? ($arsip['watermark_source'] ?? 'none');
+        $generateWm = $this->request->getPost('generate_watermark');
+        if ($generateWm !== null) {
+            $watermark_source = ($generateWm == '1' || $generateWm === 'on') ? 'system' : 'none';
+        } else {
+            $watermark_source = $this->request->getPost('watermark_source') ?? ($arsip['watermark_source'] ?? 'none');
+        }
 
         // Proses Watermark berdasarkan pilihan radio button
         if ($watermark_source === 'system') {
@@ -477,6 +596,8 @@ class Arsip extends BaseController
 
         $this->arsipModel->skipValidation(true)->update($id, $data);
 
+        log_activity('Arsip', 'UPDATE', 'Memperbarui data arsip: ' . ($data['nomor_arsip'] ?? $arsip['nomor_arsip']) . ' - ' . ($data['nama_arsip'] ?? $arsip['nama_arsip']), $arsip, $data);
+
         return redirect()->to('/arsip')->with('success', 'Data arsip berhasil diperbarui.');
     }
 
@@ -522,6 +643,8 @@ class Arsip extends BaseController
         // Hapus record dari database
         $this->arsipModel->delete($id);
 
+        log_activity('Arsip', 'DELETE', 'Menghapus arsip: ' . ($arsip['nomor_arsip'] ?? '') . ' - ' . ($arsip['nama_arsip'] ?? ''));
+
         return redirect()->to('/arsip')->with('success', 'Data arsip berhasil dihapus secara permanen.');
     }
 
@@ -552,6 +675,8 @@ class Arsip extends BaseController
         }
 
         $this->arsipModel->update($id, ['status_verifikasi' => 'Selesai']);
+
+        log_activity('Arsip', 'VERIFY', 'Memverifikasi berkas arsip: ' . ($arsip['nomor_arsip'] ?? '') . ' (Status: Selesai)');
 
         return redirect()->to('/arsip')->with('success', 'Arsip berhasil diverifikasi.');
     }

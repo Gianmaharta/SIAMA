@@ -21,7 +21,7 @@ class Jra extends BaseController
     public function index()
     {
         $session = session();
-        if (!in_array($session->get('nama_role'), ['Admin_Pemkab', 'Admin_OPD'])) {
+        if (!in_array($session->get('nama_role'), ['Admin_Pemkab', 'Admin_OPD', 'Administrator OPD'])) {
             return redirect()->to('/dashboard')->with('error', 'Akses ditolak.');
         }
 
@@ -33,7 +33,7 @@ class Jra extends BaseController
 
     public function create()
     {
-        if (!in_array(session()->get('nama_role'), ['Admin_Pemkab', 'Admin_OPD'])) {
+        if (!in_array(session()->get('nama_role'), ['Admin_Pemkab', 'Admin_OPD', 'Administrator OPD'])) {
             return redirect()->to('/dashboard')->with('error', 'Akses ditolak.');
         }
 
@@ -45,7 +45,7 @@ class Jra extends BaseController
 
     public function store()
     {
-        if (!in_array(session()->get('nama_role'), ['Admin_Pemkab', 'Admin_OPD'])) {
+        if (!in_array(session()->get('nama_role'), ['Admin_Pemkab', 'Admin_OPD', 'Administrator OPD'])) {
             return redirect()->to('/dashboard')->with('error', 'Akses ditolak.');
         }
 
@@ -112,7 +112,7 @@ class Jra extends BaseController
 
     public function edit($id)
     {
-        if (!in_array(session()->get('nama_role'), ['Admin_Pemkab', 'Admin_OPD'])) {
+        if (!in_array(session()->get('nama_role'), ['Admin_Pemkab', 'Admin_OPD', 'Administrator OPD'])) {
             return redirect()->to('/dashboard')->with('error', 'Akses ditolak.');
         }
 
@@ -121,6 +121,12 @@ class Jra extends BaseController
         if (!$data['jra']) {
             return redirect()->to('/jra')->with('error', 'Data tidak ditemukan.');
         }
+
+        // Data dengan keterangan retensi Musnah tidak dapat diedit
+        if (str_contains(strtolower(trim($data['jra']['keterangan_retensi'] ?? '')), 'musnah')) {
+            return redirect()->to('/jra')->with('error', 'Data JRA dengan status Musnah tidak dapat diedit.');
+        }
+
         $data['klasifikasi'] = $this->db->table('kode_klasifikasi')->where('id_kode_klasifikasi', $data['jra']['id_kode_klasifikasi'])->get()->getRowArray();
 
         
@@ -129,8 +135,18 @@ class Jra extends BaseController
 
     public function update($id)
     {
-        if (!in_array(session()->get('nama_role'), ['Admin_Pemkab', 'Admin_OPD'])) {
+        if (!in_array(session()->get('nama_role'), ['Admin_Pemkab', 'Admin_OPD', 'Administrator OPD'])) {
             return redirect()->to('/dashboard')->with('error', 'Akses ditolak.');
+        }
+
+        $jra = $this->jraModel->find($id);
+        if (!$jra) {
+            return redirect()->to('/jra')->with('error', 'Data tidak ditemukan.');
+        }
+
+        // Data dengan keterangan retensi Musnah tidak dapat diedit
+        if (str_contains(strtolower(trim($jra['keterangan_retensi'] ?? '')), 'musnah')) {
+            return redirect()->to('/jra')->with('error', 'Data JRA dengan status Musnah tidak dapat diedit.');
         }
 
         $kode = $this->request->getPost('kode');
@@ -179,9 +195,20 @@ class Jra extends BaseController
 
     public function delete($id)
     {
-        if (!in_array(session()->get('nama_role'), ['Admin_Pemkab', 'Admin_OPD'])) {
+        if (!in_array(session()->get('nama_role'), ['Admin_Pemkab', 'Admin_OPD', 'Administrator OPD'])) {
             return redirect()->to('/dashboard')->with('error', 'Akses ditolak.');
         }
+
+        $jra = $this->jraModel->find($id);
+        if (!$jra) {
+            return redirect()->to('/jra')->with('error', 'Data tidak ditemukan.');
+        }
+
+        // Data dengan keterangan retensi Musnah tidak dapat dihapus
+        if (str_contains(strtolower(trim($jra['keterangan_retensi'] ?? '')), 'musnah')) {
+            return redirect()->to('/jra')->with('error', 'Data JRA dengan status Musnah tidak dapat dihapus.');
+        }
+
         $this->jraModel->delete($id);
         return redirect()->to('/jra')->with('success', 'Data JRA berhasil dihapus.');
     }

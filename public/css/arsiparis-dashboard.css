@@ -1,0 +1,467 @@
+/* ============================================================== */
+/* DASHBOARD ARSIPARIS - SIAMA MODERN MINIMALIST DESIGN SYSTEM    */
+/* ============================================================== */
+
+.arsiparis-dashboard {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #172033;
+}
+
+/* 1. Header */
+.arsiparis-header-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #0F172A;
+    letter-spacing: -0.3px;
+    margin-bottom: 4px;
+}
+
+.arsiparis-header-desc {
+    font-size: 14px;
+    color: #64748B;
+    margin-bottom: 0;
+}
+
+/* 2. Top Summary Stat Cards */
+.arsiparis-stat-card {
+    background-color: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.arsiparis-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
+    border-color: #CBD5E1;
+}
+
+.arsiparis-stat-icon-purple {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background-color: #FAF5FF;
+    color: #9333EA;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+}
+
+.arsiparis-stat-icon-blue {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background-color: #EFF6FF;
+    color: #1E60EC;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+}
+
+.arsiparis-stat-icon-green {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background-color: #ECFDF5;
+    color: #10B981;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+}
+
+.arsiparis-stat-label {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #475569;
+    margin-bottom: 4px;
+}
+
+.arsiparis-stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #0F172A;
+    line-height: 1;
+}
+
+/* 3. Menu Akses Cepat */
+.quick-access-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0F172A;
+    margin-bottom: 3px;
+}
+
+.quick-access-subtitle {
+    font-size: 13.5px;
+    color: #64748B;
+    margin-bottom: 16px;
+}
+
+.quick-access-card {
+    background-color: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    height: 100%;
+}
+
+.quick-access-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    border-color: #CBD5E1;
+    color: inherit;
+}
+
+.quick-access-icon-box {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 14px;
+}
+
+.quick-access-icon-box.green {
+    background-color: #ECFDF5;
+    color: #10B981;
+}
+
+.quick-access-icon-box.amber {
+    background-color: #FFFBEB;
+    color: #F59E0B;
+}
+
+.quick-access-icon-box.blue {
+    background-color: #EFF6FF;
+    color: #1E60EC;
+}
+
+.quick-access-icon-box.purple {
+    background-color: #FAF5FF;
+    color: #8B5CF6;
+}
+
+.quick-card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0F172A;
+    margin-bottom: 4px;
+}
+
+.quick-card-desc {
+    font-size: 12.5px;
+    color: #64748B;
+    line-height: 1.45;
+    margin-bottom: 12px;
+    flex-grow: 1;
+}
+
+.quick-card-arrow {
+    text-align: right;
+    color: #1E60EC;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+/* 4. Large Panels (Donut Chart & Bar Chart) */
+.arsiparis-panel-card {
+    background-color: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    padding: 24px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.arsiparis-panel-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.arsiparis-panel-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0F172A;
+    margin-bottom: 2px;
+}
+
+.arsiparis-panel-subtitle {
+    font-size: 12.5px;
+    color: #64748B;
+    margin-bottom: 0;
+}
+
+.arsiparis-pill-badge {
+    background-color: #EFF6FF;
+    color: #1E60EC;
+    border: 1px solid #DBEAFE;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 14px;
+    border-radius: 50px;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Donut Chart with Centered Overlay */
+.donut-chart-container {
+    position: relative;
+    width: 170px;
+    height: 170px;
+    margin: 0 auto;
+}
+
+.donut-center-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+}
+
+.donut-center-number {
+    font-size: 28px;
+    font-weight: 700;
+    color: #0F172A;
+    line-height: 1;
+    margin-bottom: 2px;
+}
+
+.donut-center-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: #64748B;
+    text-transform: capitalize;
+}
+
+/* Stacked Status Pill Cards */
+.status-pill-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: center;
+    height: 100%;
+}
+
+.status-pill-item {
+    border-radius: 10px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13.5px;
+    transition: transform 0.15s ease;
+}
+
+.status-pill-item:hover {
+    transform: translateX(2px);
+}
+
+.status-pill-item.green {
+    background-color: #F0FDF4;
+    border: 1px solid #DCFCE7;
+    color: #065F46;
+}
+
+.status-pill-item.amber {
+    background-color: #FFFBEB;
+    border: 1px solid #FEF3C7;
+    color: #92400E;
+}
+
+.status-pill-item.gray {
+    background-color: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    color: #475569;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.status-dot.green {
+    background-color: #10B981;
+}
+
+.status-dot.amber {
+    background-color: #F59E0B;
+}
+
+.status-dot.gray {
+    background-color: #94A3B8;
+}
+
+.status-item-label {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-item-meta {
+    text-align: right;
+}
+
+.status-item-count {
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 1.2;
+}
+
+.status-item-pct {
+    font-size: 11px;
+    opacity: 0.85;
+}
+
+/* Card Footers */
+.arsiparis-card-footer {
+    border-top: 1px solid #F1F5F9;
+    padding-top: 14px;
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11.5px;
+    color: #94A3B8;
+}
+
+.realtime-pulse-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #10B981;
+    font-weight: 600;
+    font-size: 11.5px;
+}
+
+.pulse-dot {
+    width: 7px;
+    height: 7px;
+    background-color: #10B981;
+    border-radius: 50%;
+    box-shadow: 0 0 0 rgba(16, 185, 129, 0.4);
+    animation: pulseGlow 2s infinite;
+}
+
+@keyframes pulseGlow {
+    0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+    }
+    70% {
+        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+.footer-report-link {
+    color: #1E60EC;
+    font-weight: 600;
+    font-size: 12px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: gap 0.2s ease;
+}
+
+.footer-report-link:hover {
+    color: #1545A8;
+    gap: 6px;
+}
+
+/* 5. Table Styling for Berita Acara */
+.arsiparis-table-wrapper {
+    background-color: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    overflow: hidden;
+}
+
+.arsiparis-table-header {
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #F1F5F9;
+}
+
+.arsiparis-table {
+    margin-bottom: 0;
+    font-size: 13.5px;
+}
+
+.arsiparis-table thead th {
+    background-color: #F8FAFC;
+    color: #64748B;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 12px 20px;
+    border-bottom: 1px solid #E2E8F0;
+}
+
+.arsiparis-table tbody td {
+    padding: 14px 20px;
+    color: #334155;
+    border-bottom: 1px solid #F1F5F9;
+    vertical-align: middle;
+}
+
+.arsiparis-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.arsiparis-table tbody tr:hover td {
+    background-color: #F8FAFC;
+}
+
+.ba-empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #64748B;
+}
+
+.ba-empty-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: #F1F5F9;
+    color: #94A3B8;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 12px;
+}

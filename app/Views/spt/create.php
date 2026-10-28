@@ -5,7 +5,15 @@ Terbitkan SPT Baru - SIAMA
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<h2>Terbitkan Surat Perintah Tugas (SPT)</h2>
+<!-- Header Halaman: Tombol Back Sejajar Judul -->
+<div class="d-flex align-items-center gap-3 mb-4">
+    <a href="<?= base_url('/spt') ?>" class="btn-back-title" title="Kembali ke Daftar SPT" aria-label="Kembali">
+        <i class="bi bi-arrow-left"></i>
+    </a>
+    <div>
+        <h1 class="spt-page-title mb-0" style="font-size: 24px; font-weight: 700; color: #172033;">Terbitkan Surat Perintah Tugas (SPT)</h1>
+    </div>
+</div>
 
 <?php if (session()->getFlashdata('error')) : ?>
     <div style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 15px;">
