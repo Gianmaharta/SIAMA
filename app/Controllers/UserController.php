@@ -159,6 +159,14 @@ class UserController extends BaseController
         }
 
         log_activity('Users', 'CREATE', 'Membuat akun pengguna baru: ' . $userData['nama']);
+
+        // Kirim notifikasi pengelolaan akun (Skenario F)
+        try {
+            notification_service()->notifyUserManagement($userId, 'create', session()->get('user_id'));
+        } catch (\Throwable $e) {
+            log_message('error', 'Gagal mengirim notifikasi pembuatan user: ' . $e->getMessage());
+        }
+
         return redirect()->to('/users')->with('success', 'Akun berhasil dibuat dengan password default: Admin123!');
     }
 
@@ -337,6 +345,14 @@ class UserController extends BaseController
         ]);
 
         log_activity('Users', 'UPDATE', 'Mereset password pengguna ke default: ' . $user['nama']);
+
+        // Kirim notifikasi reset akun (Skenario F)
+        try {
+            notification_service()->notifyUserManagement($id, 'reset', session()->get('user_id'));
+        } catch (\Throwable $e) {
+            log_message('error', 'Gagal mengirim notifikasi reset user: ' . $e->getMessage());
+        }
+
         return redirect()->back()->with('success', 'Password berhasil di-reset ke default (Admin123!). Pengguna akan diminta untuk mengganti password saat login.');
     }
 

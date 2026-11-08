@@ -150,7 +150,7 @@ Surat Perintah Tugas - SIAMA
             </div>
 
             <?php if (in_array(session()->get('nama_role'), ['Pimpinan', 'Kepala_Dinas', 'Kepala Dinas'])) : ?>
-                <button type="button" class="spt-btn-create ms-sm-1" data-bs-toggle="modal" data-bs-target="#modalTerbitkanSpt">
+                <button type="button" class="spt-btn-create btn-toolbar-primary ms-sm-1" data-bs-toggle="modal" data-bs-target="#modalTerbitkanSpt">
                     <i class="bi bi-plus-lg"></i>
                     <span>Terbitkan SPT</span>
                 </button>

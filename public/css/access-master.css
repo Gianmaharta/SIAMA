@@ -146,6 +146,7 @@
 /* Tabel Access Log */
 .acc-table {
     width: 100%;
+    min-width: 750px;
     border-collapse: separate;
     border-spacing: 0;
     margin-bottom: 0;
@@ -319,4 +320,54 @@
     background-color: #FFFFFF;
     border-color: #E2E8F0;
     pointer-events: none;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 768px) {
+    .acc-filter-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .acc-filter-left {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .acc-search-wrapper {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .acc-btn-export {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .acc-table-footer {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 576px) {
+    .acc-header-title {
+        font-size: 22px;
+    }
+
+    .acc-card {
+        padding: 16px;
+    }
+
+    .acc-select-group {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .acc-select {
+        flex: 1;
+    }
 }

@@ -335,15 +335,7 @@ class Spt extends BaseController
 
         // Kirim Notifikasi ke Arsiparis
         try {
-            $notifModel = new \App\Models\NotificationModel();
-            $notifModel->insert([
-                'id_user'     => $id_user,
-                'title'       => 'Penugasan SPT Baru',
-                'message'     => "Anda telah ditugaskan pada Surat Perintah Tugas: {$nomorSpt}.",
-                'is_read'     => 0,
-                'action_type' => 'spt',
-                'action_id'   => $id_spt
-            ]);
+            notification_service()->notifySptAssigned($id_spt, $id_user, $session->get('user_id'));
         } catch (\Throwable $e) {
             log_message('error', 'Gagal mengirim notifikasi SPT: ' . $e->getMessage());
         }

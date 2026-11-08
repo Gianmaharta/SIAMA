@@ -304,6 +304,7 @@
 /* Main SPT Table */
 .spt-table {
     width: 100%;
+    min-width: 850px;
     margin-bottom: 0;
     border-collapse: separate;
     border-spacing: 0;
@@ -744,6 +745,41 @@
         flex-direction: column;
         align-items: center;
         text-align: center;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 576px) {
+    .spt-btn-create {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .spt-filter-wrap {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .spt-filter-select {
+        flex: 1;
+    }
+
+    .modal-dialog.spt-modal-dialog {
+        margin: 0.5rem auto !important;
+        max-width: calc(100% - 1rem) !important;
+        width: calc(100% - 1rem) !important;
+    }
+
+    .spt-modal-footer {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .spt-btn-modal-submit,
+    .spt-btn-modal-cancel {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
     }
 }
 
@@ -755,14 +791,14 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background-color: var(--spt-primary-blue, #1E60EC);
+    background-color: #1E3A6D;
     color: #FFFFFF !important;
     font-size: 13.5px;
     font-weight: 600;
     padding: 8px 18px;
     border-radius: 8px;
     border: none;
-    box-shadow: 0 1px 3px rgba(30, 96, 236, 0.25);
+    box-shadow: 0 1px 3px rgba(30, 58, 109, 0.25);
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     cursor: pointer;
     text-decoration: none;
@@ -770,16 +806,19 @@
     height: 38px;
 }
 
-.spt-btn-create:hover {
-    background-color: var(--spt-primary-blue-hover, #1752CE);
+.spt-btn-create:hover,
+.spt-btn-create:focus {
+    background-color: #172F59;
     color: #FFFFFF !important;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(30, 96, 236, 0.35);
+    box-shadow: 0 4px 12px rgba(30, 58, 109, 0.35);
 }
 
 .spt-btn-create:active {
+    background-color: #122648;
+    color: #FFFFFF !important;
     transform: translateY(0);
-    box-shadow: 0 1px 2px rgba(30, 96, 236, 0.2);
+    box-shadow: 0 1px 2px rgba(30, 58, 109, 0.2);
 }
 
 .spt-btn-create i {

@@ -32,6 +32,38 @@ class ArsipPageTest extends CIUnitTestCase
         ];
     }
 
+    protected function getOrCreateArsip(): array
+    {
+        $db = \Config\Database::connect('tests');
+        $arsip = $db->table('arsip')->get(1)->getRowArray();
+        if (!$arsip) {
+            $idArsip = '97f2537d-9aad-4ee1-a86a-7099274c8ed1';
+            // pastikan OPD & User test ada
+            $db->table('opd')->ignore(true)->insert(['id_opd' => '9974e50e-9512-4044-999d-7eb4061cd6b2', 'nama_opd' => 'OPD Test']);
+            $db->table('users')->ignore(true)->insert([
+                'id_user' => '08167f77-3106-4010-b801-b0716a2809d8',
+                'nama' => 'Budi Santoso',
+                'email' => 'arsiparis@siama.test',
+                'password' => password_hash('Pass123!', PASSWORD_DEFAULT),
+                'id_opd' => '9974e50e-9512-4044-999d-7eb4061cd6b2',
+                'is_active' => 1,
+                'is_default_password' => 0,
+            ]);
+            $db->table('arsip')->insert([
+                'id_arsip'          => $idArsip,
+                'nomor_arsip'       => '001/ARSIP/TEST/2026',
+                'nama_arsip'        => 'Laporan Kegiatan Test',
+                'kurun_waktu'       => '2026',
+                'kondisi'           => 'Baik',
+                'status_verifikasi' => 'Draft',
+                'id_user'           => '08167f77-3106-4010-b801-b0716a2809d8',
+                'id_opd'            => '9974e50e-9512-4044-999d-7eb4061cd6b2',
+            ]);
+            $arsip = $db->table('arsip')->where('id_arsip', $idArsip)->get()->getRowArray();
+        }
+        return $arsip;
+    }
+
     public function testArsiparisAccessesPengelolaanArsipPage()
     {
         $result = $this->withSession($this->sessArsiparis())
@@ -76,9 +108,8 @@ class ArsipPageTest extends CIUnitTestCase
 
     public function testArsiparisAccessesEditArsipPage()
     {
-        $db = \Config\Database::connect();
-        $arsip = $db->table('arsip')->get(1)->getRowArray();
-        $idArsip = $arsip['id_arsip'] ?? '97f2537d-9aad-4ee1-a86a-7099274c8ed1';
+        $arsip = $this->getOrCreateArsip();
+        $idArsip = $arsip['id_arsip'];
 
         $result = $this->withSession($this->sessArsiparis())
                        ->get('/arsip/edit/' . $idArsip);
@@ -130,8 +161,8 @@ class ArsipPageTest extends CIUnitTestCase
     public function testArsiparisCanUpdateArsip()
     {
         $db = \Config\Database::connect();
-        $arsip = $db->table('arsip')->get(1)->getRowArray();
-        $idArsip = $arsip['id_arsip'] ?? '97f2537d-9aad-4ee1-a86a-7099274c8ed1';
+        $arsip = $this->getOrCreateArsip();
+        $idArsip = $arsip['id_arsip'];
 
         $updatedNama = 'Laporan Kegiatan Update ' . time();
         $postData = [

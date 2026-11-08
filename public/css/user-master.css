@@ -286,6 +286,33 @@
     transform: translateY(-1px);
 }
 
+/* Toolbar primary add button styling */
+.user-table-toolbar .user-btn-add {
+    background-color: #1E3A6D !important;
+    border-color: #1E3A6D !important;
+    color: #FFFFFF !important;
+}
+
+.user-table-toolbar .user-btn-add:hover,
+.user-table-toolbar .user-btn-add:focus {
+    background-color: #172F59 !important;
+    border-color: #172F59 !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 12px rgba(30, 58, 109, 0.25);
+    transform: translateY(-1px);
+}
+
+.user-table-toolbar .user-btn-add:active {
+    background-color: #122648 !important;
+    border-color: #122648 !important;
+    color: #FFFFFF !important;
+    transform: translateY(0);
+}
+
+.user-table-toolbar .user-btn-add i {
+    color: #FFFFFF !important;
+}
+
 /* Table Responsive & Base Layout */
 .user-table-responsive {
     margin-bottom: 0;
@@ -294,6 +321,7 @@
 
 .user-table {
     width: 100%;
+    min-width: 780px;
     margin-bottom: 0;
     border-collapse: collapse;
 }
@@ -868,5 +896,61 @@ select.user-form-control option,
 
     .user-select-control {
         max-width: 100%;
+    }
+
+    .user-table-footer {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 576px) {
+    .user-toolbar-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .user-filter-item {
+        width: 100%;
+    }
+
+    .user-select-control {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .user-btn-add {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .modal-dialog.user-modal-dialog {
+        margin: 0.5rem auto !important;
+        max-width: calc(100% - 1rem) !important;
+        width: calc(100% - 1rem) !important;
+    }
+
+    .modal-footer.user-modal-footer {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .modal-footer.user-modal-footer button,
+    .modal-footer.user-modal-footer a {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .user-toast-container {
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+    }
+
+    .user-toast {
+        width: 100%;
+        justify-content: center;
     }
 }

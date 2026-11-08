@@ -144,6 +144,7 @@
 /* Tabel Activity Log */
 .act-table {
     width: 100%;
+    min-width: 750px;
     border-collapse: separate;
     border-spacing: 0;
     margin-bottom: 0;
@@ -338,4 +339,49 @@
     color: #CBD5E1;
     background-color: #FFFFFF;
     border-color: #E2E8F0;
+    pointer-events: none;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 768px) {
+    .act-filter-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .act-search-col {
+        min-width: 100%;
+        width: 100%;
+    }
+
+    .act-btn-export {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .act-table-footer {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 576px) {
+    .act-header-title {
+        font-size: 22px;
+    }
+
+    .act-card {
+        padding: 16px;
+    }
+
+    .act-select-group {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .act-select {
+        flex: 1;
+    }
 }

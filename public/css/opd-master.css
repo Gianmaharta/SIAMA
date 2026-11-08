@@ -288,6 +288,33 @@
     transform: translateY(-1px);
 }
 
+/* Toolbar primary add button styling */
+.opd-table-toolbar .opd-btn-add {
+    background-color: #1E3A6D !important;
+    border-color: #1E3A6D !important;
+    color: #FFFFFF !important;
+}
+
+.opd-table-toolbar .opd-btn-add:hover,
+.opd-table-toolbar .opd-btn-add:focus {
+    background-color: #172F59 !important;
+    border-color: #172F59 !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 12px rgba(30, 58, 109, 0.25);
+    transform: translateY(-1px);
+}
+
+.opd-table-toolbar .opd-btn-add:active {
+    background-color: #122648 !important;
+    border-color: #122648 !important;
+    color: #FFFFFF !important;
+    transform: translateY(0);
+}
+
+.opd-table-toolbar .opd-btn-add i {
+    color: #FFFFFF !important;
+}
+
 /* Table Responsive & Base - Compact Layout */
 .opd-table-responsive {
     margin-bottom: 0;
@@ -296,6 +323,7 @@
 
 .opd-table {
     width: 100%;
+    min-width: 680px;
     margin-bottom: 0;
     border-collapse: collapse;
 }
@@ -887,9 +915,38 @@ select.opd-form-control option,
 
     .opd-btn-add {
         width: 100%;
+        justify-content: center;
     }
 
     .opd-stat-card {
         padding: 18px 20px;
+    }
+
+    .modal-dialog.opd-modal-dialog {
+        margin: 0.5rem auto !important;
+        max-width: calc(100% - 1rem) !important;
+        width: calc(100% - 1rem) !important;
+    }
+
+    .modal-footer.opd-modal-footer {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .modal-footer.opd-modal-footer button,
+    .modal-footer.opd-modal-footer a {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .opd-toast-container {
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+    }
+
+    .opd-toast {
+        width: 100%;
+        justify-content: center;
     }
 }

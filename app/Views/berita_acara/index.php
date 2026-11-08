@@ -79,7 +79,7 @@ Daftar Berita Acara - SIAMA
 
                 <!-- Tombol Buat Berita Acara (CTA) -->
                 <?php if (in_array(session()->get('nama_role'), ['Arsiparis', 'Admin_Pemkab', 'Admin_OPD'])) : ?>
-                    <a href="<?= base_url('/berita-acara/create') ?>" class="btn ba-btn-add" id="btnTambahBA" title="Buat Draf Berita Acara Baru">
+                    <a href="<?= base_url('/berita-acara/create') ?>" class="btn ba-btn-add btn-toolbar-primary" id="btnTambahBA" title="Buat Draf Berita Acara Baru">
                         <i class="bi bi-plus-lg"></i>
                         <span>Buat Berita Acara</span>
                     </a>

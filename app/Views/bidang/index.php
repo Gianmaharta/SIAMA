@@ -61,7 +61,7 @@ Master Data Bidang - SIAMA
         <div class="bidang-toolbar-actions">
             <button 
                 type="button" 
-                class="bidang-btn-add" 
+                class="bidang-btn-add btn-toolbar-primary" 
                 data-bs-toggle="modal" 
                 data-bs-target="#modalTambahBidang"
             >

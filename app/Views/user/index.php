@@ -136,7 +136,7 @@ Manajemen Akun - SIAMA
             <!-- Tombol Tambah Pengguna -->
             <button 
                 type="button" 
-                class="user-btn-add" 
+                class="user-btn-add btn-toolbar-primary" 
                 data-bs-toggle="modal" 
                 data-bs-target="#modalTambahUser"
             >
@@ -490,86 +490,86 @@ Manajemen Akun - SIAMA
 <!-- MODAL: KONFIRMASI MASUK SEBAGAI (SWITCH USER)                  -->
 <!-- ============================================================== -->
 <div class="modal fade" id="modalSwitchUser" tabindex="-1" aria-labelledby="modalSwitchUserLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 470px;">
-        <div class="modal-content border-0 position-relative p-3" style="border-radius: 18px; box-shadow: 0 20px 45px rgba(0, 0, 0, 0.12);">
-            <!-- Close Button -->
-            <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Tutup"></button>
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+        <div class="modal-content border-0 position-relative p-2" style="border-radius: 16px; box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12);">
+            <div class="modal-body text-center pt-2 pb-2 px-2 position-relative">
+                <!-- Close Button -->
+                <button type="button" class="btn-close position-absolute top-0 end-0 m-2 shadow-none" id="btnCloseSwitchUser" data-bs-dismiss="modal" aria-label="Tutup" style="z-index: 1055; cursor: pointer;"></button>
 
-            <div class="modal-body text-center pt-3 pb-2 px-2">
                 <!-- Top Purple Icon Badge -->
-                <div class="mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 68px; height: 68px; border-radius: 50%; background-color: #F3E8FF; color: #7C3AED; font-size: 28px;">
+                <div class="mb-2 mx-auto d-flex align-items-center justify-content-center" style="width: 46px; height: 46px; border-radius: 50%; background-color: #F3E8FF; color: #7C3AED; font-size: 22px;">
                     <i class="bi bi-box-arrow-in-right"></i>
                 </div>
 
                 <!-- Judul & Subjudul -->
-                <h5 class="fw-bold text-dark mb-2" id="modalSwitchUserLabel" style="font-size: 21px; letter-spacing: -0.2px;">Masuk Sebagai Pengguna?</h5>
-                <p class="text-secondary small mb-4 px-2" style="font-size: 13px; line-height: 1.5; color: #64748B;">
+                <h5 class="fw-bold text-dark mb-1" id="modalSwitchUserLabel" style="font-size: 18px; letter-spacing: -0.2px;">Masuk Sebagai Pengguna?</h5>
+                <p class="text-secondary small mb-3 px-1" style="font-size: 12px; line-height: 1.4; color: #64748B;">
                     Anda akan dialihkan (<em>impersonate</em>) ke akun pengguna ini tanpa perlu memasukkan password.
                 </p>
 
                 <!-- Information Card -->
-                <div class="p-3 mb-4 rounded-3 text-start border" style="background-color: #F8FAFC; border-color: #E2E8F0 !important; border-radius: 14px !important;">
+                <div class="p-2 px-3 mb-3 rounded-3 text-start border" style="background-color: #F8FAFC; border-color: #E2E8F0 !important; border-radius: 12px !important;">
                     <!-- Item 1: Nama Pengguna -->
                     <div class="d-flex align-items-center">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 50px; height: 50px; background-color: #EFF6FF; color: #1E60EC; font-size: 24px;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center me-2 flex-shrink-0" style="width: 32px; height: 32px; background-color: #EFF6FF; color: #1E60EC; font-size: 16px;">
                             <i class="bi bi-person"></i>
                         </div>
                         <div class="flex-grow-1 overflow-hidden">
-                            <div class="text-secondary fw-medium mb-1" style="font-size: 11.5px; color: #64748B;">Nama Pengguna</div>
-                            <div class="fw-bold text-dark text-truncate" style="font-size: 15px; line-height: 1.3;" id="switchUserName">-</div>
-                            <div class="fw-bold text-dark" style="font-size: 14px; line-height: 1.3;" id="switchUserNameRole"></div>
+                            <div class="text-secondary fw-medium" style="font-size: 10.5px; color: #64748B; line-height: 1.2;">Nama Pengguna</div>
+                            <div class="fw-bold text-dark text-truncate" style="font-size: 13.5px; line-height: 1.25;" id="switchUserName">-</div>
+                            <div id="switchUserNameRole" class="d-none"></div>
                         </div>
                     </div>
 
-                    <div class="border-top my-3" style="border-color: #E2E8F0 !important;"></div>
+                    <div class="border-top" style="margin: 6px 0; border-color: #E2E8F0 !important;"></div>
 
                     <!-- Item 2: Email -->
                     <div class="d-flex align-items-center">
-                        <div class="d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 38px; height: 38px; border-radius: 8px; background-color: #EFF6FF; color: #1E60EC; font-size: 18px;">
+                        <div class="d-flex align-items-center justify-content-center me-2 flex-shrink-0" style="width: 32px; height: 32px; border-radius: 8px; background-color: #EFF6FF; color: #1E60EC; font-size: 15px;">
                             <i class="bi bi-envelope"></i>
                         </div>
                         <div class="flex-grow-1 overflow-hidden">
-                            <div class="text-secondary fw-medium mb-1" style="font-size: 11.5px; color: #64748B;">Email</div>
-                            <div class="text-dark fw-medium text-truncate" style="font-size: 13.5px;" id="switchUserEmail">-</div>
+                            <div class="text-secondary fw-medium" style="font-size: 10.5px; color: #64748B; line-height: 1.2;">Email</div>
+                            <div class="text-dark fw-medium text-truncate" style="font-size: 12.5px; line-height: 1.25;" id="switchUserEmail">-</div>
                         </div>
                     </div>
 
-                    <div class="border-top my-3" style="border-color: #E2E8F0 !important;"></div>
+                    <div class="border-top" style="margin: 6px 0; border-color: #E2E8F0 !important;"></div>
 
                     <!-- Item 3: Role -->
                     <div class="d-flex align-items-center">
-                        <div class="d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 38px; height: 38px; border-radius: 8px; background-color: #ECFDF5; color: #10B981; font-size: 18px;">
+                        <div class="d-flex align-items-center justify-content-center me-2 flex-shrink-0" style="width: 32px; height: 32px; border-radius: 8px; background-color: #ECFDF5; color: #10B981; font-size: 15px;">
                             <i class="bi bi-shield-check"></i>
                         </div>
                         <div class="flex-grow-1">
-                            <div class="text-secondary fw-medium mb-1" style="font-size: 11.5px; color: #64748B;">Role</div>
+                            <div class="text-secondary fw-medium" style="font-size: 10.5px; color: #64748B; line-height: 1.2;">Role</div>
                             <div>
-                                <span class="badge" id="switchUserRole" style="background-color: #EBF2FE; color: #1E60EC; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px;">-</span>
+                                <span class="badge" id="switchUserRole" style="background-color: #EBF2FE; color: #1E60EC; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 5px;">-</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="border-top my-3" style="border-color: #E2E8F0 !important;"></div>
+                    <div class="border-top" style="margin: 6px 0; border-color: #E2E8F0 !important;"></div>
 
                     <!-- Item 4: OPD -->
                     <div class="d-flex align-items-start">
-                        <div class="d-flex align-items-center justify-content-center me-3 flex-shrink-0 mt-1" style="width: 38px; height: 38px; border-radius: 8px; background-color: #FEF3C7; color: #D97706; font-size: 18px;">
+                        <div class="d-flex align-items-center justify-content-center me-2 flex-shrink-0 mt-0.5" style="width: 32px; height: 32px; border-radius: 8px; background-color: #FEF3C7; color: #D97706; font-size: 15px;">
                             <i class="bi bi-bank"></i>
                         </div>
                         <div class="flex-grow-1">
-                            <div class="text-secondary fw-medium mb-1" style="font-size: 11.5px; color: #64748B;">OPD</div>
-                            <div class="text-dark fw-medium" style="font-size: 13px; line-height: 1.45;" id="switchUserOpd">-</div>
+                            <div class="text-secondary fw-medium" style="font-size: 10.5px; color: #64748B; line-height: 1.2;">OPD</div>
+                            <div class="text-dark fw-medium" style="font-size: 12px; line-height: 1.35;" id="switchUserOpd">-</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Action Buttons: Batal & Masuk Sekarang -->
-                <div class="d-flex align-items-center gap-3 pt-1">
-                    <button type="button" class="btn btn-light border py-2 px-4 fw-semibold text-dark flex-fill" data-bs-dismiss="modal" style="border-radius: 10px; height: 44px; font-size: 14px;">
+                <div class="d-flex align-items-center gap-2 pt-1">
+                    <button type="button" class="btn btn-light border py-1 px-3 fw-semibold text-dark flex-fill" data-bs-dismiss="modal" style="border-radius: 8px; height: 38px; font-size: 13.5px;">
                         Batal
                     </button>
-                    <a href="#" id="btnConfirmSwitchUser" class="btn btn-primary py-2 px-4 fw-semibold text-white d-flex align-items-center justify-content-center gap-2 flex-fill" style="background-color: #1E60EC; border-color: #1E60EC; border-radius: 10px; height: 44px; font-size: 14px;">
-                        <i class="bi bi-box-arrow-in-right fs-5"></i>
+                    <a href="#" id="btnConfirmSwitchUser" class="btn btn-primary py-1 px-3 fw-semibold text-white d-flex align-items-center justify-content-center gap-2 flex-fill" style="background-color: #1E60EC; border-color: #1E60EC; border-radius: 8px; height: 38px; font-size: 13.5px;">
+                        <i class="bi bi-box-arrow-in-right fs-6"></i>
                         <span>Masuk Sekarang</span>
                     </a>
                 </div>
@@ -1160,6 +1160,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 populateSwitchModal(button);
             }
         });
+
+        const btnCloseSwitch = modalSwitchEl.querySelector('.btn-close');
+        if (btnCloseSwitch) {
+            btnCloseSwitch.addEventListener('click', function(e) {
+                e.preventDefault();
+                const modal = bootstrap.Modal.getOrCreateInstance(modalSwitchEl);
+                modal.hide();
+            });
+        }
     }
 
     // Delegasi klik fallback

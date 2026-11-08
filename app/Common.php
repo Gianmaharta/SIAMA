@@ -13,3 +13,32 @@
  *
  * @see: https://codeigniter.com/user_guide/extending/common.html
  */
+
+if (!function_exists('notification_service')) {
+    function notification_service(): \App\Services\NotificationService
+    {
+        return new \App\Services\NotificationService();
+    }
+}
+
+if (!function_exists('send_notification')) {
+    function send_notification(
+        string $userId,
+        string $title,
+        string $message,
+        string $type = 'general',
+        ?string $referenceId = null,
+        ?string $referenceType = null,
+        ?string $url = null
+    ): ?string {
+        return notification_service()->sendToUser(
+            $userId,
+            $title,
+            $message,
+            $type,
+            $referenceId,
+            $referenceType,
+            $url
+        );
+    }
+}

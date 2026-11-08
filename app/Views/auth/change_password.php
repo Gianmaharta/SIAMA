@@ -5,117 +5,188 @@ Ganti Password Default - SIAMA
 <?= $this->endSection() ?>
 
 <?= $this->section('styles') ?>
-<link rel="stylesheet" href="<?= base_url('css/change-password.css') ?>">
+<link rel="stylesheet" href="<?= base_url('css/change-password.css?v=' . time()) ?>">
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<div class="change-password-wrapper">
-    <!-- Header Halaman -->
-    <div class="change-password-header">
-        <h1 class="change-password-title">Ganti Password Default</h1>
-        <p class="change-password-desc">Demi keamanan, Anda diwajibkan untuk mengganti password default yang diberikan oleh administrator sebelum dapat mengakses sistem.</p>
-    </div>
+<div class="container-fluid px-0 py-2">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-11 col-lg-8 col-xl-7" style="max-width: 660px;">
 
-    <!-- Flash Message Feedback -->
-    <?php if (session()->getFlashdata('error')) : ?>
-        <div class="alert-feedback alert-danger" role="alert">
-            <i class="bi bi-exclamation-circle-fill"></i>
-            <div><?= session()->getFlashdata('error') ?></div>
-        </div>
-    <?php endif; ?>
+            <!-- Flash Message Feedback -->
+            <?php if (session()->getFlashdata('error')) : ?>
+                <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 mb-3 rounded-3 border-0 shadow-sm" role="alert">
+                    <i class="bi bi-exclamation-circle-fill fs-5 text-danger"></i>
+                    <div class="small fw-medium"><?= session()->getFlashdata('error') ?></div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
+                </div>
+            <?php endif; ?>
 
-    <?php if (session()->getFlashdata('success')) : ?>
-        <div class="alert-feedback alert-success" role="alert">
-            <i class="bi bi-check-circle-fill"></i>
-            <div><?= session()->getFlashdata('success') ?></div>
-        </div>
-    <?php endif; ?>
+            <?php if (session()->getFlashdata('success')) : ?>
+                <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 mb-3 rounded-3 border-0 shadow-sm" role="alert">
+                    <i class="bi bi-check-circle-fill fs-5 text-success"></i>
+                    <div class="small fw-medium"><?= session()->getFlashdata('success') ?></div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
+                </div>
+            <?php endif; ?>
 
-    <!-- Form Card Container -->
-    <div class="change-password-card">
-        <!-- Kotak Informasi Keamanan Akun -->
-        <div class="security-info-box">
-            <div class="security-info-icon-wrapper">
-                <i class="bi bi-shield-check"></i>
-            </div>
-            <div class="security-info-content">
-                <h4 class="security-info-title">Keamanan Akun</h4>
-                <p class="security-info-text">Pastikan password baru Anda mudah diingat tetapi sulit ditebak.</p>
-            </div>
-        </div>
-
-        <!-- Form Penggantian Password -->
-        <form action="<?= base_url('/change-password/process') ?>" method="post">
-            <?= csrf_field() ?>
-
-            <!-- Field Password Baru -->
-            <div class="form-group-custom">
-                <label for="new_password" class="form-label-custom">Password Baru</label>
-                <div class="password-input-wrapper">
-                    <i class="bi bi-lock input-icon-left"></i>
-                    <input type="password" name="new_password" id="new_password" class="form-control-password has-left-icon" placeholder="Masukkan password baru" required minlength="8" autocomplete="new-password" oninput="checkPasswordStrength(this.value)">
-                    <button type="button" class="btn-toggle-eye" onclick="toggleFieldVisibility('new_password', this)" aria-label="Tampilkan atau sembunyikan password baru">
-                        <i class="bi bi-eye"></i>
-                    </button>
+            <!-- Kotak Informasi Peringatan Keamanan Wajib -->
+            <div class="alert border-0 rounded-3 p-3 mb-4 d-flex align-items-start gap-3 shadow-sm" style="background-color: #FFFBEB; border: 1px solid #FEF3C7 !important;">
+                <div class="d-flex align-items-center justify-content-center flex-shrink-0 mt-0.5" style="color: #D97706; font-size: 20px;">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h6 class="fw-bold mb-1" style="font-size: 14px; color: #1E293B;">Peringatan Keamanan Wajib</h6>
+                    <p class="mb-0 text-secondary" style="font-size: 13px; line-height: 1.5; color: #475569 !important;">
+                        Demi keamanan sistem kearsipan digital Pemkab Buleleng, Anda diwajibkan mengganti kata sandi awal (default) sebelum mengakses fitur SIAMA lainnya.
+                    </p>
                 </div>
             </div>
 
-            <!-- Indikator Kekuatan Password -->
-            <div class="password-strength-section">
-                <div class="strength-header">
-                    <span class="strength-label">Kekuatan password</span>
-                    <span id="strengthText" class="strength-status">Kuat</span>
-                </div>
-                <div class="strength-bars">
-                    <div class="strength-bar active-blue" id="bar1"></div>
-                    <div class="strength-bar active-blue" id="bar2"></div>
-                    <div class="strength-bar active-blue" id="bar3"></div>
-                    <div class="strength-bar" id="bar4"></div>
-                </div>
-                <div class="strength-hint">
-                    Minimal 8 karakter • Gunakan kombinasi huruf, angka, dan simbol.
+            <!-- Card Form Ubah Password -->
+            <div class="card border-0 rounded-4 shadow-sm" style="background-color: #FFFFFF; border: 1px solid #E2E8F0 !important; box-shadow: 0 4px 20px rgba(11, 21, 40, 0.04) !important;">
+                <div class="card-body p-4 p-sm-5">
+                    
+                    <!-- Card Header: Judul & Badge Wajib Diperbarui -->
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-1">
+                        <h2 class="h4 fw-bold text-dark mb-0" style="letter-spacing: -0.2px; font-size: 21px;">Ganti Password Default</h2>
+                        <span class="badge rounded-pill fw-semibold px-3 py-1.5" style="background-color: #FEE2E2; color: #DC2626; font-size: 12px;">
+                            Wajib Diperbarui
+                        </span>
+                    </div>
+                    <p class="text-secondary small mb-4" style="font-size: 13.5px; color: #64748B;">
+                        Silakan perbarui kata sandi default Anda untuk melanjutkan akses sistem SIAMA.
+                    </p>
+
+                    <!-- Form Penggantian Password -->
+                    <form action="<?= base_url('/change-password/process') ?>" method="post" id="formChangePassword">
+                        <?= csrf_field() ?>
+
+                        <!-- 1. Password Lama (Default) -->
+                        <div class="mb-3">
+                            <label for="old_password" class="form-label small fw-semibold text-dark mb-1.5">
+                                Password Lama (Default) <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 text-muted" style="border-color: #CBD5E1; border-top-left-radius: 10px; border-bottom-left-radius: 10px;">
+                                    <i class="bi bi-lock"></i>
+                                </span>
+                                <input 
+                                    type="password" 
+                                    name="old_password" 
+                                    id="old_password" 
+                                    class="form-control border-start-0 border-end-0 text-dark" 
+                                    placeholder="Masukkan password bawaan/sementara" 
+                                    style="border-color: #CBD5E1; font-size: 13.5px; height: 46px;"
+                                    autocomplete="current-password"
+                                >
+                                <button 
+                                    type="button" 
+                                    class="btn btn-outline-secondary bg-white border-start-0 text-muted btn-eye-toggle" 
+                                    onclick="toggleVisibility('old_password', this)"
+                                    style="border-color: #CBD5E1; border-top-right-radius: 10px; border-bottom-right-radius: 10px;"
+                                    aria-label="Tampilkan atau sembunyikan password lama"
+                                >
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 2. Password Baru -->
+                        <div class="mb-3">
+                            <label for="new_password" class="form-label small fw-semibold text-dark mb-1.5">
+                                Password Baru <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 text-muted" style="border-color: #CBD5E1; border-top-left-radius: 10px; border-bottom-left-radius: 10px;">
+                                    <i class="bi bi-lock"></i>
+                                </span>
+                                <input 
+                                    type="password" 
+                                    name="new_password" 
+                                    id="new_password" 
+                                    class="form-control border-start-0 border-end-0 text-dark" 
+                                    placeholder="Masukkan password baru minimal 8 karakter" 
+                                    style="border-color: #CBD5E1; font-size: 13.5px; height: 46px;"
+                                    required 
+                                    minlength="8" 
+                                    autocomplete="new-password"
+                                >
+                                <button 
+                                    type="button" 
+                                    class="btn btn-outline-secondary bg-white border-start-0 text-muted btn-eye-toggle" 
+                                    onclick="toggleVisibility('new_password', this)"
+                                    style="border-color: #CBD5E1; border-top-right-radius: 10px; border-bottom-right-radius: 10px;"
+                                    aria-label="Tampilkan atau sembunyikan password baru"
+                                >
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 3. Konfirmasi Password Baru -->
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label small fw-semibold text-dark mb-1.5">
+                                Konfirmasi Password Baru <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 text-muted" style="border-color: #CBD5E1; border-top-left-radius: 10px; border-bottom-left-radius: 10px;">
+                                    <i class="bi bi-lock"></i>
+                                </span>
+                                <input 
+                                    type="password" 
+                                    name="confirm_password" 
+                                    id="confirm_password" 
+                                    class="form-control border-start-0 border-end-0 text-dark" 
+                                    placeholder="Ulangi password baru Anda" 
+                                    style="border-color: #CBD5E1; font-size: 13.5px; height: 46px;"
+                                    required 
+                                    minlength="8" 
+                                    autocomplete="new-password"
+                                >
+                                <button 
+                                    type="button" 
+                                    class="btn btn-outline-secondary bg-white border-start-0 text-muted btn-eye-toggle" 
+                                    onclick="toggleVisibility('confirm_password', this)"
+                                    style="border-color: #CBD5E1; border-top-right-radius: 10px; border-bottom-right-radius: 10px;"
+                                    aria-label="Tampilkan atau sembunyikan konfirmasi password"
+                                >
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Checkbox: Tampilkan Semua Password -->
+                        <div class="form-check mb-4 mt-2">
+                            <input class="form-check-input" type="checkbox" id="showAllPasswords" onchange="toggleAllPasswords(this)" style="cursor: pointer;">
+                            <label class="form-check-label small text-secondary fw-medium" for="showAllPasswords" style="font-size: 13px; cursor: pointer;">
+                                Tampilkan Semua Password
+                            </label>
+                        </div>
+
+                        <!-- Tombol Aksi: Simpan Password (Kiri) & Logout (Kanan) -->
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 pt-1">
+                            <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-2 px-4 py-2 fw-semibold text-white shadow-sm" style="background-color: #1E60EC; border-color: #1E60EC; border-radius: 10px; font-size: 13.5px; height: 44px;">
+                                <i class="bi bi-check2 fs-5"></i>
+                                <span>Simpan Password</span>
+                            </button>
+
+                            <button type="button" class="btn btn-danger d-inline-flex align-items-center gap-2 px-4 py-2 fw-semibold text-white shadow-sm" data-bs-toggle="modal" data-bs-target="#modalLogout" style="background-color: #DC2626; border-color: #DC2626; border-radius: 10px; font-size: 13.5px; height: 44px;">
+                                <i class="bi bi-box-arrow-right fs-6"></i>
+                                <span>Logout</span>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
-            <!-- Field Konfirmasi Password Baru -->
-            <div class="form-group-custom">
-                <label for="confirm_password" class="form-label-custom">Konfirmasi Password Baru</label>
-                <div class="password-input-wrapper">
-                    <i class="bi bi-lock input-icon-left"></i>
-                    <input type="password" name="confirm_password" id="confirm_password" class="form-control-password has-left-icon" placeholder="Masukkan kembali password baru" required minlength="8" autocomplete="new-password">
-                    <button type="button" class="btn-toggle-eye" onclick="toggleFieldVisibility('confirm_password', this)" aria-label="Tampilkan atau sembunyikan konfirmasi password">
-                        <i class="bi bi-eye"></i>
-                    </button>
-                </div>
+            <!-- Footer Bantuan -->
+            <div class="text-center mt-4">
+                <p class="text-secondary small mb-0" style="font-size: 12.5px;">
+                    Butuh bantuan? Hubungi <span class="fw-semibold text-primary">Tim Helpdesk Diskominfosanti Kab. Buleleng</span>
+                </p>
             </div>
 
-            <!-- Checkbox Tampilkan Password -->
-            <div class="form-check-password">
-                <input class="form-check-input" type="checkbox" id="show_password" onclick="toggleAllPasswords(this)">
-                <label class="form-check-label" for="show_password">
-                    Tampilkan password
-                </label>
-            </div>
-
-            <!-- Tombol Aksi (Simpan Password & Logout) -->
-            <div class="button-stack-custom">
-                <button type="submit" class="btn-submit-action">
-                    <i class="bi bi-check2"></i>
-                    <span>Simpan Password</span>
-                </button>
-                <button type="button" class="btn-logout-action border-0" data-bs-toggle="modal" data-bs-target="#modalLogout">
-                    <i class="bi bi-box-arrow-right"></i>
-                    <span>Logout</span>
-                </button>
-            </div>
-        </form>
-
-        <!-- Card Footer -->
-        <div class="change-password-footer">
-            <div class="footer-note">
-                <i class="bi bi-info-circle"></i>
-                <span>Password Anda akan digunakan untuk login pada akses berikutnya.</span>
-            </div>
         </div>
     </div>
 </div>
@@ -123,8 +194,9 @@ Ganti Password Default - SIAMA
 
 <?= $this->section('scripts') ?>
 <script>
-    function toggleFieldVisibility(fieldId, btn) {
-        const input = document.getElementById(fieldId);
+    // Toggle visibilitas satu input password
+    function toggleVisibility(inputId, btn) {
+        const input = document.getElementById(inputId);
         const icon = btn.querySelector('i');
         if (!input || !icon) return;
 
@@ -139,17 +211,22 @@ Ganti Password Default - SIAMA
         }
     }
 
+    // Toggle semua input password sekaligus lewat checkbox
     function toggleAllPasswords(checkbox) {
-        const pw1 = document.getElementById('new_password');
-        const pw2 = document.getElementById('confirm_password');
-        const eyeIcons = document.querySelectorAll('.btn-toggle-eye i');
-        
-        const targetType = checkbox.checked ? 'text' : 'password';
-        if (pw1) pw1.type = targetType;
-        if (pw2) pw2.type = targetType;
+        const fields = ['old_password', 'new_password', 'confirm_password'];
+        const isShow = checkbox.checked;
 
-        eyeIcons.forEach(icon => {
-            if (checkbox.checked) {
+        fields.forEach(function(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.type = isShow ? 'text' : 'password';
+            }
+        });
+
+        // Sesuaikan seluruh ikon mata
+        const eyeButtons = document.querySelectorAll('.btn-eye-toggle i');
+        eyeButtons.forEach(function(icon) {
+            if (isShow) {
                 icon.classList.remove('bi-eye');
                 icon.classList.add('bi-eye-slash');
             } else {
@@ -157,56 +234,6 @@ Ganti Password Default - SIAMA
                 icon.classList.add('bi-eye');
             }
         });
-    }
-
-    function checkPasswordStrength(password) {
-        const bars = [
-            document.getElementById('bar1'),
-            document.getElementById('bar2'),
-            document.getElementById('bar3'),
-            document.getElementById('bar4')
-        ];
-        const statusText = document.getElementById('strengthText');
-
-        // Reset all bars
-        bars.forEach(b => {
-            b.className = 'strength-bar';
-        });
-
-        if (!password || password.length === 0) {
-            statusText.textContent = '';
-            return;
-        }
-
-        let score = 0;
-        if (password.length >= 8) score++;
-        if (/[A-Z]/.test(password) && /[a-z]/.test(password)) score++;
-        if (/[0-9]/.test(password)) score++;
-        if (/[^A-Za-z0-9]/.test(password)) score++;
-
-        if (score === 1) {
-            bars[0].classList.add('active-red');
-            statusText.textContent = 'Lemah';
-            statusText.style.color = '#EF4444';
-        } else if (score === 2) {
-            bars[0].classList.add('active-amber');
-            bars[1].classList.add('active-amber');
-            statusText.textContent = 'Cukup';
-            statusText.style.color = '#F59E0B';
-        } else if (score === 3) {
-            bars[0].classList.add('active-blue');
-            bars[1].classList.add('active-blue');
-            bars[2].classList.add('active-blue');
-            statusText.textContent = 'Kuat';
-            statusText.style.color = '#1E60EC';
-        } else if (score >= 4) {
-            bars[0].classList.add('active-green');
-            bars[1].classList.add('active-green');
-            bars[2].classList.add('active-green');
-            bars[3].classList.add('active-green');
-            statusText.textContent = 'Sangat Kuat';
-            statusText.style.color = '#10B981';
-        }
     }
 </script>
 <?= $this->endSection() ?>

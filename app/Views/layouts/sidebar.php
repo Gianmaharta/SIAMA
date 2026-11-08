@@ -1,7 +1,7 @@
 <?php
 $uri = service('uri');
 $currentSegment = $uri->getSegment(1) ?? 'dashboard';
-$role = session()->get('nama_role');
+$role = session()->get('nama_role') ?? 'Admin_Pemkab';
 
 $notifModel = new \App\Models\NotificationModel();
 $unread = 0;
@@ -10,15 +10,20 @@ if (session()->get('user_id')) {
 }
 ?>
 <aside class="sidebar" id="appSidebar">
-    <a href="<?= base_url('/dashboard') ?>" class="sidebar-brand">
-        <?php if (file_exists(FCPATH . 'logo siama1.png')) : ?>
-            <img src="<?= base_url('logo siama1.png') ?>" alt="Logo SIAMA" class="sidebar-logo">
-        <?php elseif (file_exists(FCPATH . 'Images/logo siama1.png')) : ?>
-            <img src="<?= base_url('Images/logo siama1.png') ?>" alt="Logo SIAMA" class="sidebar-logo">
-        <?php else: ?>
-            <span class="fs-4 fw-bold text-white">SIAMA</span>
-        <?php endif; ?>
-    </a>
+    <div class="sidebar-brand-wrapper">
+        <a href="<?= base_url('/dashboard') ?>" class="sidebar-brand">
+            <?php if (file_exists(FCPATH . 'logo siama1.png')) : ?>
+                <img src="<?= base_url('logo siama1.png') ?>" alt="Logo SIAMA" class="sidebar-logo">
+            <?php elseif (file_exists(FCPATH . 'Images/logo siama1.png')) : ?>
+                <img src="<?= base_url('Images/logo siama1.png') ?>" alt="Logo SIAMA" class="sidebar-logo">
+            <?php else: ?>
+                <span class="fs-4 fw-bold text-white">SIAMA</span>
+            <?php endif; ?>
+        </a>
+        <button type="button" class="sidebar-close-btn d-lg-none" id="sidebarCloseBtn" aria-label="Tutup Menu">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
 
     <?php if (in_array($role, ['Pimpinan', 'Kepala_Dinas', 'Kepala Dinas', 'Kepala_Bidang', 'Kepala Bidang', 'Kabid', 'Arsiparis'])) : ?>
         <!-- Menu Khusus Pimpinan / Kepala Bidang / Arsiparis -->

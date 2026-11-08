@@ -157,6 +157,33 @@
     transform: translateY(-1px);
 }
 
+/* Toolbar primary add button styling */
+.bidang-table-toolbar .bidang-btn-add {
+    background-color: #1E3A6D !important;
+    border-color: #1E3A6D !important;
+    color: #FFFFFF !important;
+}
+
+.bidang-table-toolbar .bidang-btn-add:hover,
+.bidang-table-toolbar .bidang-btn-add:focus {
+    background-color: #172F59 !important;
+    border-color: #172F59 !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 12px rgba(30, 58, 109, 0.25);
+    transform: translateY(-1px);
+}
+
+.bidang-table-toolbar .bidang-btn-add:active {
+    background-color: #122648 !important;
+    border-color: #122648 !important;
+    color: #FFFFFF !important;
+    transform: translateY(0);
+}
+
+.bidang-table-toolbar .bidang-btn-add i {
+    color: #FFFFFF !important;
+}
+
 /* Table Responsive & Base Layout */
 .bidang-table-responsive {
     margin-bottom: 0;
@@ -165,6 +192,7 @@
 
 .bidang-table {
     width: 100%;
+    min-width: 700px;
     margin-bottom: 0;
     border-collapse: collapse;
 }
@@ -679,4 +707,70 @@ select.bidang-form-control option,
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 991px) {
+    .bidang-table-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .bidang-search-wrap {
+        max-width: 100%;
+        min-width: 100%;
+    }
+
+    .bidang-toolbar-actions {
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .bidang-table-footer {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 576px) {
+    .bidang-toolbar-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .bidang-btn-add {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .modal-dialog.bidang-modal-dialog {
+        margin: 0.5rem auto !important;
+        max-width: calc(100% - 1rem) !important;
+        width: calc(100% - 1rem) !important;
+    }
+
+    .modal-footer.bidang-modal-footer {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .modal-footer.bidang-modal-footer button,
+    .modal-footer.bidang-modal-footer a {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .bidang-toast-container {
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+    }
+
+    .bidang-toast {
+        width: 100%;
+        justify-content: center;
+    }
 }

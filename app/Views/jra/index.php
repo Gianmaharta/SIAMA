@@ -81,7 +81,7 @@ $totalData = count($jra_list);
 
         <!-- Tombol Tambah JRA Baru (Membuka Modal Overlay) -->
         <div class="jra-toolbar-actions">
-            <button type="button" class="jra-btn-add border-0" data-bs-toggle="modal" data-bs-target="#modalTambahJra">
+            <button type="button" class="jra-btn-add btn-toolbar-primary border-0" data-bs-toggle="modal" data-bs-target="#modalTambahJra">
                 <i class="bi bi-plus-lg"></i>
                 <span>Tambah JRA Baru</span>
             </button>

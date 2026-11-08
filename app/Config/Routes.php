@@ -86,6 +86,11 @@ $routes->group('jra', ['filter' => 'auth'], static function ($routes) {
 // --- Notifikasi ---
 $routes->group('notification', ['filter' => 'auth'], static function ($routes) {
     $routes->get('/', 'Notification::index');
+    $routes->get('unread-count', 'Notification::unreadCount');
+    $routes->get('dropdown', 'Notification::getDropdownList');
+    $routes->get('read-and-redirect/(:segment)', 'Notification::readAndRedirect/$1');
+    $routes->post('mark-read/(:segment)', 'Notification::markRead/$1');
+    $routes->post('mark-all-read', 'Notification::markAllRead');
     $routes->post('action/(:segment)', 'Notification::action/$1');
 });
 

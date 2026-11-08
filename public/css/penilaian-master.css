@@ -326,6 +326,7 @@
 /* Main Penilaian Table */
 .penilaian-table {
     width: 100%;
+    min-width: 820px;
     margin-bottom: 0;
     border-collapse: collapse;
 }
@@ -791,6 +792,39 @@
         flex-direction: column;
         align-items: center;
         text-align: center;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 576px) {
+    .penilaian-filter-wrap {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .penilaian-filter-select {
+        width: 100%;
+    }
+
+    .penilaian-form-card {
+        padding: 16px 14px;
+    }
+
+    .penilaian-info-table th,
+    .penilaian-detail-table th {
+        width: 110px;
+        font-size: 12px;
+    }
+
+    .penilaian-info-table td,
+    .penilaian-detail-table td {
+        font-size: 12.5px;
+    }
+
+    .penilaian-btn-submit,
+    .penilaian-btn-cancel {
+        width: 100%;
+        justify-content: center;
     }
 }
 

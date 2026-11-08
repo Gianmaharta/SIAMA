@@ -419,6 +419,7 @@
 .arsiparis-table {
     margin-bottom: 0;
     font-size: 13.5px;
+    min-width: 650px;
 }
 
 .arsiparis-table thead th {
@@ -464,4 +465,58 @@
     justify-content: center;
     font-size: 24px;
     margin-bottom: 12px;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 768px) {
+    .arsiparis-panel-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .arsiparis-pill-badge {
+        align-self: flex-start;
+    }
+}
+
+@media (max-width: 576px) {
+    .arsiparis-header-title {
+        font-size: 20px;
+    }
+
+    .arsiparis-header-desc {
+        font-size: 13px;
+    }
+
+    .arsiparis-stat-card .card-body {
+        padding: 16px !important;
+    }
+
+    .arsiparis-stat-icon-purple,
+    .arsiparis-stat-icon-blue,
+    .arsiparis-stat-icon-green {
+        width: 46px;
+        height: 46px;
+        font-size: 22px;
+    }
+
+    .arsiparis-stat-value {
+        font-size: 24px;
+    }
+
+    .quick-access-title {
+        font-size: 16px;
+    }
+
+    .arsiparis-panel-card {
+        padding: 16px;
+    }
+
+    .arsiparis-table-header {
+        padding: 14px 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
 }

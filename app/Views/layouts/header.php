@@ -27,22 +27,47 @@ if (session()->get('user_id')) {
 ?>
 
 <?php if (session()->has('original_admin_id')) : ?>
+    <?php
+    $cleanName = trim($userName);
+    if (preg_match('/\((.*?)\)$/', $cleanName, $matches)) {
+        $inParen = trim($matches[1]);
+        if (strcasecmp($inParen, $roleDisplay) === 0 
+            || strcasecmp($inParen, $userRole) === 0 
+            || in_array(strtolower($inParen), ['arsiparis', 'pimpinan', 'kepala dinas', 'kepala bidang', 'kabid', 'admin opd', 'admin pemkab'])) {
+            $cleanName = trim(preg_replace('/\s*\([^)]*\)$/', '', $cleanName));
+        }
+    }
+    $impersonatedUserTitle = 'Sedang Masuk sebagai ' . $cleanName . ' (' . $roleDisplay . ')';
+
+    $impersonatedOpd = session()->get('impersonated_opd_nama');
+    if (empty($impersonatedOpd) && session()->get('id_opd')) {
+        $opdModel = new \App\Models\OpdModel();
+        $opdData = $opdModel->find(session()->get('id_opd'));
+        $impersonatedOpd = $opdData['nama_opd'] ?? '';
+    }
+    $impersonatedOpdFormatted = (!empty($impersonatedOpd) && $impersonatedOpd !== '-') 
+        ? rtrim($impersonatedOpd, " .\t\n\r\0\x0B") . '.' 
+        : '';
+    ?>
     <div class="impersonation-bar">
-        <span>
-            <i class="bi bi-exclamation-triangle-fill me-1"></i>
-            <strong>Mode Penyamaran Aktif:</strong> Anda sedang menyamar sebagai 
-            <strong><?= esc($userName) ?></strong> (<?= esc($userRole) ?> - <?= esc(session()->get('impersonated_opd_nama') ?? 'OPD') ?>)
-        </span>
+        <div class="impersonation-content">
+            <div class="impersonation-title">
+                <i class="bi bi-info-circle me-2"></i><?= esc($impersonatedUserTitle) ?>
+            </div>
+            <?php if (!empty($impersonatedOpdFormatted)) : ?>
+                <div class="impersonation-subtitle"><?= esc($impersonatedOpdFormatted) ?></div>
+            <?php endif; ?>
+        </div>
         <a href="<?= base_url('/users/switch-back') ?>" class="impersonation-btn">
-            <i class="bi bi-arrow-return-left me-1"></i> Kembali ke Admin Pemkab
+            <i class="bi bi-arrow-left me-1"></i> Kembali ke Akun Admin Pemkab
         </a>
     </div>
 <?php endif; ?>
 
 <header class="top-navbar">
-    <div class="d-flex align-items-center">
+    <div class="d-flex align-items-center flex-grow-1 min-w-0 me-2" style="min-width: 0;">
         <!-- Mobile Sidebar Toggle -->
-        <button class="btn btn-link text-secondary p-0 me-3 d-lg-none border-0 shadow-none" id="sidebarToggleBtn" type="button" aria-label="Buka Menu Sidebar">
+        <button class="btn btn-link text-secondary p-0 me-2 me-sm-3 d-lg-none border-0 shadow-none flex-shrink-0" id="sidebarToggleBtn" type="button" aria-label="Buka Menu Sidebar">
             <i class="bi bi-list fs-2" style="line-height: 1;"></i>
         </button>
         <!-- Left: Search Box -->
@@ -51,7 +76,7 @@ if (session()->get('user_id')) {
             <input 
                 type="text" 
                 class="search-input" 
-                placeholder="Cari menu, arsip, OPD, atau kata kunci..." 
+                placeholder="Cari menu, arsip, OPD..." 
                 aria-label="Cari"
             >
         </div>
@@ -59,12 +84,12 @@ if (session()->get('user_id')) {
 
     <!-- Right: User Area -->
     <div class="nav-user-area">
-        <!-- Notification Button -->
-        <a href="<?= base_url('/notification') ?>" class="nav-notif-btn" title="Notifikasi">
+        <!-- Notification Button (Langsung Menampilkan Halaman Semua Notifikasi) -->
+        <a href="<?= base_url('/notification') ?>" class="nav-notif-btn" id="navNotifBtn" title="Notifikasi">
             <i class="bi bi-bell"></i>
-            <?php if ($unread > 0 || in_array($userRole, ['Pimpinan', 'Kepala_Dinas', 'Kepala Dinas', 'Kepala_Bidang', 'Kepala Bidang', 'Kabid'])) : ?>
-                <span class="notif-dot"></span>
-            <?php endif; ?>
+            <span class="notif-badge-count <?= $unread > 0 ? '' : 'd-none' ?>" id="navNotifBadge">
+                <?= $unread > 99 ? '99+' : $unread ?>
+            </span>
         </a>
 
         <!-- User Profile Dropdown -->

@@ -139,6 +139,13 @@ class BeritaAcara extends BaseController
 
             log_activity('Berita Acara', 'create', 'Membuat draf Berita Acara nomor: ' . $nomor_ba);
             
+            // Kirim notifikasi ke Kepala Bidang di OPD
+            try {
+                notification_service()->notifyBaDraftCreated($id_ba, $session->get('user_id'));
+            } catch (\Throwable $e) {
+                log_message('error', 'Gagal mengirim notifikasi draf BA: ' . $e->getMessage());
+            }
+
             return redirect()->to('/berita-acara')->with('success', 'Draf Berita Acara berhasil dibuat.');
         } catch (\Exception $e) {
             $db->transRollback();
@@ -333,6 +340,13 @@ class BeritaAcara extends BaseController
         $ba = $this->beritaAcaraModel->find($id);
         log_activity('Berita Acara', 'update', "Kepala Bidang $msg Berita Acara nomor: " . $ba['nomor_ba']);
 
+        // Kirim Notifikasi (Skenario C2 & D)
+        try {
+            notification_service()->notifyBaKabidVerified($id, $keputusan, $catatan);
+        } catch (\Throwable $e) {
+            log_message('error', 'Gagal mengirim notifikasi verifikasi BA: ' . $e->getMessage());
+        }
+
         return redirect()->to('/berita-acara/detail/' . $id)->with('success', 'Verifikasi berhasil disimpan.');
     }
 
@@ -345,6 +359,13 @@ class BeritaAcara extends BaseController
 
         $ba = $this->beritaAcaraModel->find($id);
         log_activity('Berita Acara', 'update', "Pimpinan mengesahkan Berita Acara nomor: " . $ba['nomor_ba']);
+
+        // Kirim Notifikasi (Skenario E)
+        try {
+            notification_service()->notifyBaPimpinanSigned($id, session()->get('user_id'));
+        } catch (\Throwable $e) {
+            log_message('error', 'Gagal mengirim notifikasi pengesahan BA: ' . $e->getMessage());
+        }
 
         return redirect()->to('/berita-acara/detail/' . $id)->with('success', 'Berita Acara berhasil disahkan.');
     }

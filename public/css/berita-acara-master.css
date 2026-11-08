@@ -180,6 +180,7 @@
 
 .ba-table {
     width: 100%;
+    min-width: 780px;
     border-collapse: collapse;
     margin-bottom: 0;
     vertical-align: middle;
@@ -517,6 +518,36 @@
         flex-direction: column;
         align-items: center;
         text-align: center;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 576px) {
+    .ba-btn-add {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .ba-filter-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .ba-status-filter-wrap {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .ba-select-status {
+        flex: 1;
+    }
+
+    .ba-form-card {
+        padding: 16px;
+    }
+
+    .ba-form-card-header {
+        padding: 16px 16px 0 16px;
     }
 }
 
@@ -524,8 +555,8 @@
    Berita Acara - Form Create / Edit & Actions
    ========================================================================== */
 .ba-btn-add {
-    background-color: #1E60EC;
-    border-color: #1E60EC;
+    background-color: #1E3A6D;
+    border-color: #1E3A6D;
     color: #FFFFFF;
     border-radius: 8px;
     padding: 7px 16px;
@@ -541,12 +572,24 @@
     flex-shrink: 0;
 }
 
-.ba-btn-add:hover {
-    background-color: #1752CE;
-    border-color: #1752CE;
+.ba-btn-add:hover,
+.ba-btn-add:focus {
+    background-color: #172F59;
+    border-color: #172F59;
     color: #FFFFFF;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(30, 96, 236, 0.25);
+    box-shadow: 0 4px 12px rgba(30, 58, 109, 0.25);
+}
+
+.ba-btn-add:active {
+    background-color: #122648;
+    border-color: #122648;
+    color: #FFFFFF;
+    transform: translateY(0);
+}
+
+.ba-btn-add i {
+    color: #FFFFFF;
 }
 
 .ba-btn-save {
@@ -662,6 +705,7 @@
 
 .ba-table-select-arsip {
     width: 100%;
+    min-width: 650px;
     margin-bottom: 0;
     border-collapse: separate;
     border-spacing: 0;

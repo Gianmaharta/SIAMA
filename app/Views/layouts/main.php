@@ -20,6 +20,7 @@
     
     <!-- Custom Dashboard CSS -->
     <link rel="stylesheet" href="<?= base_url('css/dashboard.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('css/notification-master.css') ?>">
     <?= $this->renderSection('styles') ?>
 </head>
 <body>
@@ -70,8 +71,14 @@
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const toggleBtn = document.getElementById('sidebarToggleBtn');
+        const closeBtn = document.getElementById('sidebarCloseBtn');
         const sidebar = document.getElementById('appSidebar');
         const backdrop = document.getElementById('sidebarBackdrop');
+
+        function closeMobileSidebar() {
+            if (sidebar) sidebar.classList.remove('sidebar-open');
+            if (backdrop) backdrop.classList.remove('show');
+        }
 
         if (toggleBtn && sidebar) {
             toggleBtn.addEventListener('click', function() {
@@ -80,11 +87,12 @@
             });
         }
 
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeMobileSidebar);
+        }
+
         if (backdrop && sidebar) {
-            backdrop.addEventListener('click', function() {
-                sidebar.classList.remove('sidebar-open');
-                backdrop.classList.remove('show');
-            });
+            backdrop.addEventListener('click', closeMobileSidebar);
         }
 
         // Listener logout modal agar selalu bisa dipencet lancar dari dropdown manapun
@@ -111,6 +119,8 @@
         });
     });
     </script>
+    <!-- Notification System Dynamic Handler -->
+    <script src="<?= base_url('js/notification.js') ?>"></script>
     <?= $this->renderSection('scripts') ?>
 </body>
 </html>

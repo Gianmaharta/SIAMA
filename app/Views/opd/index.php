@@ -135,7 +135,7 @@ Master Data OPD - SIAMA
             <!-- Tombol Tambah OPD -->
             <button 
                 type="button" 
-                class="opd-btn-add" 
+                class="opd-btn-add btn-toolbar-primary" 
                 data-bs-toggle="modal" 
                 data-bs-target="#modalTambahOpd"
             >

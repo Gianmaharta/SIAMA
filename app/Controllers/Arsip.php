@@ -347,6 +347,14 @@ class Arsip extends BaseController
 
         log_activity('Arsip', 'CREATE', 'Mengunggah berkas arsip alih media: ' . ($data['nomor_arsip'] ?? '') . ' - ' . ($data['nama_arsip'] ?? ''));
 
+        // Kirim Notifikasi ke Kepala Bidang (Skenario B)
+        try {
+            $id_arsip_inserted = $this->arsipModel->getInsertID();
+            notification_service()->notifyArsipUploaded((string)$id_arsip_inserted, $user_id);
+        } catch (\Throwable $e) {
+            log_message('error', 'Gagal mengirim notifikasi arsip: ' . $e->getMessage());
+        }
+
         return redirect()->to('/arsip')->with('success', 'Arsip berhasil ditambahkan.');
     }
 
@@ -677,6 +685,13 @@ class Arsip extends BaseController
         $this->arsipModel->update($id, ['status_verifikasi' => 'Selesai']);
 
         log_activity('Arsip', 'VERIFY', 'Memverifikasi berkas arsip: ' . ($arsip['nomor_arsip'] ?? '') . ' (Status: Selesai)');
+
+        // Kirim Notifikasi ke Arsiparis Pembuat (Skenario C1)
+        try {
+            notification_service()->notifyArsipVerified((string)$id, $session->get('user_id'));
+        } catch (\Throwable $e) {
+            log_message('error', 'Gagal mengirim notifikasi verifikasi arsip: ' . $e->getMessage());
+        }
 
         return redirect()->to('/arsip')->with('success', 'Arsip berhasil diverifikasi.');
     }
