@@ -122,6 +122,11 @@ class UserController extends BaseController
             if ($roleTarget && $roleTarget->nama_role !== 'Admin_Pemkab') {
                 $rules['id_opd'] = 'required';
             }
+        } elseif ($roleLogin === 'Admin_OPD') {
+            $roleTarget = $this->userModel->db->table('roles')->where('id_role', $this->request->getPost('id_role'))->get()->getRow();
+            if ($roleTarget && in_array($roleTarget->nama_role, ['Admin_Pemkab', 'Admin_OPD'])) {
+                return redirect()->back()->withInput()->with('error', 'Akses Ditolak: Anda tidak dapat menetapkan peran Administrator.');
+            }
         }
 
         if (! $this->validate($rules)) {

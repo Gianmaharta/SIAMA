@@ -164,7 +164,9 @@ class AuditLog extends BaseController
             ]);
         }
         fclose($output);
-        exit();
+        if (!defined('ENVIRONMENT') || ENVIRONMENT !== 'testing') {
+            exit();
+        }
     }
 
     /**
@@ -295,6 +297,8 @@ class AuditLog extends BaseController
             ]);
         }
         fclose($output);
-        exit();
+        if (!defined('ENVIRONMENT') || ENVIRONMENT !== 'testing') {
+            exit();
+        }
     }
 }

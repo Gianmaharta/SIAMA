@@ -434,6 +434,7 @@ class SIAMAEndToEndTest extends CIUnitTestCase
     protected function setupNotifikasi(): void
     {
         $this->setupArsip();
+        $this->setupBA();
         $db = $this->db();
         $db->table('arsip')->where('id_arsip', static::$idArsip)
             ->update(['tanggal_retensi_aktif_berakhir' => date('Y-m-d', strtotime('-1 day'))]);

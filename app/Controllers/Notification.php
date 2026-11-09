@@ -225,6 +225,10 @@ class Notification extends BaseController
         }
 
         if ($action === 'musnahkan') {
+            // BR-06: Arsip hanya boleh dimusnahkan jika telah memiliki Berita Acara yang sah
+            if (empty($arsip['id_berita_acara'])) {
+                return redirect()->back()->with('error', 'Pemusnahan ditolak: Arsip belum memiliki Berita Acara yang sah (Aturan BR-06).');
+            }
             $this->arsipModel->update($id_arsip, ['status_retensi_aktif' => 'Musnah']);
             $msg = 'Arsip berhasil ditetapkan sebagai Musnah (Soft Delete).';
         } elseif ($action === 'inaktif') {

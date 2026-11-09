@@ -137,6 +137,15 @@ class Opd extends BaseController
             return redirect()->to('/opd')->with('error', 'Data OPD tidak ditemukan.');
         }
 
+        // Cek relasi child data (Bidang, User, Arsip) untuk menjaga integritas data
+        $hasBidang = $this->opdModel->db->table('bidang')->where('id_opd', $id)->countAllResults() > 0;
+        $hasUser   = $this->opdModel->db->table('users')->where('id_opd', $id)->countAllResults() > 0;
+        $hasArsip  = $this->opdModel->db->table('arsip')->where('id_opd', $id)->countAllResults() > 0;
+
+        if ($hasBidang || $hasUser || $hasArsip) {
+            return redirect()->to('/opd')->with('error', 'Gagal menghapus OPD. Pastikan OPD ini tidak memiliki relasi data (seperti Bidang, User, atau Arsip).');
+        }
+
         try {
             $this->opdModel->delete($id);
             log_activity('OPD', 'DELETE', "Menghapus data master OPD: {$opd['nama_opd']} ({$opd['kode_opd']})");

@@ -56,7 +56,7 @@ class ArsipPageTest extends CIUnitTestCase
                 'kurun_waktu'       => '2026',
                 'kondisi'           => 'Baik',
                 'status_verifikasi' => 'Draft',
-                'id_user'           => '08167f77-3106-4010-b801-b0716a2809d8',
+                'id_user_upload'    => '08167f77-3106-4010-b801-b0716a2809d8',
                 'id_opd'            => '9974e50e-9512-4044-999d-7eb4061cd6b2',
             ]);
             $arsip = $db->table('arsip')->where('id_arsip', $idArsip)->get()->getRowArray();

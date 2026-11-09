@@ -320,6 +320,21 @@ class BeritaAcara extends BaseController
 
     public function verifikasiKabid($id)
     {
+        $ba = $this->beritaAcaraModel->find($id);
+        if (!$ba) {
+            return redirect()->to('/berita-acara')->with('error', 'Berita Acara tidak ditemukan.');
+        }
+
+        // BR-08: Anti Self-Approval
+        if (!empty($ba['id_pelaksana']) && $ba['id_pelaksana'] === session()->get('user_id')) {
+            return redirect()->to('/berita-acara/detail/' . $id)->with('error', 'Pelanggaran aturan: Pembuat draf dilarang memverifikasi Berita Acara miliknya sendiri (Anti Self-Approval).');
+        }
+
+        // Hanya boleh verifikasi jika status Draf_Kabid atau Revisi
+        if (!in_array($ba['status_persetujuan'], ['Draf_Kabid', 'Revisi'])) {
+            return redirect()->to('/berita-acara/detail/' . $id)->with('error', 'Status Berita Acara tidak valid untuk diverifikasi Kepala Bidang.');
+        }
+
         $keputusan = $this->request->getPost('keputusan');
         $catatan = $this->request->getPost('catatan_revisi');
 
@@ -352,6 +367,21 @@ class BeritaAcara extends BaseController
 
     public function ttdPimpinan($id)
     {
+        $ba = $this->beritaAcaraModel->find($id);
+        if (!$ba) {
+            return redirect()->to('/berita-acara')->with('error', 'Berita Acara tidak ditemukan.');
+        }
+
+        // BR-08: Bypass protection - harus melalui verifikasi Kabid terlebih dahulu
+        if ($ba['status_persetujuan'] !== 'Draf_Pimpinan') {
+            return redirect()->to('/berita-acara/detail/' . $id)->with('error', 'Berita Acara belum diverifikasi oleh Kepala Bidang.');
+        }
+
+        // BR-08: Anti self-approval protection - Pimpinan tidak boleh mengesahkan BA yang dibuat oleh dirinya sendiri
+        if (!empty($ba['id_pelaksana']) && $ba['id_pelaksana'] === session()->get('user_id')) {
+            return redirect()->to('/berita-acara/detail/' . $id)->with('error', 'Pelanggaran aturan: Pembuat draf dilarang mengesahkan Berita Acara miliknya sendiri (Anti Self-Approval).');
+        }
+
         $this->beritaAcaraModel->update($id, [
             'status_persetujuan' => 'Selesai',
             'id_pimpinan' => session()->get('user_id')
@@ -388,6 +418,10 @@ class BeritaAcara extends BaseController
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
+
+        if (defined('ENVIRONMENT') && ENVIRONMENT === 'testing') {
+            return $this->response->setHeader('Content-Type', 'application/pdf')->setBody($dompdf->output());
+        }
 
         $dompdf->stream("Berita_Acara_" . str_replace('/', '_', $ba['nomor_ba']) . ".pdf", ["Attachment" => 0]);
         exit();

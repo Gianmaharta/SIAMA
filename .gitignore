@@ -124,3 +124,21 @@ _modules/*
 
 /results/
 /phpunit.xml
+
+#-------------------------
+# Exclusions (Testing Scripts & Documents)
+#-------------------------
+*.py
+scratch/
+*.docx
+*.doc
+~$*
+tests/_docs/
+public/uploads/arsip/*.pdf
+!public/uploads/arsip/index.html
+public/uploads/spt/*.pdf
+!public/uploads/spt/index.html
+tests/Feature/
+tests/_support/SiamaTestCase.php
+tests/unit/PriorityCalculationTest.php
+
