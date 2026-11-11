@@ -95,6 +95,13 @@
             backdrop.addEventListener('click', closeMobileSidebar);
         }
 
+        // Global Handler: Pindahkan modal apapun langsung ke <body> saat hendak dibuka agar tidak tertutup backdrop / terperangkap stacking context .app-layout
+        document.addEventListener('show.bs.modal', function(e) {
+            if (e.target && e.target.parentElement !== document.body) {
+                document.body.appendChild(e.target);
+            }
+        });
+
         // Listener logout modal agar selalu bisa dipencet lancar dari dropdown manapun
         document.addEventListener('click', function(e) {
             const logoutTrigger = e.target.closest('[data-bs-target="#modalLogout"]');

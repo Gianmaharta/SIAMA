@@ -666,7 +666,8 @@ class Arsip extends BaseController
     public function verify($id)
     {
         $session = session();
-        if ($session->get('nama_role') !== 'Kepala_Bidang') {
+        $userRole = $session->get('nama_role') ?? $session->get('role');
+        if (!in_array($userRole, ['Kepala_Bidang', 'Kabid', 'Admin_Pemkab'], true)) {
             return redirect()->to('/arsip')->with('error', 'Akses ditolak. Hanya Kepala Bidang yang dapat memverifikasi arsip.');
         }
 
@@ -676,16 +677,20 @@ class Arsip extends BaseController
             return redirect()->to('/arsip')->with('error', 'Arsip tidak ditemukan.');
         }
 
-        if ($arsip['status_verifikasi'] !== 'Menunggu') {
-            return redirect()->to('/arsip')->with('error', 'Arsip ini sudah diverifikasi.');
+        $currentStatus = strtolower(trim((string)($arsip['status_verifikasi'] ?? '')));
+        if ($currentStatus !== 'menunggu' && $currentStatus !== 'draft') {
+            return redirect()->to('/arsip/detail/' . $id)->with('error', 'Arsip ini sudah diverifikasi.');
         }
 
         // Pastikan Kabid hanya bisa memverifikasi arsip di OPD-nya
-        if ($arsip['id_opd'] != $session->get('id_opd')) {
-            return redirect()->to('/arsip')->with('error', 'Anda tidak berhak memverifikasi arsip dari OPD lain.');
+        if ($userRole !== 'Admin_Pemkab' && !empty($session->get('id_opd')) && $arsip['id_opd'] != $session->get('id_opd')) {
+            return redirect()->to('/arsip/detail/' . $id)->with('error', 'Anda tidak berhak memverifikasi arsip dari OPD lain.');
         }
 
-        $this->arsipModel->update($id, ['status_verifikasi' => 'Selesai']);
+        $this->arsipModel->update($id, [
+            'status_verifikasi' => 'Selesai',
+            'updated_by'        => $session->get('user_id'),
+        ]);
 
         log_activity('Arsip', 'VERIFY', 'Memverifikasi berkas arsip: ' . ($arsip['nomor_arsip'] ?? '') . ' (Status: Selesai)');
 
@@ -696,6 +701,6 @@ class Arsip extends BaseController
             log_message('error', 'Gagal mengirim notifikasi verifikasi arsip: ' . $e->getMessage());
         }
 
-        return redirect()->to('/arsip')->with('success', 'Arsip berhasil diverifikasi.');
+        return redirect()->to('/arsip/detail/' . $id)->with('success', 'Arsip berhasil diverifikasi.');
     }
 }

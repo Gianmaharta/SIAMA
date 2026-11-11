@@ -149,7 +149,7 @@ $routes->group('arsip', ['filter' => 'auth'], static function ($routes) {
     $routes->get('delete/(:segment)', 'Arsip::delete/$1', ['filter' => 'role:Arsiparis']);
 
     // Khusus Kepala Bidang: Verifikasi Arsip
-    $routes->post('verify/(:segment)', 'Arsip::verify/$1', ['filter' => 'role:Kepala_Bidang']);
+    $routes->post('verify/(:segment)', 'Arsip::verify/$1', ['filter' => 'role:Kepala_Bidang,Admin_Pemkab']);
 });
 
 // --- Modul Manajemen Pengguna ---

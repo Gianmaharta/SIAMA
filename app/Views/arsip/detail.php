@@ -247,6 +247,15 @@ Detail Arsip - SIAMA
 .pdf-modal-header .btn-close {
     filter: invert(1);
 }
+
+/* Cegah modal tertutup backdrop */
+#modalVerifikasiArsip,
+#modalPdfViewer {
+    z-index: 1065 !important;
+}
+.modal-backdrop {
+    z-index: 1050 !important;
+}
 </style>
 <?= $this->endSection() ?>
 
@@ -266,10 +275,27 @@ Detail Arsip - SIAMA
     
     <div class="d-flex align-items-center gap-2">
         <?php 
-        $roleSession = session()->get('nama_role');
+        $roleSession = session()->get('nama_role') ?? session()->get('role');
         $idRole = session()->get('id_role');
+        $userOpd = session()->get('id_opd');
+        
         $isArsiparis = ($idRole == 5 || $roleSession === 'Arsiparis');
+        $isKabid = in_array($roleSession, ['Kepala_Bidang', 'Kabid', 'Admin_Pemkab'], true);
+        
+        // Status verifikasi arsip
+        $stVerifRaw = $arsip['status_verifikasi'] ?? 'Menunggu';
+        $stVerifLower = strtolower(trim((string)$stVerifRaw));
+        $isOpdMatch = ($roleSession === 'Admin_Pemkab') || empty($userOpd) || ($userOpd == ($arsip['id_opd'] ?? ''));
+        $canVerify = $isKabid && $isOpdMatch && ($stVerifLower === 'menunggu' || $stVerifLower === 'draft');
         ?>
+
+        <?php if ($canVerify) : ?>
+            <button type="button" class="btn btn-success d-inline-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalVerifikasiArsip" style="background-color: #0E9F6E; border-color: #0E9F6E; font-size: 13.5px; padding: 8px 18px; border-radius: 8px; font-weight: 600; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);">
+                <i class="bi bi-patch-check-fill fs-6"></i>
+                <span>Verifikasi Arsip</span>
+            </button>
+        <?php endif; ?>
+
         <?php if ($isArsiparis) : ?>
             <a href="<?= base_url('/arsip/edit/' . $arsip['id_arsip']) ?>" class="btn btn-primary d-inline-flex align-items-center gap-2" style="background-color: #1E60EC; border-color: #1E60EC; font-size: 13.5px; padding: 8px 16px; border-radius: 8px;">
                 <i class="bi bi-pencil-square"></i>
@@ -564,6 +590,13 @@ Detail Arsip - SIAMA
             </div>
 
             <div class="d-flex align-items-center gap-2 flex-wrap">
+                <?php if ($canVerify) : ?>
+                    <button type="button" class="btn btn-success d-inline-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalVerifikasiArsip" style="background-color: #0E9F6E; border-color: #0E9F6E; font-size: 13.5px; font-weight: 600; padding: 8px 16px; border-radius: 8px;">
+                        <i class="bi bi-patch-check-fill"></i>
+                        <span>Verifikasi Berkas</span>
+                    </button>
+                <?php endif; ?>
+
                 <?php if ($ext === 'pdf') : ?>
                     <button type="button" class="btn-pdf-preview" data-bs-toggle="modal" data-bs-target="#modalPdfViewer">
                         <i class="bi bi-eye"></i>
@@ -621,4 +654,123 @@ Detail Arsip - SIAMA
     <?php endif; ?>
 </div>
 
+<!-- 4. Aksi Verifikasi Kepala Bidang (Role Based) -->
+<?php if ($canVerify) : ?>
+    <div class="arsip-detail-card mb-4" style="border: 1px solid #86EFAC; background-color: #F0FDF4; border-radius: 12px; padding: 22px 24px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);">
+        <div class="d-flex align-items-center justify-content-between pb-3 mb-3 border-bottom flex-wrap gap-2" style="border-color: #DCFCE7 !important;">
+            <div class="d-flex align-items-center gap-2">
+                <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background-color: #DEF7EC; color: #0E9F6E; font-size: 19px;">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <div>
+                    <h3 class="mb-0 fw-bold" style="font-size: 16px; color: #03543F;">Aksi Verifikasi Kepala Bidang</h3>
+                    <span class="small" style="color: #046C4E;">Pemeriksaan keabsahan dokumen dan kelayakan berkas alih media</span>
+                </div>
+            </div>
+            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2 rounded-pill fw-semibold" style="font-size: 12px;">
+                <i class="bi bi-clock-history me-1"></i>Menunggu Verifikasi
+            </span>
+        </div>
+        
+        <p class="small mb-3" style="color: #1F2937; line-height: 1.6;">
+            Berkas digital hasil alih media di atas telah selesai diunggah oleh Arsiparis pelaksana. Sebagai <strong>Kepala Bidang</strong>, Anda memiliki wewenang untuk memeriksa keterbacaan, keabsahan metadata, dan kelengkapan hasil pemindaian berkas. Klik tombol di bawah ini untuk memverifikasi dan menyetujui arsip ini agar dapat disertakan dalam draf Berita Acara Alih Media.
+        </p>
+
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <button type="button" class="btn btn-success fw-semibold px-4 py-2 d-inline-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalVerifikasiArsip" style="background-color: #0E9F6E; border-color: #0E9F6E; border-radius: 8px; font-size: 13.5px;">
+                <i class="bi bi-patch-check-fill"></i>
+                <span>Verifikasi & Setujui Arsip</span>
+            </button>
+            <?php if (!empty($arsip['file_arsip'])) : ?>
+                <?php if ($ext === 'pdf') : ?>
+                    <button type="button" class="btn btn-outline-secondary px-3 py-2 d-inline-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalPdfViewer" style="border-radius: 8px; font-size: 13.5px;">
+                        <i class="bi bi-eye"></i>
+                        <span>Tinjau Berkas Terlebih Dahulu</span>
+                    </button>
+                <?php else : ?>
+                    <a href="<?= $file_url ?>" target="_blank" class="btn btn-outline-secondary px-3 py-2 d-inline-flex align-items-center gap-2" style="border-radius: 8px; font-size: 13.5px;">
+                        <i class="bi bi-eye"></i>
+                        <span>Tinjau Berkas</span>
+                    </a>
+                <?php endif; ?>
+            <?php endif; ?>
+        </div>
+    </div>
+<?php elseif ($stVerifLower === 'selesai') : ?>
+    <div class="arsip-detail-card mb-4" style="border: 1px solid #DEF7EC; background-color: #F9FDFB; border-radius: 12px; padding: 18px 22px;">
+        <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background-color: #DEF7EC; color: #0E9F6E; font-size: 20px;">
+                <i class="bi bi-check-circle-fill"></i>
+            </div>
+            <div>
+                <h4 class="mb-1 fw-bold" style="font-size: 15px; color: #03543F;">Arsip Telah Diverifikasi (Status: Selesai)</h4>
+                <p class="mb-0 small" style="color: #046C4E;">Dokumen alih media ini telah berhasil diverifikasi oleh Kepala Bidang dan memenuhi syarat keabsahan untuk proses Berita Acara.</p>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
+<!-- Modal Konfirmasi Verifikasi Arsip -->
+<div class="modal fade" id="modalVerifikasiArsip" tabindex="-1" aria-labelledby="modalVerifikasiArsipLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+        <div class="modal-content border-0 shadow" style="border-radius: 16px;">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background-color: #DEF7EC; color: #0E9F6E; font-size: 24px;">
+                        <i class="bi bi-patch-check-fill"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark mb-0" id="modalVerifikasiArsipLabel" style="font-size: 17px;">Konfirmasi Verifikasi</h5>
+                        <p class="text-secondary small mb-0">Verifikasi kelayakan arsip digital</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <div class="modal-body px-4 py-3">
+                <p class="text-secondary small mb-3" style="line-height: 1.5;">
+                    Apakah Anda yakin ingin memverifikasi berkas arsip berikut?
+                </p>
+                <div class="p-3 rounded-3 bg-light border mb-3">
+                    <div class="small fw-bold text-primary mb-1"><?= esc($arsip['nomor_arsip']) ?></div>
+                    <div class="fw-semibold text-dark small mb-1"><?= esc($arsip['nama_arsip']) ?></div>
+                    <div class="text-muted" style="font-size: 11.5px;">
+                        Pengunggah: <?= esc($arsip['nama_uploader'] ?? $arsip['created_by'] ?? 'Arsiparis') ?>
+                    </div>
+                </div>
+                <div class="small text-muted" style="font-size: 12px; line-height: 1.5;">
+                    <i class="bi bi-info-circle me-1 text-primary"></i>
+                    Setelah diverifikasi, status verifikasi akan berubah menjadi <strong>Selesai</strong> dan notifikasi otomatis akan dikirimkan kepada Arsiparis.
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0 px-4 pb-4 d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-light border px-3 py-2 rounded-3 text-secondary fw-medium" data-bs-dismiss="modal" style="font-size: 13.5px;">
+                    Batal
+                </button>
+                <form action="<?= base_url('/arsip/verify/' . $arsip['id_arsip']) ?>" method="post" class="m-0">
+                    <?= csrf_field() ?>
+                    <button type="submit" class="btn btn-success px-4 py-2 rounded-3 fw-semibold d-inline-flex align-items-center gap-2" style="font-size: 13.5px; background-color: #0E9F6E; border-color: #0E9F6E;">
+                        <i class="bi bi-check2"></i>
+                        <span>Ya, Verifikasi Arsip</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?= $this->endSection() ?>
+
+
+<?= $this->section('scripts') ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Pindahkan modals ke <body> segera setelah DOM siap agar bebas dari stacking context .app-layout
+    ['modalVerifikasiArsip', 'modalPdfViewer'].forEach(function(modalId) {
+        const m = document.getElementById(modalId);
+        if (m && m.parentElement !== document.body) {
+            document.body.appendChild(m);
+        }
+    });
+});
+</script>
 <?= $this->endSection() ?>
