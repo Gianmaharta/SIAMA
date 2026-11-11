@@ -68,7 +68,7 @@ class ArsipSeeder extends Seeder
                 'tanggal_mulai'   => '2026-09-01',
                 'tanggal_selesai' => '2026-09-30',
                 'status'          => 'Aktif',
-                'file_spt'        => null,
+                'file_spt'        => '1789959872_0d82256beb96a483ad2a.pdf',
             ],
             [
                 'id_spt'          => 2,
@@ -80,7 +80,7 @@ class ArsipSeeder extends Seeder
                 'tanggal_mulai'   => '2026-09-05',
                 'tanggal_selesai' => '2026-09-25',
                 'status'          => 'Aktif',
-                'file_spt'        => null,
+                'file_spt'        => '1789959872_0d82256beb96a483ad2a.pdf',
             ],
         ];
         $this->db->table('spt')->ignore(true)->insertBatch($spt);

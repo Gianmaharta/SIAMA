@@ -272,5 +272,56 @@ class ArsipPageTest extends CIUnitTestCase
         $this->assertEquals('Menunggu', $stored['status_verifikasi']);
         $this->assertEquals('Aktif', $stored['status_retensi_aktif']);
     }
+
+    public function testArsipDetailDisplaysKlasifikasiArsipMetadata()
+    {
+        $db = \Config\Database::connect();
+        $arsip = $this->getOrCreateArsip();
+
+        // Ensure archive has a valid classification
+        $klas = $db->table('kode_klasifikasi')->get(1)->getRowArray();
+        if ($klas) {
+            $db->table('arsip')->where('id_arsip', $arsip['id_arsip'])->update([
+                'id_kode_klasifikasi' => $klas['id_kode_klasifikasi']
+            ]);
+        }
+
+        $result = $this->withSession($this->sessArsiparis())
+                       ->get('/arsip/detail/' . $arsip['id_arsip']);
+
+        $result->assertOK();
+        $body = $result->getBody();
+
+        // 1. Verify "Klasifikasi Arsip" label is present
+        $result->assertSee('Klasifikasi Arsip');
+        // 2. Verify old label "Tingkat Perkembangan" is NOT present
+        $this->assertStringNotContainsString('Tingkat Perkembangan', $body);
+
+        // 3. Verify dynamic classification name is displayed
+        if ($klas && !empty($klas['nama_klasifikasi'])) {
+            $result->assertSee($klas['nama_klasifikasi']);
+        }
+    }
+
+    public function testArsipDetailDisplaysHyphenWhenKlasifikasiNotAvailable()
+    {
+        $db = \Config\Database::connect();
+        $arsip = $this->getOrCreateArsip();
+
+        // Remove classification
+        $db->table('arsip')->where('id_arsip', $arsip['id_arsip'])->update([
+            'id_kode_klasifikasi' => null
+        ]);
+
+        $result = $this->withSession($this->sessArsiparis())
+                       ->get('/arsip/detail/' . $arsip['id_arsip']);
+
+        $result->assertOK();
+        $body = $result->getBody();
+
+        // Verify "Klasifikasi Arsip" label is present
+        $result->assertSee('Klasifikasi Arsip');
+        $this->assertStringNotContainsString('Tingkat Perkembangan', $body);
+    }
 }
 

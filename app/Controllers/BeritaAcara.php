@@ -52,9 +52,12 @@ class BeritaAcara extends BaseController
     public function create()
     {
         $session = session();
+        $role = $session->get('nama_role');
+        if ($role !== 'Arsiparis') {
+            return redirect()->to('/berita-acara')->with('error', 'Akses ditolak. Hanya Arsiparis yang dapat membuat Berita Acara.');
+        }
         $id_opd = $session->get('id_opd');
         $user_id = $session->get('user_id');
-        $role = $session->get('nama_role');
         
         // Ambil SPT aktif milik user (atau semua SPT milik OPD)
         $sptQuery = $this->sptModel;
@@ -76,6 +79,11 @@ class BeritaAcara extends BaseController
 
     public function store()
     {
+        $session = session();
+        if ($session->get('nama_role') !== 'Arsiparis') {
+            return redirect()->to('/berita-acara')->with('error', 'Akses ditolak. Hanya Arsiparis yang dapat membuat Berita Acara.');
+        }
+
         $db = \Config\Database::connect();
         $db->transBegin();
 
@@ -155,14 +163,18 @@ class BeritaAcara extends BaseController
 
     public function edit($id)
     {
+        $session = session();
+        if ($session->get('nama_role') !== 'Arsiparis') {
+            return redirect()->to('/berita-acara')->with('error', 'Akses ditolak. Hanya Arsiparis yang dapat mengedit draf Berita Acara.');
+        }
+
         $ba = $this->beritaAcaraModel->find($id);
 
         if (!$ba || !in_array($ba['status_persetujuan'], ['Draf_Kabid', 'Revisi'])) {
             return redirect()->to('/berita-acara')->with('error', 'Berita Acara ini tidak dapat diedit karena sudah diproses atau disahkan.');
         }
 
-        $session = session();
-        $id_opd = $session->get('id_opd') ?? $ba['id_opd'];
+        $id_opd = $session->get('id_opd') ?: $ba['id_opd'];
         $data['ba'] = $ba;
         $data['spt_list'] = $this->sptModel->where('id_opd', $id_opd)
                                            ->where('status', 'Aktif')
@@ -197,6 +209,11 @@ class BeritaAcara extends BaseController
 
     public function update($id)
     {
+        $session = session();
+        if ($session->get('nama_role') !== 'Arsiparis') {
+            return redirect()->to('/berita-acara')->with('error', 'Akses ditolak. Hanya Arsiparis yang dapat mengedit draf Berita Acara.');
+        }
+
         $ba = $this->beritaAcaraModel->find($id);
 
         if (!$ba || !in_array($ba['status_persetujuan'], ['Draf_Kabid', 'Revisi'])) {
@@ -269,6 +286,11 @@ class BeritaAcara extends BaseController
 
     public function delete($id)
     {
+        $session = session();
+        if ($session->get('nama_role') !== 'Arsiparis') {
+            return redirect()->to('/berita-acara')->with('error', 'Akses ditolak. Hanya Arsiparis yang dapat menghapus draf Berita Acara.');
+        }
+
         $ba = $this->beritaAcaraModel->find($id);
 
         if (!$ba || !in_array($ba['status_persetujuan'], ['Draf_Kabid', 'Revisi'])) {

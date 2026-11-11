@@ -311,6 +311,146 @@ Detail Berita Acara - SIAMA
         margin-bottom: 0;
     }
 }
+
+/* ==========================================================================
+   Aksi Verifikasi Kepala Bidang (Redesign Modern & Minimalis)
+   ========================================================================== */
+.ba-verif-icon-navy {
+    color: #1E3A6D !important;
+    font-size: 19px;
+}
+
+.ba-verif-option {
+    position: relative;
+    display: block;
+    background-color: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 13px 18px;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ba-verif-option:hover {
+    border-color: #CBD5E1;
+    background-color: #F8FAFC;
+}
+
+/* Radio Button Input */
+.ba-verif-radio {
+    width: 19px;
+    height: 19px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+}
+
+/* Pilihan Setujui - Sentuhan Hijau Halus */
+.ba-verif-option-approve:hover {
+    border-color: #A7F3D0;
+    background-color: #F0FDF4;
+}
+
+.ba-verif-option-approve.selected,
+.ba-verif-option-approve:has(.ba-verif-radio-approve:checked) {
+    border-color: #22C55E;
+    background-color: #F0FDF4;
+    box-shadow: 0 0 0 1px #22C55E, 0 1px 3px rgba(34, 197, 94, 0.12);
+}
+
+.ba-verif-radio-approve:checked {
+    background-color: #16A34A;
+    border-color: #16A34A;
+}
+
+.ba-verif-radio-approve:focus {
+    border-color: #22C55E;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.18);
+}
+
+/* Pilihan Tolak - Sentuhan Merah Halus */
+.ba-verif-option-reject:hover {
+    border-color: #FECACA;
+    background-color: #FEF2F2;
+}
+
+.ba-verif-option-reject.selected,
+.ba-verif-option-reject:has(.ba-verif-radio-reject:checked) {
+    border-color: #EF4444;
+    background-color: #FEF2F2;
+    box-shadow: 0 0 0 1px #EF4444, 0 1px 3px rgba(239, 68, 68, 0.12);
+}
+
+.ba-verif-radio-reject:checked {
+    background-color: #DC2626;
+    border-color: #DC2626;
+}
+
+.ba-verif-radio-reject:focus {
+    border-color: #EF4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18);
+}
+
+/* Teks Pilihan */
+.ba-verif-option-content {
+    font-size: 13.5px;
+    line-height: 1.4;
+}
+
+.ba-verif-option-name {
+    font-size: 13.5px;
+}
+
+.ba-verif-option-desc {
+    font-size: 13px;
+    color: #64748B;
+}
+
+.ba-verif-option-sep {
+    color: #CBD5E1;
+}
+
+/* Tombol Kirim Keputusan di Kanan Bawah */
+.ba-btn-verif-submit {
+    background-color: #1E3A6D;
+    border: 1px solid #1E3A6D;
+    color: #FFFFFF !important;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    padding: 9px 24px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 1px 3px rgba(30, 58, 109, 0.2);
+    cursor: pointer;
+}
+
+.ba-btn-verif-submit:hover,
+.ba-btn-verif-submit:focus {
+    background-color: #172F59;
+    border-color: #172F59;
+    color: #FFFFFF !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(30, 58, 109, 0.28);
+}
+
+.ba-btn-verif-submit:active {
+    background-color: #122648;
+    border-color: #122648;
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(30, 58, 109, 0.2);
+}
+
+@media (max-width: 576px) {
+    .ba-btn-verif-submit {
+        width: 100%;
+    }
+}
 </style>
 <?= $this->endSection() ?>
 
@@ -330,19 +470,11 @@ Detail Berita Acara - SIAMA
         <?php 
             $userRole = session()->get('nama_role') ?? session()->get('role');
             $currentStatus = $ba['status_persetujuan'] ?? '';
-            if (in_array($currentStatus, ['Draf_Kabid', 'Draft_Kabid', 'Revisi']) && in_array($userRole, ['Arsiparis', 'Admin_Pemkab', 'Admin_OPD']) && !empty($ba['id_berita_acara'])) : 
+            if (in_array($currentStatus, ['Draf_Kabid', 'Draft_Kabid', 'Revisi']) && $userRole === 'Arsiparis' && !empty($ba['id_berita_acara'])) : 
         ?>
             <a href="<?= base_url('/berita-acara/edit/' . $ba['id_berita_acara']) ?>" class="btn btn-warning d-inline-flex align-items-center gap-2 px-3 py-2 fw-medium text-dark" style="border-radius: 8px; font-size: 13.5px;">
                 <i class="bi bi-pencil-square"></i>
                 <span>Edit Draf</span>
-            </a>
-        <?php endif; ?>
-
-        <!-- Tombol Cetak Dokumen PDF jika Berita Acara tersedia -->
-        <?php if (!empty($ba['id_berita_acara'])) : ?>
-            <a href="<?= base_url('/berita-acara/cetak/' . $ba['id_berita_acara']) ?>" target="_blank" class="btn btn-outline-primary d-inline-flex align-items-center gap-2 px-3 py-2 fw-medium" style="border-radius: 8px; font-size: 13.5px;">
-                <i class="bi bi-printer"></i>
-                <span>Cetak Dokumen PDF</span>
             </a>
         <?php endif; ?>
     </div>
@@ -592,39 +724,72 @@ Detail Berita Acara - SIAMA
 ?>
 
 <?php if ($role === 'Kepala_Bidang' && ($statusBa === 'Draf_Kabid' || $statusBa === 'Draft_Kabid')) : ?>
-    <div class="ba-detail-card border-warning" style="background-color: #FFFDF5;">
-        <div class="ba-detail-card-header border-warning-subtle">
-            <h2 class="ba-detail-card-title text-warning-emphasis">
-                <i class="bi bi-shield-check text-warning"></i>
+    <div class="ba-detail-card">
+        <div class="ba-detail-card-header">
+            <h2 class="ba-detail-card-title">
+                <i class="bi bi-shield-check ba-verif-icon-navy"></i>
                 <span>Aksi Verifikasi Kepala Bidang</span>
             </h2>
         </div>
-        <form action="<?= base_url('/berita-acara/verifikasi-kabid/' . $ba['id_berita_acara']) ?>" method="post">
+        <form action="<?= base_url('/berita-acara/verifikasi-kabid/' . $ba['id_berita_acara']) ?>" method="post" id="formVerifikasiKabid">
             <?= csrf_field() ?>
-            <div class="mb-3">
-                <label class="form-label fw-semibold text-dark small mb-2">Keputusan Verifikasi:</label>
-                <div class="d-flex gap-4">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="keputusan" value="Approve" required id="kep_approve">
-                        <label class="form-check-label fw-medium text-success small" for="kep_approve">
-                            <i class="bi bi-check-circle me-1"></i> Setujui (Teruskan ke Pimpinan)
+            <div class="mb-4">
+                <label class="form-label fw-semibold text-dark small mb-2" style="font-size: 13.5px;">Keputusan Verifikasi:</label>
+                <div class="row g-3">
+                    <!-- Pilihan 1: Setujui -->
+                    <div class="col-12 col-md-6">
+                        <label class="ba-verif-option ba-verif-option-approve h-100" for="kep_approve">
+                            <div class="d-flex align-items-center gap-3 w-100">
+                                <input class="form-check-input ba-verif-radio ba-verif-radio-approve m-0" type="radio" name="keputusan" value="Approve" required id="kep_approve">
+                                <div class="ba-verif-option-content">
+                                    <span class="ba-verif-option-name text-success fw-semibold">
+                                        <i class="bi bi-check-circle me-1"></i>Setujui
+                                    </span>
+                                </div>
+                            </div>
                         </label>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="keputusan" value="Reject" required id="kep_reject">
-                        <label class="form-check-label fw-medium text-danger small" for="kep_reject">
-                            <i class="bi bi-x-circle me-1"></i> Tolak (Minta Revisi)
+
+                    <!-- Pilihan 2: Tolak -->
+                    <div class="col-12 col-md-6">
+                        <label class="ba-verif-option ba-verif-option-reject h-100" for="kep_reject">
+                            <div class="d-flex align-items-center gap-3 w-100">
+                                <input class="form-check-input ba-verif-radio ba-verif-radio-reject m-0" type="radio" name="keputusan" value="Reject" required id="kep_reject">
+                                <div class="ba-verif-option-content">
+                                    <span class="ba-verif-option-name text-danger fw-semibold">
+                                        <i class="bi bi-x-circle me-1"></i>Tolak
+                                    </span>
+                                </div>
+                            </div>
                         </label>
                     </div>
                 </div>
             </div>
-            <div class="mb-3">
-                <label for="catatan_revisi" class="form-label fw-semibold text-dark small mb-1">Catatan Verifikasi (Wajib diisi jika ditolak):</label>
-                <textarea name="catatan_revisi" id="catatan_revisi" rows="3" class="form-control" placeholder="Tulis catatan jika ada perbaikan..." style="font-size: 13.5px; border-radius: 8px;"></textarea>
+
+            <!-- Wrapper Catatan Revisi Opsional jika memilih Tolak -->
+            <div id="wrapperCatatanRevisi" class="mb-4 d-none">
+                <label for="catatan_revisi" class="form-label fw-semibold text-dark small mb-1" style="font-size: 13px;">
+                    Catatan Revisi <span class="text-secondary fw-normal">(Opsional)</span>:
+                </label>
+                <textarea name="catatan_revisi" id="catatan_revisi" rows="3" class="form-control" placeholder="Tuliskan catatan perbaikan untuk arsiparis pelaksana (opsional)..." style="font-size: 13.5px; border-radius: 8px;"></textarea>
             </div>
-            <button type="submit" class="btn btn-warning fw-semibold px-4 py-2 text-dark" style="border-radius: 8px; font-size: 13.5px;">
-                <i class="bi bi-send me-1"></i> Kirim Keputusan
-            </button>
+
+            <!-- Baris Tombol Aksi Sejajar: Kiri = Cetak Dokumen PDF, Kanan = Kirim Keputusan -->
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-3 border-top mt-4">
+                <div>
+                    <?php if (!empty($ba['id_berita_acara'])) : ?>
+                        <a href="<?= base_url('/berita-acara/cetak/' . $ba['id_berita_acara']) ?>" target="_blank" class="btn btn-outline-primary d-inline-flex align-items-center gap-2 px-3 py-2 fw-medium" style="border-radius: 8px; font-size: 13.5px;">
+                            <i class="bi bi-printer"></i>
+                            <span>Cetak Dokumen PDF</span>
+                        </a>
+                    <?php endif; ?>
+                </div>
+                <div>
+                    <button type="submit" class="btn ba-btn-verif-submit">
+                        <i class="bi bi-send me-1"></i> Kirim Keputusan
+                    </button>
+                </div>
+            </div>
         </form>
     </div>
 <?php endif; ?>
@@ -640,11 +805,83 @@ Detail Berita Acara - SIAMA
         <p class="text-secondary small mb-3">Dokumen telah diverifikasi oleh Kepala Bidang. Klik tombol di bawah untuk membubuhkan tanda tangan elektronik dan mengesahkan Berita Acara secara resmi.</p>
         <form action="<?= base_url('/berita-acara/ttd-pimpinan/' . $ba['id_berita_acara']) ?>" method="post">
             <?= csrf_field() ?>
-            <button type="submit" class="btn btn-primary fw-semibold px-4 py-2" style="border-radius: 8px; font-size: 13.5px; background-color: #1E60EC; border-color: #1E60EC;">
-                <i class="bi bi-check2-circle me-1"></i> Tandatangani & Sahkan
-            </button>
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-2">
+                <div>
+                    <?php if (!empty($ba['id_berita_acara'])) : ?>
+                        <a href="<?= base_url('/berita-acara/cetak/' . $ba['id_berita_acara']) ?>" target="_blank" class="btn btn-outline-primary d-inline-flex align-items-center gap-2 px-3 py-2 fw-medium" style="border-radius: 8px; font-size: 13.5px;">
+                            <i class="bi bi-printer"></i>
+                            <span>Cetak Dokumen PDF</span>
+                        </a>
+                    <?php endif; ?>
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-primary fw-semibold px-4 py-2" style="border-radius: 8px; font-size: 13.5px; background-color: #1E60EC; border-color: #1E60EC;">
+                        <i class="bi bi-check2-circle me-1"></i> Tandatangani & Sahkan
+                    </button>
+                </div>
+            </div>
         </form>
     </div>
 <?php endif; ?>
 
+<?php if ($statusBa === 'Selesai' && !empty($ba['id_berita_acara'])) : ?>
+    <div class="ba-detail-card">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div>
+                <h6 class="fw-bold text-dark mb-1" style="font-size: 15px;">Dokumen Berita Acara Telah Disahkan</h6>
+                <p class="text-secondary small mb-0">Berita Acara ini telah diverifikasi dan disahkan secara resmi.</p>
+            </div>
+            <div>
+                <a href="<?= base_url('/berita-acara/cetak/' . $ba['id_berita_acara']) ?>" target="_blank" class="btn btn-outline-primary d-inline-flex align-items-center gap-2 px-3 py-2 fw-medium" style="border-radius: 8px; font-size: 13.5px;">
+                    <i class="bi bi-printer"></i>
+                    <span>Cetak Dokumen PDF</span>
+                </a>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
+<?= $this->endSection() ?>
+
+<?= $this->section('scripts') ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const verifRadios = document.querySelectorAll('input[name="keputusan"]');
+    const wrapperCatatan = document.getElementById('wrapperCatatanRevisi');
+    const inputCatatan = document.getElementById('catatan_revisi');
+
+    function updateVerifSelection() {
+        let isReject = false;
+        verifRadios.forEach(radio => {
+            const parent = radio.closest('.ba-verif-option');
+            if (radio.checked) {
+                if (parent) parent.classList.add('selected');
+                if (radio.value === 'Reject') {
+                    isReject = true;
+                }
+            } else {
+                if (parent) parent.classList.remove('selected');
+            }
+        });
+
+        if (wrapperCatatan) {
+            if (isReject) {
+                wrapperCatatan.classList.remove('d-none');
+            } else {
+                wrapperCatatan.classList.add('d-none');
+                if (inputCatatan) {
+                    inputCatatan.value = '';
+                }
+            }
+        }
+    }
+
+    if (verifRadios.length > 0) {
+        verifRadios.forEach(radio => {
+            radio.addEventListener('change', updateVerifSelection);
+        });
+        updateVerifSelection();
+    }
+});
+</script>
 <?= $this->endSection() ?>

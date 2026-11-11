@@ -78,7 +78,7 @@ Daftar Berita Acara - SIAMA
                 </div>
 
                 <!-- Tombol Buat Berita Acara (CTA) -->
-                <?php if (in_array(session()->get('nama_role'), ['Arsiparis', 'Admin_Pemkab', 'Admin_OPD'])) : ?>
+                <?php if (session()->get('nama_role') === 'Arsiparis') : ?>
                     <a href="<?= base_url('/berita-acara/create') ?>" class="btn ba-btn-add btn-toolbar-primary" id="btnTambahBA" title="Buat Draf Berita Acara Baru">
                         <i class="bi bi-plus-lg"></i>
                         <span>Buat Berita Acara</span>
@@ -170,7 +170,7 @@ Daftar Berita Acara - SIAMA
                                     </a>
                                     <?php 
                                         $userRole = session()->get('nama_role') ?? session()->get('role');
-                                        if (in_array($rawStatus, ['Draf_Kabid', 'Revisi']) && in_array($userRole, ['Arsiparis', 'Admin_Pemkab', 'Admin_OPD'])) : 
+                                        if (in_array($rawStatus, ['Draf_Kabid', 'Revisi']) && $userRole === 'Arsiparis') : 
                                     ?>
                                         <a href="<?= base_url('/berita-acara/edit/' . $row['id_berita_acara']) ?>" class="btn-ba-action btn-ba-edit" title="Edit Draf Berita Acara">
                                             <i class="bi bi-pencil-square"></i>

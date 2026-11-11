@@ -192,7 +192,7 @@ class Spt extends BaseController
 
         // Ambil daftar pelaksana dari tabel spt_assignments
         $builder = $db->table('spt_assignments');
-        $builder->select('users.nama, users.email, bidang.nama_bidang, spt_assignments.status, spt_assignments.created_at as tgl_ditugaskan, assigner.nama as nama_assigner');
+        $builder->select('users.id_user, users.nama, users.email, bidang.nama_bidang, spt_assignments.status, spt_assignments.created_at as tgl_ditugaskan, assigner.nama as nama_assigner');
         $builder->join('users', 'users.id_user = spt_assignments.id_user');
         $builder->join('bidang', 'bidang.id_bidang = users.id_bidang', 'left');
         $builder->join('users as assigner', 'assigner.id_user = spt_assignments.assigned_by', 'left');

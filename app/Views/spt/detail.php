@@ -56,13 +56,6 @@ Detail Surat Perintah Tugas (SPT) - SIAMA
             <p class="text-secondary small mb-0">Rincian informasi surat perintah tugas dan arsiparis pelaksana alih media.</p>
         </div>
     </div>
-
-    <!-- Tombol Aksi Tambahan jika belum ditugaskan & Role Kepala Bidang -->
-    <?php if (in_array($user_role ?? session()->get('nama_role'), ['Kepala_Bidang', 'Kepala Bidang', 'Kabid']) && ($spt['status_penugasan'] ?? '') === 'belum_ditugaskan') : ?>
-        <a href="<?= base_url('/spt/assign/' . $spt['id_spt']) ?>" class="btn btn-primary d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 shadow-sm fw-medium" style="background-color: #1E60EC; border-color: #1E60EC; font-size: 13.5px;">
-            <i class="bi bi-person-plus-fill"></i> Tugaskan Arsiparis
-        </a>
-    <?php endif; ?>
 </div>
 
 <!-- Flash Message Feedback -->
@@ -83,6 +76,51 @@ Detail Surat Perintah Tugas (SPT) - SIAMA
             <?= session()->getFlashdata('error') ?>
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
+    </div>
+<?php endif; ?>
+
+<?php 
+$currentUserId = session()->get('user_id');
+$currentUserRole = $user_role ?? session()->get('nama_role') ?? '';
+$isArsiparisRole = in_array($currentUserRole, ['Arsiparis']);
+$isAssignedPelaksana = false;
+if (!empty($pelaksana_list)) {
+    foreach ($pelaksana_list as $pelaksanaItem) {
+        if (($pelaksanaItem['id_user'] ?? '') === $currentUserId) {
+            $isAssignedPelaksana = true;
+            break;
+        }
+    }
+}
+?>
+
+<?php if ($isAssignedPelaksana || ($isArsiparisRole && !empty($pelaksana_list))) : ?>
+    <!-- Banner Khusus Arsiparis Pelaksana Tugas -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4" style="background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); border-left: 5px solid #1E60EC !important;">
+        <div class="card-body p-3 p-md-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-white text-primary d-flex align-items-center justify-content-center shadow-sm flex-shrink-0" style="width: 46px; height: 46px; font-size: 22px;">
+                    <i class="bi bi-file-earmark-person-fill"></i>
+                </div>
+                <div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                        <h6 class="fw-bold mb-0 text-dark" style="font-size: 15px;">Anda Ditugaskan pada SPT Ini</h6>
+                        <span class="badge bg-primary text-white px-2 py-0-5 rounded-pill" style="font-size: 11px;">Pelaksana Alih Media</span>
+                    </div>
+                    <p class="text-secondary small mb-0">Tinjau isi dokumen SPT berikut dan mulailah proses input alih media arsip digital sesuai tugas.</p>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <?php if (!empty($spt['file_spt'])) : ?>
+                    <button type="button" class="btn btn-white btn-sm d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 bg-white border shadow-sm fw-medium text-dark" data-bs-toggle="modal" data-bs-target="#modalPdfViewer">
+                        <i class="bi bi-file-earmark-pdf-fill text-danger"></i> <span>Lihat Dokumen SPT</span>
+                    </button>
+                <?php endif; ?>
+                <a href="<?= base_url('/arsip/create?id_spt=' . $spt['id_spt']) ?>" class="btn btn-sm d-inline-flex align-items-center gap-2 px-3 py-2 rounded-3 fw-medium text-white shadow-sm" style="background-color: #1E3A6D; border-color: #1E3A6D;">
+                    <i class="bi bi-folder-plus"></i> <span>Mulai Alih Media</span>
+                </a>
+            </div>
+        </div>
     </div>
 <?php endif; ?>
 
@@ -168,6 +206,12 @@ Detail Surat Perintah Tugas (SPT) - SIAMA
                     <a href="<?= base_url('uploads/spt/' . $spt['file_spt']) ?>" target="_blank" download class="btn btn-light border btn-sm d-inline-flex align-items-center gap-2 rounded-3 px-3 py-2 text-secondary">
                         <i class="bi bi-download"></i> Unduh PDF
                     </a>
+                </div>
+            <?php else : ?>
+                <div class="pt-3 border-top">
+                    <span class="text-secondary small fst-italic">
+                        <i class="bi bi-info-circle me-1"></i>Dokumen fisik SPT (PDF) belum dilampirkan.
+                    </span>
                 </div>
             <?php endif; ?>
         </div>

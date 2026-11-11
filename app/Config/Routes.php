@@ -97,11 +97,11 @@ $routes->group('notification', ['filter' => 'auth'], static function ($routes) {
 // --- Modul Berita Acara ---
 $routes->group('berita-acara', ['filter' => 'auth'], function($routes) {
     $routes->get('/', 'BeritaAcara::index');
-    $routes->get('create', 'BeritaAcara::create', ['filter' => 'role:Arsiparis,Admin_Pemkab,Admin_OPD']);
-    $routes->post('store', 'BeritaAcara::store', ['filter' => 'role:Arsiparis,Admin_Pemkab,Admin_OPD']);
-    $routes->get('edit/(:segment)', 'BeritaAcara::edit/$1', ['filter' => 'role:Arsiparis,Admin_Pemkab,Admin_OPD']);
-    $routes->post('update/(:segment)', 'BeritaAcara::update/$1', ['filter' => 'role:Arsiparis,Admin_Pemkab,Admin_OPD']);
-    $routes->get('delete/(:segment)', 'BeritaAcara::delete/$1', ['filter' => 'role:Arsiparis,Admin_Pemkab,Admin_OPD']);
+    $routes->get('create', 'BeritaAcara::create', ['filter' => 'role:Arsiparis']);
+    $routes->post('store', 'BeritaAcara::store', ['filter' => 'role:Arsiparis']);
+    $routes->get('edit/(:segment)', 'BeritaAcara::edit/$1', ['filter' => 'role:Arsiparis']);
+    $routes->post('update/(:segment)', 'BeritaAcara::update/$1', ['filter' => 'role:Arsiparis']);
+    $routes->get('delete/(:segment)', 'BeritaAcara::delete/$1', ['filter' => 'role:Arsiparis']);
     $routes->get('detail/(:segment)', 'BeritaAcara::detail/$1');
     $routes->post('verifikasi-kabid/(:segment)', 'BeritaAcara::verifikasiKabid/$1', ['filter' => 'role:Kepala_Bidang']);
     $routes->post('ttd-pimpinan/(:segment)', 'BeritaAcara::ttdPimpinan/$1', ['filter' => 'role:Pimpinan']);

@@ -165,6 +165,7 @@ class SiamaSeeder extends Seeder
                 'perihal' => 'Tugas Alih Media Arsip Triwulan I',
                 'tanggal_mulai' => '2026-01-15',
                 'tanggal_selesai' => '2026-03-31',
+                'file_spt' => '1789959872_0d82256beb96a483ad2a.pdf',
                 'status' => 'Aktif',
                 'created_at' => date('Y-m-d H:i:s')
             ],
@@ -177,6 +178,7 @@ class SiamaSeeder extends Seeder
                 'perihal' => 'Tugas Alih Media Arsip Kepegawaian',
                 'tanggal_mulai' => '2026-04-10',
                 'tanggal_selesai' => '2026-06-30',
+                'file_spt' => '1789959872_0d82256beb96a483ad2a.pdf',
                 'status' => 'Aktif',
                 'created_at' => date('Y-m-d H:i:s')
             ]

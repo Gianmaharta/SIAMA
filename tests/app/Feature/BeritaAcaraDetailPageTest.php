@@ -274,4 +274,179 @@ class BeritaAcaraDetailPageTest extends CIUnitTestCase
         $arsip2 = $db->table('arsip')->where('id_arsip', $idArsip2)->get()->getRowArray();
         $this->assertEquals($idBa, $arsip2['id_berita_acara']);
     }
+
+    protected function sessKabid(): array
+    {
+        return [
+            'user_id'             => 'kabid-test-id-' . time(),
+            'email'               => 'kabid@siama.test',
+            'nama_lengkap'        => 'Kepala Bidang Test',
+            'nama_role'           => 'Kepala_Bidang',
+            'id_role'             => '4',
+            'id_opd'              => '9974e50e-9512-4044-999d-7eb4061cd6b2',
+            'id_bidang'           => 'fb5bbc04-7b27-43a6-8010-9b59d64e0cca',
+            'isLoggedIn'          => true,
+            'is_default_password' => 0,
+        ];
+    }
+
+    public function testKabidVerifikasiSectionRedesignRendered(): void
+    {
+        $db = \Config\Database::connect();
+        $idBa = 'ba-kabid-verif-' . time();
+
+        $db->table('berita_acara')->insert([
+            'id_berita_acara'    => $idBa,
+            'id_opd'             => '9974e50e-9512-4044-999d-7eb4061cd6b2',
+            'nomor_ba'           => 'VERIF/BA/' . time(),
+            'tanggal_ba'         => date('Y-m-d'),
+            'status_persetujuan' => 'Draf_Kabid',
+            'id_pelaksana'       => 'other-arsiparis-id', // Anti self-approval check passed
+            'created_at'         => date('Y-m-d H:i:s'),
+            'updated_at'         => date('Y-m-d H:i:s'),
+        ]);
+
+        $result = $this->withSession($this->sessKabid())
+                       ->get('/berita-acara/detail/' . $idBa);
+
+        $result->assertOK();
+        $body = $result->getBody();
+
+        // 1. Header
+        $result->assertSee('Aksi Verifikasi Kepala Bidang');
+        $this->assertStringContainsString('bi-shield-check', $body);
+        $this->assertStringContainsString('ba-verif-icon-navy', $body);
+        $this->assertStringNotContainsString('border-warning', $body);
+
+        // 2. Keputusan Verifikasi Radio Options (Sederhana: Setujui & Tolak)
+        $result->assertSee('Keputusan Verifikasi:');
+        $result->assertSee('Setujui');
+        $result->assertSee('Tolak');
+        $this->assertStringNotContainsString('Teruskan ke Pimpinan', $body);
+        $this->assertStringNotContainsString('Menolak hasil verifikasi', $body);
+        $this->assertStringContainsString('ba-verif-option-approve', $body);
+        $this->assertStringContainsString('ba-verif-option-reject', $body);
+
+        // 3. Catatan revisi opsional jika tolak
+        $this->assertStringContainsString('catatan_revisi', $body);
+        $this->assertStringContainsString('<textarea', $body);
+
+        // 4. Tombol Cetak Dokumen PDF di bawah card dan tombol Kirim Keputusan
+        $result->assertSee('Cetak Dokumen PDF');
+        $result->assertSee('Kirim Keputusan');
+        $this->assertStringContainsString('ba-btn-verif-submit', $body);
+    }
+
+    public function testKabidCanApproveWithoutCatatan(): void
+    {
+        $db = \Config\Database::connect();
+        $idBa = 'ba-appr-' . time();
+
+        $db->table('berita_acara')->insert([
+            'id_berita_acara'    => $idBa,
+            'id_opd'             => '9974e50e-9512-4044-999d-7eb4061cd6b2',
+            'nomor_ba'           => 'APPR/BA/' . time(),
+            'tanggal_ba'         => date('Y-m-d'),
+            'status_persetujuan' => 'Draf_Kabid',
+            'id_pelaksana'       => 'other-arsiparis-id',
+            'created_at'         => date('Y-m-d H:i:s'),
+            'updated_at'         => date('Y-m-d H:i:s'),
+        ]);
+
+        $result = $this->withSession($this->sessKabid())
+                       ->post('/berita-acara/verifikasi-kabid/' . $idBa, [
+                           'keputusan' => 'Approve',
+                       ]);
+
+        $result->assertRedirectTo('/berita-acara/detail/' . $idBa);
+
+        $updatedBa = $db->table('berita_acara')->where('id_berita_acara', $idBa)->get()->getRowArray();
+        $this->assertEquals('Draf_Pimpinan', $updatedBa['status_persetujuan']);
+    }
+
+    public function testKabidCanRejectWithoutCatatan(): void
+    {
+        $db = \Config\Database::connect();
+        $idBa = 'ba-rej-' . time();
+
+        $db->table('berita_acara')->insert([
+            'id_berita_acara'    => $idBa,
+            'id_opd'             => '9974e50e-9512-4044-999d-7eb4061cd6b2',
+            'nomor_ba'           => 'REJ/BA/' . time(),
+            'tanggal_ba'         => date('Y-m-d'),
+            'status_persetujuan' => 'Draf_Kabid',
+            'id_pelaksana'       => 'other-arsiparis-id',
+            'created_at'         => date('Y-m-d H:i:s'),
+            'updated_at'         => date('Y-m-d H:i:s'),
+        ]);
+
+        $result = $this->withSession($this->sessKabid())
+                       ->post('/berita-acara/verifikasi-kabid/' . $idBa, [
+                           'keputusan' => 'Reject',
+                       ]);
+
+        $result->assertRedirectTo('/berita-acara/detail/' . $idBa);
+
+        $updatedBa = $db->table('berita_acara')->where('id_berita_acara', $idBa)->get()->getRowArray();
+        $this->assertEquals('Revisi', $updatedBa['status_persetujuan']);
+    }
+
+    public function testAdminPemkabCannotEditDraftBeritaAcaraWhenLoggedIn(): void
+    {
+        $db = \Config\Database::connect();
+        $idBa = 'ba-admin-test-' . time();
+        $idArsip = 'arsip-adm-' . time();
+
+        $db->table('arsip')->insert([
+            'id_arsip'          => $idArsip,
+            'id_opd'            => '9974e50e-9512-4044-999d-7eb4061cd6b2',
+            'nomor_arsip'       => 'ARS/ADM/' . time(),
+            'nama_arsip'        => 'Arsip Admin ' . time(),
+            'status_verifikasi' => 'Selesai',
+            'id_berita_acara'   => $idBa,
+            'created_at'        => date('Y-m-d H:i:s'),
+        ]);
+
+        $db->table('berita_acara')->insert([
+            'id_berita_acara'    => $idBa,
+            'id_opd'             => '9974e50e-9512-4044-999d-7eb4061cd6b2',
+            'nomor_ba'           => 'ADMIN/BA/' . time(),
+            'tanggal_ba'         => '2026-09-10',
+            'status_persetujuan' => 'Draf_Kabid',
+            'created_at'         => date('Y-m-d H:i:s'),
+            'updated_at'         => date('Y-m-d H:i:s'),
+        ]);
+
+        $db->table('berita_acara_detail')->insert([
+            'id_berita_acara' => $idBa,
+            'id_arsip'        => $idArsip,
+        ]);
+
+        // 1. Admin Pemkab pada halaman detail tidak melihat tombol Edit Draf
+        $detailResult = $this->withSession($this->sessAdminPemkab())
+                             ->get('/berita-acara/detail/' . $idBa);
+        $detailResult->assertOK();
+        $this->assertStringNotContainsString('Edit Draf', $detailResult->getBody());
+
+        // 2. Admin Pemkab pada halaman index tidak melihat tombol Edit
+        $indexResult = $this->withSession($this->sessAdminPemkab())
+                            ->get('/berita-acara');
+        $indexResult->assertOK();
+        $this->assertStringNotContainsString('/berita-acara/edit/' . $idBa, $indexResult->getBody());
+
+        // 3. Admin Pemkab mencoba akses GET /berita-acara/edit/:id langsung -> ditolak / diredirect
+        $editGetResult = $this->withSession($this->sessAdminPemkab())
+                              ->get('/berita-acara/edit/' . $idBa);
+        $editGetResult->assertRedirect();
+
+        // 4. Admin Pemkab mencoba akses POST /berita-acara/update/:id langsung -> ditolak / diredirect
+        $postData = [
+            'nomor_ba'   => 'ADMIN/BA/UPDATED',
+            'tanggal_ba' => '2026-09-12',
+            'arsip_ids'  => [$idArsip],
+        ];
+        $updatePostResult = $this->withSession($this->sessAdminPemkab())
+                                 ->post('/berita-acara/update/' . $idBa, $postData);
+        $updatePostResult->assertRedirect();
+    }
 }

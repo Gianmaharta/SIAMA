@@ -217,15 +217,51 @@ Surat Perintah Tugas - SIAMA
 <!-- Modal Overlay: Terbitkan SPT -->
 <?= $this->include('spt/modal_terbitkan') ?>
 
+<!-- Modal PDF Viewer Bootstrap 5 -->
+<div class="modal fade" id="modalPdfViewerIndex" tabindex="-1" aria-labelledby="modalPdfViewerIndexLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" style="height: 90vh;">
+        <div class="modal-content h-100 border-0 rounded-4 shadow-lg overflow-hidden">
+            <div class="modal-header bg-light border-bottom px-4 py-3">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-file-earmark-pdf-fill text-danger fs-5"></i>
+                    <h5 class="modal-title fw-bold text-dark fs-6" id="modalPdfViewerIndexLabel">
+                        Dokumen SPT: <span id="pdfViewerNomorSpt"></span>
+                    </h5>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <a href="#" id="pdfViewerDownloadBtn" target="_blank" download class="btn btn-outline-secondary btn-sm rounded-3">
+                        <i class="bi bi-download me-1"></i> Unduh
+                    </a>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+            </div>
+            <div class="modal-body p-0 h-100 bg-secondary-subtle">
+                <iframe id="pdfViewerFrame" src="" class="w-100 h-100 border-0" title="Viewer Dokumen SPT"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
 <script>
+// Fungsi Global untuk Viewer PDF SPT dari tabel
+function viewSptPdf(nomorSpt, fileUrl) {
+    document.getElementById('pdfViewerNomorSpt').textContent = nomorSpt;
+    document.getElementById('pdfViewerDownloadBtn').href = fileUrl;
+    document.getElementById('pdfViewerFrame').src = fileUrl;
+    const modalElement = document.getElementById('modalPdfViewerIndex');
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+    modal.show();
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Data dari Controller CI4
     const rawData = <?= json_encode($spt_list ?? [], JSON_UNESCAPED_SLASHES) ?>;
     const baseDetailUrl = "<?= base_url('/spt/detail') ?>";
     const baseAssignUrl = "<?= base_url('/spt/assign') ?>";
+    const baseFileUrl   = "<?= base_url('uploads/spt') ?>";
     const currentUserRole = "<?= esc($user_role ?? session()->get('nama_role') ?? '') ?>";
 
     // Konfigurasi & State
@@ -481,6 +517,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const canAssign = ['Kepala_Bidang', 'Kepala Bidang', 'Kabid'].includes(currentUserRole);
 
             let actionHtml = `<div class="spt-action-group">`;
+            if (row.file_spt && String(row.file_spt).trim() !== '') {
+                const fileUrl = baseFileUrl + '/' + encodeURIComponent(row.file_spt);
+                const safeNomorSpt = escapeHtml(row.nomor_spt || 'SPT').replace(/'/g, "\\'");
+                actionHtml += `
+                    <button type="button" class="spt-action-btn spt-btn-doc" onclick="viewSptPdf('${safeNomorSpt}', '${fileUrl}')" title="Lihat Dokumen SPT (PDF)">
+                        <i class="bi bi-file-earmark-pdf"></i> <span>Dokumen</span>
+                    </button>
+                `;
+            }
             if (canAssign && isBelumDitugaskan) {
                 actionHtml += `
                     <a href="${assignUrl}" class="spt-action-btn spt-btn-assign" title="Tugaskan Arsiparis">

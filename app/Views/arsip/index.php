@@ -317,74 +317,12 @@ document.addEventListener('DOMContentLoaded', function() {
      */
     function renderAksi(row) {
         const detailUrl = baseDetailUrl + '/' + encodeURIComponent(row.id_arsip);
-        const editUrl = baseEditUrl + '/' + encodeURIComponent(row.id_arsip);
-        const deleteUrl = baseDeleteUrl + '/' + encodeURIComponent(row.id_arsip);
-        const hasFile = row.file_arsip && String(row.file_arsip).trim() !== '';
-        const fileUrl = hasFile ? baseFileUrl + '/' + encodeURIComponent(row.file_arsip) : '';
-        const canManage = ['Arsiparis', 'Admin_Pemkab'].includes(currentUserRole);
-
-        let dropdownItems = `
-            <li>
-                <a class="dropdown-item" href="${detailUrl}">
-                    <i class="bi bi-eye me-2 text-primary"></i> Detail Lengkap
-                </a>
-            </li>
-        `;
-
-        if (canManage) {
-            dropdownItems += `
-                <li>
-                    <a class="dropdown-item" href="${editUrl}">
-                        <i class="bi bi-pencil me-2 text-secondary"></i> Edit Data
-                    </a>
-                </li>
-            `;
-
-            if (!hasFile) {
-                dropdownItems += `
-                    <li>
-                        <a class="dropdown-item text-primary" href="${editUrl}">
-                            <i class="bi bi-upload me-2"></i> Unggah Berkas
-                        </a>
-                    </li>
-                `;
-            }
-        }
-
-        if (hasFile) {
-            dropdownItems += `
-                <li>
-                    <a class="dropdown-item" href="${fileUrl}" target="_blank" download>
-                        <i class="bi bi-download me-2 text-success"></i> Unduh Berkas
-                    </a>
-                </li>
-            `;
-        }
-
-        if (canManage) {
-            dropdownItems += `
-                <li><hr class="dropdown-divider my-1"></li>
-                <li>
-                    <a class="dropdown-item text-danger" href="${deleteUrl}" onclick="return confirm('Apakah Anda yakin ingin menghapus data arsip ini? Data yang dihapus tidak dapat dipulihkan.');">
-                        <i class="bi bi-trash me-2"></i> Hapus Arsip
-                    </a>
-                </li>
-            `;
-        }
 
         return `
-            <div class="d-inline-flex align-items-center gap-1 justify-content-center">
+            <div class="d-inline-flex align-items-center justify-content-center">
                 <a href="${detailUrl}" class="arsip-btn-action-detail" title="Lihat Detail Arsip">
                     <i class="bi bi-eye"></i> Detail
                 </a>
-                <div class="dropdown">
-                    <button class="arsip-btn-dots" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Opsi Aksi">
-                        <i class="bi bi-three-dots-vertical"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 py-1" style="border-radius: 10px; font-size: 13px; min-width: 160px; z-index: 1050;">
-                        ${dropdownItems}
-                    </ul>
-                </div>
             </div>
         `;
     }

@@ -737,3 +737,143 @@
 .ba-table-select-arsip tbody tr:hover td {
     background-color: #F8FAFC;
 }
+
+/* ==========================================================================
+   Aksi Verifikasi Kepala Bidang (Redesign Modern & Minimalis)
+   ========================================================================== */
+.ba-verif-icon-navy {
+    color: #1E3A6D !important;
+    font-size: 19px;
+}
+
+.ba-verif-option {
+    position: relative;
+    display: block;
+    background-color: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 13px 18px;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ba-verif-option:hover {
+    border-color: #CBD5E1;
+    background-color: #F8FAFC;
+}
+
+/* Radio Button Input */
+.ba-verif-radio {
+    width: 19px;
+    height: 19px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+}
+
+/* Pilihan Setujui - Sentuhan Hijau Halus */
+.ba-verif-option-approve:hover {
+    border-color: #A7F3D0;
+    background-color: #F0FDF4;
+}
+
+.ba-verif-option-approve.selected,
+.ba-verif-option-approve:has(.ba-verif-radio-approve:checked) {
+    border-color: #22C55E;
+    background-color: #F0FDF4;
+    box-shadow: 0 0 0 1px #22C55E, 0 1px 3px rgba(34, 197, 94, 0.12);
+}
+
+.ba-verif-radio-approve:checked {
+    background-color: #16A34A;
+    border-color: #16A34A;
+}
+
+.ba-verif-radio-approve:focus {
+    border-color: #22C55E;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.18);
+}
+
+/* Pilihan Tolak - Sentuhan Merah Halus */
+.ba-verif-option-reject:hover {
+    border-color: #FECACA;
+    background-color: #FEF2F2;
+}
+
+.ba-verif-option-reject.selected,
+.ba-verif-option-reject:has(.ba-verif-radio-reject:checked) {
+    border-color: #EF4444;
+    background-color: #FEF2F2;
+    box-shadow: 0 0 0 1px #EF4444, 0 1px 3px rgba(239, 68, 68, 0.12);
+}
+
+.ba-verif-radio-reject:checked {
+    background-color: #DC2626;
+    border-color: #DC2626;
+}
+
+.ba-verif-radio-reject:focus {
+    border-color: #EF4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18);
+}
+
+/* Teks Pilihan */
+.ba-verif-option-content {
+    font-size: 13.5px;
+    line-height: 1.4;
+}
+
+.ba-verif-option-name {
+    font-size: 13.5px;
+}
+
+.ba-verif-option-desc {
+    font-size: 13px;
+    color: #64748B;
+}
+
+.ba-verif-option-sep {
+    color: #CBD5E1;
+}
+
+/* Tombol Kirim Keputusan di Kanan Bawah */
+.ba-btn-verif-submit {
+    background-color: #1E3A6D;
+    border: 1px solid #1E3A6D;
+    color: #FFFFFF !important;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    padding: 9px 24px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 1px 3px rgba(30, 58, 109, 0.2);
+    cursor: pointer;
+}
+
+.ba-btn-verif-submit:hover,
+.ba-btn-verif-submit:focus {
+    background-color: #172F59;
+    border-color: #172F59;
+    color: #FFFFFF !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(30, 58, 109, 0.28);
+}
+
+.ba-btn-verif-submit:active {
+    background-color: #122648;
+    border-color: #122648;
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(30, 58, 109, 0.2);
+}
+
+@media (max-width: 576px) {
+    .ba-btn-verif-submit {
+        width: 100%;
+    }
+}

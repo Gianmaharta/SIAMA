@@ -34,13 +34,22 @@ Tambah Arsip - SIAMA
 
 <!-- Feedback Info jika terhubung dengan SPT -->
 <?php if (!empty($spt_terpilih)) : ?>
-    <div class="alert alert-info alert-dismissible fade show d-flex align-items-center gap-3 mb-4 rounded-3 border-0 shadow-sm" role="alert">
-        <i class="bi bi-info-circle-fill fs-4 text-info"></i>
-        <div>
-            <h6 class="fw-bold mb-1" style="font-size: 13.5px;">Arsip Terhubung dengan SPT</h6>
-            <div class="small">Nomor SPT: <strong><?= esc($spt_terpilih['nomor_spt']) ?></strong> &bull; Perihal: <?= esc($spt_terpilih['perihal']) ?></div>
+    <div class="alert alert-info alert-dismissible fade show d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4 rounded-3 border-0 shadow-sm" role="alert">
+        <div class="d-flex align-items-center gap-3">
+            <i class="bi bi-info-circle-fill fs-4 text-info flex-shrink-0"></i>
+            <div>
+                <h6 class="fw-bold mb-1" style="font-size: 13.5px;">Arsip Terhubung dengan SPT</h6>
+                <div class="small">Nomor SPT: <strong><?= esc($spt_terpilih['nomor_spt']) ?></strong> &bull; Perihal: <?= esc($spt_terpilih['perihal']) ?></div>
+            </div>
         </div>
-        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Tutup"></button>
+        <div class="d-flex align-items-center gap-2">
+            <?php if (!empty($spt_terpilih['file_spt'])) : ?>
+                <a href="<?= base_url('uploads/spt/' . $spt_terpilih['file_spt']) ?>" target="_blank" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1 rounded-2 fw-medium bg-white" style="font-size: 12.5px;">
+                    <i class="bi bi-file-earmark-pdf text-danger"></i> Lihat Dokumen SPT
+                </a>
+            <?php endif; ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
+        </div>
     </div>
 <?php endif; ?>
 

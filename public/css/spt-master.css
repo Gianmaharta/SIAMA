@@ -388,7 +388,7 @@
 }
 
 .spt-table .col-aksi {
-    min-width: 165px;
+    min-width: 180px;
     text-align: center;
     white-space: nowrap;
     padding-right: 24px;
@@ -447,6 +447,19 @@
     color: #FFFFFF;
     border-color: #334155;
     box-shadow: 0 2px 6px rgba(51, 65, 85, 0.2);
+}
+
+.spt-btn-doc {
+    background-color: #FEF2F2;
+    color: #DC2626;
+    border-color: #FEE2E2;
+}
+
+.spt-btn-doc:hover {
+    background-color: #DC2626;
+    color: #FFFFFF;
+    border-color: #DC2626;
+    box-shadow: 0 2px 6px rgba(220, 38, 38, 0.25);
 }
 
 /* Table Body Rows */
@@ -783,9 +796,6 @@
     }
 }
 
-/* ============================================================== */
-/* MODAL OVERLAY: TERBITKAN SPT                                   */
-/* ============================================================== */
 .spt-btn-create {
     display: inline-flex;
     align-items: center;

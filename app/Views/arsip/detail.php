@@ -428,8 +428,8 @@ Detail Arsip - SIAMA
                     </div>
                     <div class="col-12 col-sm-4">
                         <div class="arsip-meta-row">
-                            <span class="arsip-meta-label">Tingkat Perkembangan</span>
-                            <span class="arsip-meta-value"><?= esc($arsip['tingkat_perkembangan'] ?? 'Asli') ?></span>
+                            <span class="arsip-meta-label">Klasifikasi Arsip</span>
+                            <span class="arsip-meta-value"><?= !empty($arsip['nama_klasifikasi']) ? esc($arsip['nama_klasifikasi']) : (!empty($arsip['kode_klasifikasi_text']) ? esc($arsip['kode_klasifikasi_text']) : '-') ?></span>
                         </div>
                     </div>
                 </div>
