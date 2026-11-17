@@ -661,7 +661,8 @@ html, body {
 
 /* GRAPH PANEL (Full Width) */
 .chart-panel {
-    height: 520px;
+    min-height: 520px;
+    height: auto;
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -1336,3 +1337,758 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .user-table-toolbar .user-btn-add i {
     color: #FFFFFF !important;
 }
+
+/* ==========================================================================
+   ADMIN PEMKAB DASHBOARD ENHANCEMENTS: MONITORING WORKFLOW & PROGRES
+   ========================================================================== */
+
+/* Pending Work / Butuh Tindak Lanjut Card */
+.pending-work-panel {
+    background: #FFFFFF;
+}
+
+.pending-work-badge-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #FEF3C7;
+    color: #92400E;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid #FDE68A;
+}
+
+.pending-tahapan-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px !important;
+}
+
+.table-modern {
+    width: 100%;
+    margin-bottom: 0;
+    font-size: 13px;
+    font-family: var(--font-poppins);
+}
+
+.table-modern thead th {
+    background: #F8FAFC;
+    color: #475569;
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 10px 14px;
+    border-bottom: 1px solid #E2E8F0;
+    white-space: nowrap;
+}
+
+.table-modern tbody td {
+    padding: 12px 14px;
+    vertical-align: middle;
+    color: #1E293B;
+    border-bottom: 1px solid #F1F5F9;
+}
+
+.table-modern tbody tr:hover {
+    background-color: #F8FAFC;
+}
+
+/* Workflow Step Indicators */
+.workflow-step-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 50px;
+    white-space: nowrap;
+}
+
+.workflow-step-pill .step-num {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.workflow-step-pill.step-tahap-1 {
+    background: #F1F5F9;
+    color: #475569;
+    border: 1px solid #CBD5E1;
+}
+.workflow-step-pill.step-tahap-1 .step-num {
+    background: #64748B;
+    color: #FFFFFF;
+}
+
+.workflow-step-pill.step-tahap-2 {
+    background: #EFF6FF;
+    color: #1E60EC;
+    border: 1px solid #BFDBFE;
+}
+.workflow-step-pill.step-tahap-2 .step-num {
+    background: #1E60EC;
+    color: #FFFFFF;
+}
+
+.workflow-step-pill.step-tahap-3 {
+    background: #E0F2FE;
+    color: #0369A1;
+    border: 1px solid #BAE6FD;
+}
+.workflow-step-pill.step-tahap-3 .step-num {
+    background: #0284C7;
+    color: #FFFFFF;
+}
+
+.workflow-step-pill.step-tahap-4 {
+    background: #FEF3C7;
+    color: #92400E;
+    border: 1px solid #FDE68A;
+}
+.workflow-step-pill.step-tahap-4 .step-num {
+    background: #D97706;
+    color: #FFFFFF;
+}
+
+.workflow-step-pill.step-tahap-5 {
+    background: #F3E8FF;
+    color: #6B21A8;
+    border: 1px solid #E9D5FF;
+}
+.workflow-step-pill.step-tahap-5 .step-num {
+    background: #8B5CF6;
+    color: #FFFFFF;
+}
+
+.workflow-step-pill.step-selesai {
+    background: #DEF7EC;
+    color: #03543F;
+    border: 1px solid #BCF0DA;
+}
+.workflow-step-pill.step-selesai .step-num {
+    background: #10B981;
+    color: #FFFFFF;
+}
+
+/* Status Badges */
+.badge-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.badge-status-green {
+    background: #DEF7EC;
+    color: #03543F;
+}
+
+.badge-status-amber {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.badge-status-blue {
+    background: #EFF6FF;
+    color: #1E60EC;
+}
+
+.badge-status-purple {
+    background: #F3E8FF;
+    color: #6B21A8;
+}
+
+.badge-status-rose {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+/* Progress Bar per OPD */
+.opd-progress-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 140px;
+}
+
+.opd-progress-track {
+    height: 7px;
+    background: #E2E8F0;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.opd-progress-fill {
+    height: 100%;
+    border-radius: 10px;
+    background: #1E60EC;
+    transition: width 0.4s ease;
+}
+
+.opd-progress-fill.fill-completed {
+    background: #10B981;
+}
+
+.opd-progress-fill.fill-empty {
+    background: #CBD5E1;
+}
+
+.opd-progress-text {
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748B;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Action Buttons in Dashboard Tables */
+.btn-dashboard-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #1E60EC;
+    background: #EFF6FF;
+    border: 1px solid #DBEAFE;
+    padding: 4px 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.btn-dashboard-action:hover {
+    background: #1E60EC;
+    color: #FFFFFF;
+    border-color: #1E60EC;
+}
+
+/* Sub-panel Divider in Chart Card */
+.panel-divider {
+    height: 1px;
+    background: #F1F5F9;
+    margin: 20px 0;
+}
+
+.panel-sub-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.panel-sub-title {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--dark-text);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.workflow-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.workflow-search-box {
+    position: relative;
+    min-width: 220px;
+}
+
+.workflow-search-box input {
+    font-size: 12px;
+    padding-left: 32px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid #E2E8F0;
+    font-family: var(--font-poppins);
+}
+
+.workflow-search-box i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: #94A3B8;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+   WORKFLOW MONITORING REDESIGN & ENHANCED TABLE LAYOUT
+   ========================================================================== */
+.table-workflow {
+    width: 100%;
+    min-width: 1180px;
+    margin-bottom: 0;
+    font-family: var(--font-poppins);
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table-workflow thead th {
+    background: #F8FAFC;
+    color: #475569;
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 13px 16px;
+    border-top: none;
+    border-bottom: 2px solid #E2E8F0;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.table-workflow tbody td {
+    padding: 14px 16px;
+    vertical-align: middle;
+    color: #1E293B;
+    border-bottom: 1px solid #EDF2F7;
+    background-color: #FFFFFF;
+    transition: background-color 0.15s ease;
+}
+
+.table-workflow tbody tr:hover td {
+    background-color: #F8FAFC;
+}
+
+/* Proporsi Lebar Kolom Workflow */
+.col-wf-nomor {
+    width: 16%;
+    min-width: 175px;
+}
+.col-wf-opd {
+    width: 22%;
+    min-width: 240px;
+}
+.col-wf-tgl {
+    width: 10%;
+    min-width: 115px;
+}
+.col-wf-arsip {
+    width: 8%;
+    min-width: 95px;
+}
+.col-wf-tahap {
+    width: 15%;
+    min-width: 175px;
+}
+.col-wf-petugas {
+    width: 14%;
+    min-width: 165px;
+}
+.col-wf-status {
+    width: 14%;
+    min-width: 170px;
+    text-align: center;
+}
+.col-wf-update {
+    width: 10%;
+    min-width: 125px;
+}
+.col-wf-aksi {
+    width: 6%;
+    min-width: 85px;
+}
+
+/* Detail Komponen Kolom Nomor SPT */
+.wf-spt-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.wf-spt-icon {
+    font-size: 16px;
+    color: #1E60EC;
+    flex-shrink: 0;
+}
+.wf-spt-text {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #0F172A;
+    word-break: break-word;
+}
+
+/* Detail Komponen Kolom OPD */
+.wf-opd-box {
+    display: flex;
+    flex-direction: column;
+}
+.wf-opd-name {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: #1E293B;
+    line-height: 1.45;
+    word-break: break-word;
+}
+
+/* Detail Tanggal & Jumlah Berkas */
+.wf-date-badge {
+    font-size: 12px;
+    color: #475569;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.wf-count-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #334155;
+    background-color: #F1F5F9;
+    border: 1px solid #E2E8F0;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+/* Workflow Step Indicators (Tahapan Alur) */
+.workflow-step-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 50px;
+    white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.workflow-step-pill .step-num {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10.5px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.workflow-step-pill.step-tahap-1 {
+    background: #F1F5F9;
+    color: #334155;
+    border: 1px solid #CBD5E1;
+}
+.workflow-step-pill.step-tahap-1 .step-num {
+    background: #475569;
+    color: #FFFFFF;
+}
+
+.workflow-step-pill.step-tahap-2 {
+    background: #EFF6FF;
+    color: #1D4ED8;
+    border: 1px solid #BFDBFE;
+}
+.workflow-step-pill.step-tahap-2 .step-num {
+    background: #2563EB;
+    color: #FFFFFF;
+}
+
+.workflow-step-pill.step-tahap-3 {
+    background: #E0F2FE;
+    color: #0369A1;
+    border: 1px solid #BAE6FD;
+}
+.workflow-step-pill.step-tahap-3 .step-num {
+    background: #0284C7;
+    color: #FFFFFF;
+}
+
+.workflow-step-pill.step-tahap-4 {
+    background: #FEF3C7;
+    color: #92400E;
+    border: 1px solid #FDE68A;
+}
+.workflow-step-pill.step-tahap-4 .step-num {
+    background: #D97706;
+    color: #FFFFFF;
+}
+
+.workflow-step-pill.step-tahap-5 {
+    background: #F3E8FF;
+    color: #6B21A8;
+    border: 1px solid #DDD6FE;
+}
+.workflow-step-pill.step-tahap-5 .step-num {
+    background: #7C3AED;
+    color: #FFFFFF;
+}
+
+.workflow-step-pill.step-selesai {
+    background: #DEF7EC;
+    color: #065F46;
+    border: 1px solid #A7F3D0;
+}
+.workflow-step-pill.step-selesai .step-num {
+    background: #10B981;
+    color: #FFFFFF;
+}
+
+/* Petugas & Role (Struktur Bertingkat Bersih) */
+.wf-petugas-card {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.wf-petugas-name {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #1E293B;
+    display: flex;
+    align-items: center;
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+.wf-petugas-role {
+    font-size: 11px;
+    font-weight: 500;
+    color: #64748B;
+    padding-left: 2px;
+}
+
+/* Status Proses (Bentuk Berbeda dari Tahapan) */
+.wf-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    border: 1px solid transparent;
+}
+
+.wf-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.wf-status-badge.badge-status-green {
+    background: #DEF7EC;
+    color: #03543F;
+    border-color: #BCF0DA;
+}
+.wf-status-badge.badge-status-green .wf-status-dot {
+    background: #10B981;
+}
+
+.wf-status-badge.badge-status-amber {
+    background: #FEF3C7;
+    color: #92400E;
+    border-color: #FDE68A;
+}
+.wf-status-badge.badge-status-amber .wf-status-dot {
+    background: #D97706;
+}
+
+.wf-status-badge.badge-status-blue {
+    background: #EFF6FF;
+    color: #1E60EC;
+    border-color: #BFDBFE;
+}
+.wf-status-badge.badge-status-blue .wf-status-dot {
+    background: #1E60EC;
+}
+
+.wf-status-badge.badge-status-purple {
+    background: #F3E8FF;
+    color: #6B21A8;
+    border-color: #E9D5FF;
+}
+.wf-status-badge.badge-status-purple .wf-status-dot {
+    background: #8B5CF6;
+}
+
+.wf-status-badge.badge-status-rose {
+    background: #FEE2E2;
+    color: #991B1B;
+    border-color: #FECACA;
+}
+.wf-status-badge.badge-status-rose .wf-status-dot {
+    background: #EF4444;
+}
+
+/* Pembaruan Terakhir (2 Baris Rapi) */
+.wf-time-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+}
+
+.wf-time-date {
+    font-size: 12px;
+    font-weight: 500;
+    color: #334155;
+    white-space: nowrap;
+}
+
+.wf-time-hour {
+    font-size: 11px;
+    color: #64748B;
+    white-space: nowrap;
+}
+
+/* Tombol Aksi Detail */
+.btn-wf-detail {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #1E60EC;
+    background: #EFF6FF;
+    border: 1px solid #DBEAFE;
+    padding: 5px 12px;
+    border-radius: 7px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-wf-detail:hover {
+    background: #1E60EC;
+    color: #FFFFFF;
+    border-color: #1E60EC;
+    box-shadow: 0 2px 6px rgba(30, 96, 236, 0.2);
+    text-decoration: none;
+}
+
+/* ==========================================================================
+   ADMIN OPD DASHBOARD ENHANCEMENTS: RINGKASAN PROSES ALIH MEDIA & WORKFLOW
+   ========================================================================== */
+.opd-summary-box {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+@media (max-width: 992px) {
+    .opd-summary-box {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .opd-summary-box {
+        grid-template-columns: 1fr;
+    }
+}
+
+.opd-summary-card {
+    border-radius: 12px;
+    padding: 16px 18px;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.opd-summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.opd-summary-icon-box {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.opd-summary-content {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.opd-summary-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #64748B;
+    margin-bottom: 2px;
+}
+
+.opd-summary-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0F172A;
+    line-height: 1.2;
+}
+
+.opd-summary-card.card-selesai {
+    background: #F0FDF4;
+    border-color: #DCFCE7;
+}
+.opd-summary-card.card-selesai .opd-summary-icon-box {
+    background: #DEF7EC;
+    color: #10B981;
+}
+
+.opd-summary-card.card-proses {
+    background: #F8FAFC;
+    border-color: #E2E8F0;
+}
+.opd-summary-card.card-proses .opd-summary-icon-box {
+    background: #EFF6FF;
+    color: #1E60EC;
+}
+
+.opd-summary-card.card-menunggu {
+    background: #FFFBEB;
+    border-color: #FEF3C7;
+}
+.opd-summary-card.card-menunggu .opd-summary-icon-box {
+    background: #FEF3C7;
+    color: #D97706;
+}
+
+.opd-summary-card.card-belum {
+    background: #F8FAFC;
+    border-color: #E2E8F0;
+}
+.opd-summary-card.card-belum .opd-summary-icon-box {
+    background: #F1F5F9;
+    color: #475569;
+}
+
+
+

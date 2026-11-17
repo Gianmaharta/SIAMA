@@ -14,6 +14,7 @@ class NotificationModel extends BaseModel
     protected $allowedFields    = [
         'id_notification',
         'id_user',
+        'sender_id',
         'title',
         'message',
         'type',
@@ -54,15 +55,19 @@ class NotificationModel extends BaseModel
             return [];
         }
 
-        $builder = $this->where('id_user', $id_user);
+        $builder = $this->select('notifications.*, u_sender.nama as sender_nama, r_sender.nama_role as sender_role')
+            ->join('users u_sender', 'u_sender.id_user = notifications.sender_id', 'left')
+            ->join('user_roles ur_sender', 'ur_sender.id_user = u_sender.id_user', 'left')
+            ->join('roles r_sender', 'r_sender.id_role = ur_sender.id_role', 'left')
+            ->where('notifications.id_user', $id_user);
 
         if ($filter === 'unread') {
-            $builder->where('is_read', 0);
+            $builder->where('notifications.is_read', 0);
         } elseif ($filter === 'read') {
-            $builder->where('is_read', 1);
+            $builder->where('notifications.is_read', 1);
         }
 
-        $builder->orderBy('created_at', 'DESC');
+        $builder->orderBy('notifications.created_at', 'DESC');
 
         if ($limit !== null) {
             $builder->limit($limit, $offset);
@@ -80,8 +85,12 @@ class NotificationModel extends BaseModel
             return [];
         }
 
-        return $this->where('id_user', $id_user)
-                    ->orderBy('created_at', 'DESC')
+        return $this->select('notifications.*, u_sender.nama as sender_nama, r_sender.nama_role as sender_role')
+                    ->join('users u_sender', 'u_sender.id_user = notifications.sender_id', 'left')
+                    ->join('user_roles ur_sender', 'ur_sender.id_user = u_sender.id_user', 'left')
+                    ->join('roles r_sender', 'r_sender.id_role = ur_sender.id_role', 'left')
+                    ->where('notifications.id_user', $id_user)
+                    ->orderBy('notifications.created_at', 'DESC')
                     ->limit($limit)
                     ->findAll();
     }

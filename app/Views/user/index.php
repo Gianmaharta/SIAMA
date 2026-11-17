@@ -486,6 +486,13 @@ Manajemen Akun - SIAMA
     </div>
 </div>
 
+<?php 
+$currentRoleSession = session()->get('nama_role');
+// Fitur "Masuk Sebagai" HANYA boleh ada jika akun sedang aktif sebagai Admin Pemkab asli
+// Admin OPD (maupun Admin Pemkab yang sedang masuk sebagai Admin OPD) tidak memiliki wewenang ini
+$isCanSwitchRole = in_array($currentRoleSession, ['Admin_Pemkab', 'Admin Pemkab']) && !session()->has('original_admin_id');
+?>
+<?php if ($isCanSwitchRole) : ?>
 <!-- ============================================================== -->
 <!-- MODAL: KONFIRMASI MASUK SEBAGAI (SWITCH USER)                  -->
 <!-- ============================================================== -->
@@ -577,6 +584,7 @@ Manajemen Akun - SIAMA
         </div>
     </div>
 </div>
+<?php endif; ?>
 
 <?= $this->endSection() ?>
 
@@ -587,7 +595,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const rawData = <?= json_encode($users ?? []) ?>;
     const allBidangs = <?= json_encode($bidangs ?? []) ?>;
     const currentUserId = "<?= esc(session()->get('user_id') ?? '') ?>";
-    const isCanSwitch = <?= (session()->get('nama_role') === 'Admin_Pemkab' || session()->has('original_admin_id')) ? 'true' : 'false' ?>;
+    const isCanSwitch = <?= $isCanSwitchRole ? 'true' : 'false' ?>;
     const baseEditUrl = "<?= base_url('/users/update') ?>";
     const baseDeleteUrl = "<?= base_url('/users/delete') ?>";
     const baseSwitchUrl = "<?= base_url('/users/switch') ?>";

@@ -33,6 +33,7 @@ class NotificationService
 
     /**
      * Kirim notifikasi tunggal ke pengguna tertentu
+     * Dilengkapi pencegahan duplikasi dalam 5 menit terakhir untuk aktivitas yang sama
      */
     public function sendToUser(
         string $userId,
@@ -41,27 +42,32 @@ class NotificationService
         string $type = 'general',
         ?string $referenceId = null,
         ?string $referenceType = null,
-        ?string $url = null
+        ?string $url = null,
+        ?string $senderId = null
     ): ?string {
         if (empty($userId) || empty($title) || empty($message)) {
             return null;
         }
 
         // Cek apakah notifikasi identik persis sudah pernah dikirim dalam 5 menit terakhir (cegah duplikasi)
-        $existing = $this->db->table('notifications')
+        $builder = $this->db->table('notifications')
             ->where('id_user', $userId)
             ->where('title', $title)
-            ->where('reference_id', $referenceId)
-            ->where('created_at >=', date('Y-m-d H:i:s', strtotime('-5 minutes')))
-            ->get()
-            ->getRowArray();
+            ->where('created_at >=', date('Y-m-d H:i:s', strtotime('-5 minutes')));
+
+        if (!empty($referenceId)) {
+            $builder->where('reference_id', $referenceId);
+        }
+
+        $existing = $builder->get()->getRowArray();
 
         if ($existing) {
-            return $existing['id_notification'];
+            return null; // Duplikasi dicegah: notifikasi identik telah dikirim dalam 5 menit terakhir
         }
 
         return $this->notifModel->send([
             'id_user'        => $userId,
+            'sender_id'      => $senderId,
             'title'          => $title,
             'message'        => $message,
             'type'           => $type,
@@ -74,8 +80,70 @@ class NotificationService
         ]);
     }
 
+    // =========================================================================
+    // 1. ALUR NOTIFIKASI OTOMATIS WORKFLOW SIAMA
+    // =========================================================================
+
     /**
-     * Skenario A: Kepala Bidang → Arsiparis (Penugasan Alih Media Baru)
+     * Skenario A: Pimpinan menerbitkan SPT
+     * Penerima: Kepala Bidang yang berkaitan dengan OPD atau bidang pada SPT.
+     * Pesan: "Surat Perintah Tugas baru telah diterbitkan. Silakan tindak lanjuti penugasan Arsiparis."
+     * Aksi: Lihat Detail SPT.
+     */
+    public function notifySptCreated(string $id_spt, ?string $pimpinan_user_id = null): array
+    {
+        $spt = $this->sptModel->find($id_spt);
+        if (!$spt) {
+            return [];
+        }
+
+        $nomorSpt = $spt['nomor_spt'] ?? '-';
+        $title = 'Surat Perintah Tugas Baru Diterbitkan';
+        $message = "Surat Perintah Tugas baru telah diterbitkan. Silakan tindak lanjuti penugasan Arsiparis.";
+        if (!empty($nomorSpt) && $nomorSpt !== '-') {
+            $message = "Surat Perintah Tugas baru telah diterbitkan. Silakan tindak lanjuti penugasan Arsiparis. (Nomor: {$nomorSpt})";
+        }
+        $url = base_url('/spt/detail/' . $id_spt);
+
+        // Cari Kepala Bidang di OPD bersangkutan
+        $kabidQuery = $this->db->table('users u')
+            ->join('user_roles ur', 'u.id_user = ur.id_user')
+            ->join('roles r', 'ur.id_role = r.id_role')
+            ->whereIn('r.nama_role', ['Kepala_Bidang', 'Kepala Bidang', 'Kabid'])
+            ->where('u.is_active', 1);
+
+        if (!empty($spt['id_opd'])) {
+            $kabidQuery->where('u.id_opd', $spt['id_opd']);
+        }
+
+        $kabids = $kabidQuery->select('u.id_user')->get()->getResultArray();
+
+        $sentIds = [];
+        $uniqueRecipients = array_unique(array_column($kabids, 'id_user'));
+        foreach ($uniqueRecipients as $kabidId) {
+            $sent = $this->sendToUser(
+                $kabidId,
+                $title,
+                $message,
+                'spt',
+                $id_spt,
+                'spt',
+                $url,
+                $pimpinan_user_id
+            );
+            if ($sent) {
+                $sentIds[] = $sent;
+            }
+        }
+
+        return $sentIds;
+    }
+
+    /**
+     * Skenario B: Kepala Bidang menugaskan Arsiparis
+     * Penerima: Arsiparis yang dipilih dalam penugasan.
+     * Pesan: "Anda mendapatkan penugasan alih media arsip baru."
+     * Aksi: Lihat Penugasan.
      */
     public function notifySptAssigned(string $id_spt, string $id_user_arsiparis, ?string $assigned_by_id = null): ?string
     {
@@ -84,19 +152,9 @@ class NotificationService
             return null;
         }
 
-        $namaOpd = '-';
-        if (!empty($spt['id_opd'])) {
-            $opd = $this->opdModel->find($spt['id_opd']);
-            if ($opd) {
-                $namaOpd = $opd['nama_opd'];
-            }
-        }
-
         $nomorSpt = $spt['nomor_spt'] ?? '-';
-        $tanggalSpt = !empty($spt['tanggal_spt']) ? date('d/m/Y', strtotime($spt['tanggal_spt'])) : date('d/m/Y');
-
         $title = 'Penugasan Alih Media Baru';
-        $message = "Anda mendapatkan penugasan alih media arsip baru. Nomor SPT: {$nomorSpt}, OPD: {$namaOpd}, Tanggal: {$tanggalSpt}.";
+        $message = "Anda mendapatkan penugasan alih media arsip baru. Nomor SPT: {$nomorSpt}.";
         $url = base_url('/spt/detail/' . $id_spt);
 
         return $this->sendToUser(
@@ -106,12 +164,92 @@ class NotificationService
             'spt',
             $id_spt,
             'spt',
-            $url
+            $url,
+            $assigned_by_id
         );
     }
 
     /**
-     * Skenario B: Arsiparis → Kepala Bidang (Hasil Alih Media Terkirim & Menunggu Verifikasi)
+     * Skenario C: Arsiparis memulai pekerjaan
+     * Penerima: Kepala Bidang yang memberikan penugasan.
+     * Pesan: "Proses alih media untuk SPT [Nomor SPT] telah dimulai."
+     * Aksi: Pantau Pekerjaan.
+     */
+    public function notifySptStarted(string $id_spt, string $arsiparis_user_id): array
+    {
+        $spt = $this->sptModel->find($id_spt);
+        if (!$spt) {
+            return [];
+        }
+
+        $nomorSpt = $spt['nomor_spt'] ?? '-';
+        $title = 'Pekerjaan Alih Media Dimulai';
+        $message = "Proses alih media untuk SPT {$nomorSpt} telah dimulai.";
+        $url = base_url('/spt/detail/' . $id_spt);
+
+        $recipients = [];
+
+        // 1. Ambil yang menugaskan dari spt_assignments
+        $assignment = $this->db->table('spt_assignments')
+            ->where('id_spt', $id_spt)
+            ->where('id_user', $arsiparis_user_id)
+            ->get()
+            ->getRowArray();
+
+        if ($assignment && !empty($assignment['assigned_by'])) {
+            $recipients[] = $assignment['assigned_by'];
+        }
+
+        // 2. Fallback: Kepala Bidang di OPD/Bidang terkait
+        if (empty($recipients)) {
+            $arsiparis = $this->userModel->find($arsiparis_user_id);
+            if ($arsiparis) {
+                $kabidQuery = $this->db->table('users u')
+                    ->join('user_roles ur', 'u.id_user = ur.id_user')
+                    ->join('roles r', 'ur.id_role = r.id_role')
+                    ->whereIn('r.nama_role', ['Kepala_Bidang', 'Kepala Bidang', 'Kabid'])
+                    ->where('u.is_active', 1);
+
+                if (!empty($spt['id_opd'])) {
+                    $kabidQuery->where('u.id_opd', $spt['id_opd']);
+                }
+                if (!empty($arsiparis['id_bidang'])) {
+                    $kabidQuery->where('u.id_bidang', $arsiparis['id_bidang']);
+                }
+
+                $kabids = $kabidQuery->select('u.id_user')->get()->getResultArray();
+                foreach ($kabids as $k) {
+                    $recipients[] = $k['id_user'];
+                }
+            }
+        }
+
+        $sentIds = [];
+        $uniqueRecipients = array_unique(array_filter($recipients));
+        foreach ($uniqueRecipients as $kabidId) {
+            $sent = $this->sendToUser(
+                $kabidId,
+                $title,
+                $message,
+                'spt',
+                $id_spt,
+                'spt',
+                $url,
+                $arsiparis_user_id
+            );
+            if ($sent) {
+                $sentIds[] = $sent;
+            }
+        }
+
+        return $sentIds;
+    }
+
+    /**
+     * Skenario D: Arsiparis mengirim hasil alih media untuk verifikasi
+     * Penerima: Kepala Bidang terkait.
+     * Pesan: "Hasil alih media telah dikirim dan menunggu verifikasi."
+     * Aksi: Periksa Hasil.
      */
     public function notifyArsipUploaded(string $id_arsip, string $uploader_id): array
     {
@@ -124,11 +262,10 @@ class NotificationService
         $namaArsip  = $arsip['nama_arsip'] ?? 'Arsip Baru';
 
         $title = 'Hasil Alih Media Menunggu Verifikasi';
-        $message = "Hasil alih media arsip telah dikirim dan menunggu verifikasi. Berkas: {$nomorArsip} - {$namaArsip}.";
+        $message = "Hasil alih media telah dikirim dan menunggu verifikasi. Berkas: {$nomorArsip} - {$namaArsip}.";
         $url = base_url('/arsip/detail/' . $id_arsip);
 
         // Cari Kepala Bidang penerima:
-        // 1. Jika terikat SPT, periksa siapa yang menugaskan di spt_assignments
         $recipients = [];
         if (!empty($arsip['id_spt'])) {
             $assignment = $this->db->table('spt_assignments')
@@ -140,14 +277,13 @@ class NotificationService
             }
         }
 
-        // 2. Jika belum ada penerima, cari Kepala Bidang di OPD & Bidang pengunggah
         if (empty($recipients)) {
             $uploader = $this->userModel->find($uploader_id);
             if ($uploader) {
                 $kabidQuery = $this->db->table('users u')
                     ->join('user_roles ur', 'u.id_user = ur.id_user')
                     ->join('roles r', 'ur.id_role = r.id_role')
-                    ->where('r.nama_role', 'Kepala_Bidang')
+                    ->whereIn('r.nama_role', ['Kepala_Bidang', 'Kepala Bidang', 'Kabid'])
                     ->where('u.is_active', 1);
 
                 if (!empty($uploader['id_opd'])) {
@@ -174,7 +310,8 @@ class NotificationService
                 'arsip',
                 $id_arsip,
                 'arsip',
-                $url
+                $url,
+                $uploader_id
             );
             if ($sent) {
                 $sentIds[] = $sent;
@@ -185,7 +322,316 @@ class NotificationService
     }
 
     /**
-     * Skenario C1: Kepala Bidang → Arsiparis (Verifikasi Berkas Arsip Disetujui)
+     * Draf Berita Acara Baru dibuat oleh Arsiparis → Notifikasi ke Kepala Bidang
+     */
+    public function notifyBaDraftCreated(string $id_ba, string $creator_user_id): array
+    {
+        $ba = $this->baModel->find($id_ba);
+        if (!$ba) {
+            return [];
+        }
+
+        $nomorBa = $ba['nomor_ba'] ?? '-';
+        $title = 'Draf Berita Acara Menunggu Verifikasi';
+        $message = "Hasil alih media dan draf Berita Acara nomor {$nomorBa} telah dikirim dan menunggu verifikasi.";
+        $url = base_url('/berita-acara/detail/' . $id_ba);
+
+        $kabids = $this->db->table('users u')
+            ->join('user_roles ur', 'u.id_user = ur.id_user')
+            ->join('roles r', 'ur.id_role = r.id_role')
+            ->whereIn('r.nama_role', ['Kepala_Bidang', 'Kepala Bidang', 'Kabid'])
+            ->where('u.is_active', 1)
+            ->where('u.id_opd', $ba['id_opd'])
+            ->select('u.id_user')
+            ->get()
+            ->getResultArray();
+
+        $sentIds = [];
+        $uniqueRecipients = array_unique(array_column($kabids, 'id_user'));
+        foreach ($uniqueRecipients as $kId) {
+            $sent = $this->sendToUser(
+                $kId,
+                $title,
+                $message,
+                'berita_acara',
+                $id_ba,
+                'berita_acara',
+                $url,
+                $creator_user_id
+            );
+            if ($sent) {
+                $sentIds[] = $sent;
+            }
+        }
+
+        return $sentIds;
+    }
+
+    /**
+     * Skenario E & F: Verifikasi Berita Acara oleh Kepala Bidang
+     * - E. Kepala Bidang menyetujui hasil/Berita Acara → Pimpinan
+     * - F. Kepala Bidang meminta revisi → Arsiparis pelaksana
+     */
+    public function notifyBaKabidVerified(string $id_ba, string $keputusan, ?string $catatanRevisi = null, ?string $kabid_user_id = null): array
+    {
+        $ba = $this->baModel->find($id_ba);
+        if (!$ba) {
+            return [];
+        }
+
+        $nomorBa = $ba['nomor_ba'] ?? '-';
+        $url = base_url('/berita-acara/detail/' . $id_ba);
+        $sentIds = [];
+
+        if ($keputusan === 'Approve') {
+            // Skenario E: Pimpinan yang berwenang
+            $title = 'Berita Acara Menunggu Pengesahan Pimpinan';
+            $message = "Berita Acara telah diverifikasi dan siap ditindaklanjuti oleh Pimpinan. Nomor BA: {$nomorBa}.";
+
+            // Cari Pimpinan pada OPD terkait
+            $pimpinan = $this->db->table('users u')
+                ->join('user_roles ur', 'u.id_user = ur.id_user')
+                ->join('roles r', 'ur.id_role = r.id_role')
+                ->whereIn('r.nama_role', ['Pimpinan', 'Kepala_Dinas', 'Kepala Dinas'])
+                ->where('u.is_active', 1)
+                ->where('u.id_opd', $ba['id_opd'])
+                ->select('u.id_user')
+                ->get()
+                ->getResultArray();
+
+            $uniquePimpinan = array_unique(array_column($pimpinan, 'id_user'));
+            foreach ($uniquePimpinan as $pId) {
+                $sent = $this->sendToUser(
+                    $pId,
+                    $title,
+                    $message,
+                    'berita_acara',
+                    $id_ba,
+                    'berita_acara',
+                    $url,
+                    $kabid_user_id
+                );
+                if ($sent) {
+                    $sentIds[] = $sent;
+                }
+            }
+        } else {
+            // Skenario F: Arsiparis yang bertanggung jawab atas pekerjaan tersebut
+            if (!empty($ba['id_pelaksana'])) {
+                $title = 'Permintaan Perbaikan Alih Media';
+                $revisiNote = !empty($catatanRevisi) ? " Catatan: {$catatanRevisi}" : '';
+                $message = "Hasil alih media memerlukan perbaikan. Silakan periksa catatan revisi.{$revisiNote}";
+
+                $sent = $this->sendToUser(
+                    $ba['id_pelaksana'],
+                    $title,
+                    $message,
+                    'berita_acara',
+                    $id_ba,
+                    'berita_acara',
+                    $url,
+                    $kabid_user_id
+                );
+                if ($sent) {
+                    $sentIds[] = $sent;
+                }
+            }
+        }
+
+        return $sentIds;
+    }
+
+    /**
+     * Skenario G: Arsiparis mengirim ulang hasil revisi
+     * Penerima: Kepala Bidang terkait.
+     * Pesan: "Hasil perbaikan telah dikirim kembali untuk diperiksa."
+     * Aksi: Periksa Hasil Revisi.
+     */
+    public function notifyBaRevisionResubmitted(string $id_ba, string $arsiparis_user_id): array
+    {
+        $ba = $this->baModel->find($id_ba);
+        if (!$ba) {
+            return [];
+        }
+
+        $nomorBa = $ba['nomor_ba'] ?? '-';
+        $title = 'Hasil Perbaikan Dikirim Ulang';
+        $message = "Hasil perbaikan telah dikirim kembali untuk diperiksa. Nomor BA: {$nomorBa}.";
+        $url = base_url('/berita-acara/detail/' . $id_ba);
+
+        $recipients = [];
+        if (!empty($ba['id_kabid'])) {
+            $recipients[] = $ba['id_kabid'];
+        }
+
+        if (empty($recipients)) {
+            $kabids = $this->db->table('users u')
+                ->join('user_roles ur', 'u.id_user = ur.id_user')
+                ->join('roles r', 'ur.id_role = r.id_role')
+                ->whereIn('r.nama_role', ['Kepala_Bidang', 'Kepala Bidang', 'Kabid'])
+                ->where('u.is_active', 1)
+                ->where('u.id_opd', $ba['id_opd'])
+                ->select('u.id_user')
+                ->get()
+                ->getResultArray();
+
+            foreach ($kabids as $k) {
+                $recipients[] = $k['id_user'];
+            }
+        }
+
+        $sentIds = [];
+        $uniqueRecipients = array_unique(array_filter($recipients));
+        foreach ($uniqueRecipients as $kabidId) {
+            $sent = $this->sendToUser(
+                $kabidId,
+                $title,
+                $message,
+                'berita_acara',
+                $id_ba,
+                'berita_acara',
+                $url,
+                $arsiparis_user_id
+            );
+            if ($sent) {
+                $sentIds[] = $sent;
+            }
+        }
+
+        return $sentIds;
+    }
+
+    /**
+     * Skenario H: Pimpinan menandatangani Berita Acara
+     * Penerima: Kepala Bidang dan Arsiparis yang berkaitan dengan Berita Acara tersebut, serta Admin OPD.
+     * Pesan: "Berita Acara telah ditandatangani oleh Pimpinan."
+     * Aksi: Lihat Berita Acara.
+     */
+    public function notifyBaPimpinanSigned(string $id_ba, string $pimpinan_user_id): array
+    {
+        $ba = $this->baModel->find($id_ba);
+        if (!$ba) {
+            return [];
+        }
+
+        $nomorBa = $ba['nomor_ba'] ?? '-';
+        $title = 'Berita Acara Telah Ditandatangani';
+        $message = "Berita Acara telah ditandatangani oleh Pimpinan. Nomor BA: {$nomorBa}.";
+        $url = base_url('/berita-acara/detail/' . $id_ba);
+
+        $recipients = [];
+
+        // 1. Kepala Bidang yang memverifikasi
+        if (!empty($ba['id_kabid'])) {
+            $recipients[] = $ba['id_kabid'];
+        }
+
+        // 2. Arsiparis pelaksana pembuat BA
+        if (!empty($ba['id_pelaksana'])) {
+            $recipients[] = $ba['id_pelaksana'];
+        }
+
+        // 3. Admin OPD dari OPD bersangkutan
+        if (!empty($ba['id_opd'])) {
+            $adminOpds = $this->db->table('users u')
+                ->join('user_roles ur', 'u.id_user = ur.id_user')
+                ->join('roles r', 'ur.id_role = r.id_role')
+                ->whereIn('r.nama_role', ['Admin_OPD', 'Admin OPD', 'Administrator OPD'])
+                ->where('u.id_opd', $ba['id_opd'])
+                ->where('u.is_active', 1)
+                ->select('u.id_user')
+                ->get()
+                ->getResultArray();
+
+            foreach ($adminOpds as $adm) {
+                $recipients[] = $adm['id_user'];
+            }
+        }
+
+        $sentIds = [];
+        $uniqueRecipients = array_unique(array_filter($recipients));
+        foreach ($uniqueRecipients as $targetId) {
+            $sent = $this->sendToUser(
+                $targetId,
+                $title,
+                $message,
+                'berita_acara',
+                $id_ba,
+                'berita_acara',
+                $url,
+                $pimpinan_user_id
+            );
+            if ($sent) {
+                $sentIds[] = $sent;
+            }
+        }
+
+        return $sentIds;
+    }
+
+    /**
+     * Skenario I: Pimpinan menolak atau meminta perbaikan Berita Acara
+     * Penerima: Kepala Bidang yang mengajukan atau memverifikasi Berita Acara.
+     * Pesan: "Berita Acara memerlukan tindak lanjut. Silakan periksa catatan dari Pimpinan."
+     * Aksi: Lihat Catatan.
+     */
+    public function notifyBaPimpinanRejected(string $id_ba, string $pimpinan_user_id, ?string $catatan = null): array
+    {
+        $ba = $this->baModel->find($id_ba);
+        if (!$ba) {
+            return [];
+        }
+
+        $nomorBa = $ba['nomor_ba'] ?? '-';
+        $title = 'Catatan Tindak Lanjut Berita Acara';
+        $catatanText = !empty($catatan) ? " Catatan: {$catatan}" : "";
+        $message = "Berita Acara memerlukan tindak lanjut. Silakan periksa catatan dari Pimpinan.{$catatanText}";
+        $url = base_url('/berita-acara/detail/' . $id_ba);
+
+        $recipients = [];
+        if (!empty($ba['id_kabid'])) {
+            $recipients[] = $ba['id_kabid'];
+        }
+
+        if (empty($recipients)) {
+            $kabids = $this->db->table('users u')
+                ->join('user_roles ur', 'u.id_user = ur.id_user')
+                ->join('roles r', 'ur.id_role = r.id_role')
+                ->whereIn('r.nama_role', ['Kepala_Bidang', 'Kepala Bidang', 'Kabid'])
+                ->where('u.is_active', 1)
+                ->where('u.id_opd', $ba['id_opd'])
+                ->select('u.id_user')
+                ->get()
+                ->getResultArray();
+
+            foreach ($kabids as $k) {
+                $recipients[] = $k['id_user'];
+            }
+        }
+
+        $sentIds = [];
+        $uniqueRecipients = array_unique(array_filter($recipients));
+        foreach ($uniqueRecipients as $kabidId) {
+            $sent = $this->sendToUser(
+                $kabidId,
+                $title,
+                $message,
+                'berita_acara',
+                $id_ba,
+                'berita_acara',
+                $url,
+                $pimpinan_user_id
+            );
+            if ($sent) {
+                $sentIds[] = $sent;
+            }
+        }
+
+        return $sentIds;
+    }
+
+    /**
+     * Verifikasi Berkas Arsip oleh Kepala Bidang (Disetujui) → Notifikasi ke Arsiparis
      */
     public function notifyArsipVerified(string $id_arsip, string $kabid_user_id): ?string
     {
@@ -213,191 +659,13 @@ class NotificationService
             'arsip',
             $id_arsip,
             'arsip',
-            $url
+            $url,
+            $kabid_user_id
         );
     }
 
     /**
-     * Skenario C2 & D: Verifikasi Berita Acara oleh Kepala Bidang
-     * - Jika Approve: Notifikasi ke Pimpinan (Skenario D)
-     * - Jika Revisi: Notifikasi ke Arsiparis / Pelaksana (Skenario C2)
-     */
-    public function notifyBaKabidVerified(string $id_ba, string $keputusan, ?string $catatanRevisi = null): array
-    {
-        $ba = $this->baModel->find($id_ba);
-        if (!$ba) {
-            return [];
-        }
-
-        $nomorBa = $ba['nomor_ba'] ?? '-';
-        $url = base_url('/berita-acara/detail/' . $id_ba);
-        $sentIds = [];
-
-        if ($keputusan === 'Approve') {
-            // Skenario D: Kirim notifikasi ke Pimpinan / Kepala Dinas
-            $title = 'Berita Acara Menunggu Pengesahan';
-            $message = "Berita Acara baru nomor {$nomorBa} telah diverifikasi oleh Kepala Bidang dan menunggu pengesahan Anda.";
-
-            // Cari Pimpinan pada OPD terkait
-            $pimpinan = $this->db->table('users u')
-                ->join('user_roles ur', 'u.id_user = ur.id_user')
-                ->join('roles r', 'ur.id_role = r.id_role')
-                ->where('r.nama_role', 'Pimpinan')
-                ->where('u.is_active', 1)
-                ->where('u.id_opd', $ba['id_opd'])
-                ->select('u.id_user')
-                ->get()
-                ->getResultArray();
-
-            foreach ($pimpinan as $p) {
-                $sent = $this->sendToUser(
-                    $p['id_user'],
-                    $title,
-                    $message,
-                    'berita_acara',
-                    $id_ba,
-                    'berita_acara',
-                    $url
-                );
-                if ($sent) {
-                    $sentIds[] = $sent;
-                }
-            }
-        } else {
-            // Skenario C2: Kembalikan untuk revisi ke Arsiparis / Pelaksana pembuat BA
-            if (!empty($ba['id_pelaksana'])) {
-                $title = 'Revisi Berita Acara Alih Media';
-                $revisiNote = !empty($catatanRevisi) ? " Catatan: {$catatanRevisi}" : '';
-                $message = "Berita Acara nomor {$nomorBa} dikembalikan oleh Kepala Bidang untuk revisi.{$revisiNote}";
-
-                $sent = $this->sendToUser(
-                    $ba['id_pelaksana'],
-                    $title,
-                    $message,
-                    'berita_acara',
-                    $id_ba,
-                    'berita_acara',
-                    $url
-                );
-                if ($sent) {
-                    $sentIds[] = $sent;
-                }
-            }
-        }
-
-        return $sentIds;
-    }
-
-    /**
-     * Skenario E: Pimpinan → Kepala Bidang & Arsiparis (Pengesahan Berita Acara Selesai)
-     */
-    public function notifyBaPimpinanSigned(string $id_ba, string $pimpinan_user_id): array
-    {
-        $ba = $this->baModel->find($id_ba);
-        if (!$ba) {
-            return [];
-        }
-
-        $nomorBa = $ba['nomor_ba'] ?? '-';
-        $title = 'Berita Acara Berhasil Disahkan';
-        $message = "Berita Acara alih media nomor {$nomorBa} telah resmi disahkan oleh Pimpinan/Kepala Dinas.";
-        $url = base_url('/berita-acara/detail/' . $id_ba);
-
-        $recipients = [];
-
-        // 1. Kepala Bidang yang memverifikasi
-        if (!empty($ba['id_kabid'])) {
-            $recipients[] = $ba['id_kabid'];
-        }
-
-        // 2. Arsiparis pelaksana pembuat BA
-        if (!empty($ba['id_pelaksana'])) {
-            $recipients[] = $ba['id_pelaksana'];
-        }
-
-        // 3. Admin OPD dari OPD bersangkutan
-        if (!empty($ba['id_opd'])) {
-            $adminOpds = $this->db->table('users u')
-                ->join('user_roles ur', 'u.id_user = ur.id_user')
-                ->join('roles r', 'ur.id_role = r.id_role')
-                ->where('r.nama_role', 'Admin_OPD')
-                ->where('u.id_opd', $ba['id_opd'])
-                ->where('u.is_active', 1)
-                ->select('u.id_user')
-                ->get()
-                ->getResultArray();
-
-            foreach ($adminOpds as $adm) {
-                $recipients[] = $adm['id_user'];
-            }
-        }
-
-        $sentIds = [];
-        $uniqueRecipients = array_unique(array_filter($recipients));
-        foreach ($uniqueRecipients as $targetId) {
-            $sent = $this->sendToUser(
-                $targetId,
-                $title,
-                $message,
-                'berita_acara',
-                $id_ba,
-                'berita_acara',
-                $url
-            );
-            if ($sent) {
-                $sentIds[] = $sent;
-            }
-        }
-
-        return $sentIds;
-    }
-
-    /**
-     * Draf Berita Acara Baru dibuat oleh Arsiparis → Notifikasi ke Kepala Bidang di OPD
-     */
-    public function notifyBaDraftCreated(string $id_ba, string $creator_user_id): array
-    {
-        $ba = $this->baModel->find($id_ba);
-        if (!$ba) {
-            return [];
-        }
-
-        $nomorBa = $ba['nomor_ba'] ?? '-';
-        $title = 'Draf Berita Acara Menunggu Verifikasi';
-        $message = "Draf Berita Acara nomor {$nomorBa} telah dibuat dan menunggu verifikasi Kepala Bidang.";
-        $url = base_url('/berita-acara/detail/' . $id_ba);
-
-        $kabids = $this->db->table('users u')
-            ->join('user_roles ur', 'u.id_user = ur.id_user')
-            ->join('roles r', 'ur.id_role = r.id_role')
-            ->where('r.nama_role', 'Kepala_Bidang')
-            ->where('u.is_active', 1)
-            ->where('u.id_opd', $ba['id_opd'])
-            ->select('u.id_user')
-            ->get()
-            ->getResultArray();
-
-        $sentIds = [];
-        foreach ($kabids as $k) {
-            $sent = $this->sendToUser(
-                $k['id_user'],
-                $title,
-                $message,
-                'berita_acara',
-                $id_ba,
-                'berita_acara',
-                $url
-            );
-            if ($sent) {
-                $sentIds[] = $sent;
-            }
-        }
-
-        return $sentIds;
-    }
-
-    /**
-     * Skenario F: Notifikasi Pengelolaan Akun Pengguna (Admin Pemkab & Admin OPD)
+     * Notifikasi Pengelolaan Akun Pengguna (Admin Pemkab & Admin OPD)
      */
     public function notifyUserManagement(string $target_user_id, string $actionType = 'create', ?string $actor_id = null): array
     {
@@ -420,7 +688,7 @@ class NotificationService
             $adminOpds = $this->db->table('users u')
                 ->join('user_roles ur', 'u.id_user = ur.id_user')
                 ->join('roles r', 'ur.id_role = r.id_role')
-                ->where('r.nama_role', 'Admin_OPD')
+                ->whereIn('r.nama_role', ['Admin_OPD', 'Admin OPD', 'Administrator OPD'])
                 ->where('u.id_opd', $targetUser['id_opd'])
                 ->where('u.is_active', 1)
                 ->select('u.id_user')
@@ -444,7 +712,8 @@ class NotificationService
                 'user',
                 $target_user_id,
                 'user',
-                $url
+                $url,
+                $actor_id
             );
             if ($sent) {
                 $sentIds[] = $sent;
@@ -454,4 +723,3 @@ class NotificationService
         return $sentIds;
     }
 }
-

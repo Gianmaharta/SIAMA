@@ -121,6 +121,29 @@ Pusat Notifikasi - SIAMA
 
                     <p class="notif-card-desc"><?= esc($notif['message']) ?></p>
 
+                    <!-- Info Pengirim & Referensi Dokumen -->
+                    <?php if (!empty($notif['sender_nama']) || !empty($notif['reference_type'])) : ?>
+                        <div class="d-flex align-items-center gap-2 mb-3 flex-wrap" style="font-size: 12px;">
+                            <?php if (!empty($notif['sender_nama'])) : ?>
+                                <span class="d-inline-flex align-items-center gap-1.5 text-secondary">
+                                    <i class="bi bi-person-fill text-muted"></i>
+                                    <span class="text-dark fw-medium"><?= esc($notif['sender_nama']) ?></span>
+                                </span>
+                                <?php if (!empty($notif['sender_role'])) : ?>
+                                    <span class="badge bg-light text-secondary border px-2 py-0.5" style="font-size: 10px; font-weight: 500;">
+                                        <?= esc(ucwords(str_replace('_', ' ', $notif['sender_role']))) ?>
+                                    </span>
+                                <?php endif; ?>
+                            <?php endif; ?>
+
+                            <?php if (!empty($notif['reference_type']) && !empty($notif['reference_id'])) : ?>
+                                <span class="badge bg-light text-muted border px-2 py-0.5" style="font-size: 10px;">
+                                    Ref: <?= esc(strtoupper($notif['reference_type'])) ?> #<?= esc(substr($notif['reference_id'], 0, 8)) ?>
+                                </span>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+
                     <!-- Tindakan Khusus JRA Retention (Jika Ada) -->
                     <?php if ($notif['action_type'] === 'retensi_arsip') : ?>
                         <div class="notif-jra-actions mb-3">
@@ -193,8 +216,8 @@ Pusat Notifikasi - SIAMA
 
                             <?php if (!empty($notif['target_url']) && !in_array($notif['action_type'], ['retensi_arsip', 'retensi_inaktif_arsip'])) : ?>
                                 <a href="<?= base_url('/notification/read-and-redirect/' . $notif['id_notification']) ?>" class="btn-notif-action btn-notif-primary">
-                                    <span>Buka Tautan</span>
-                                    <i class="bi bi-box-arrow-up-right" style="font-size: 11px;"></i>
+                                    <span><?= esc($notif['action_label'] ?? 'Buka Dokumen') ?></span>
+                                    <i class="bi bi-arrow-right" style="font-size: 11px;"></i>
                                 </a>
                             <?php endif; ?>
                         </div>

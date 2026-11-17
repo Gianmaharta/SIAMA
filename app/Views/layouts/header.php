@@ -84,13 +84,36 @@ if (session()->get('user_id')) {
 
     <!-- Right: User Area -->
     <div class="nav-user-area">
-        <!-- Notification Button (Langsung Menampilkan Halaman Semua Notifikasi) -->
-        <a href="<?= base_url('/notification') ?>" class="nav-notif-btn" id="navNotifBtn" title="Notifikasi">
-            <i class="bi bi-bell"></i>
-            <span class="notif-badge-count <?= $unread > 0 ? '' : 'd-none' ?>" id="navNotifBadge">
-                <?= $unread > 99 ? '99+' : $unread ?>
-            </span>
-        </a>
+        <!-- Notification Dropdown -->
+        <div class="dropdown notif-dropdown-wrapper">
+            <button class="nav-notif-btn" id="notifDropdownBtn" type="button" data-bs-toggle="dropdown" data-bs-auto-close="true" aria-expanded="false" title="Notifikasi">
+                <i class="bi bi-bell"></i>
+                <span class="notif-badge-count <?= $unread > 0 ? '' : 'd-none' ?>" id="navNotifBadge">
+                    <?= $unread > 99 ? '99+' : $unread ?>
+                </span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end notif-dropdown-menu p-0" aria-labelledby="notifDropdownBtn">
+                <div class="notif-dropdown-header p-3 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-bold notif-dropdown-title text-dark">Notifikasi</span>
+                        <span class="badge bg-primary text-white rounded-pill px-2 py-0.5" id="dropdownUnreadBadge" style="font-size: 10.5px;">
+                            <?= $unread ?> Baru
+                        </span>
+                    </div>
+                    <button type="button" class="btn btn-link text-primary text-decoration-none p-0 small fw-medium" id="btnMarkAllReadDropdown" style="font-size: 12px;">
+                        Tandai Semua Dibaca
+                    </button>
+                </div>
+                <div class="notif-dropdown-body" id="notifDropdownList">
+                    <!-- Dimuat dinamis via AJAX -->
+                </div>
+                <div class="notif-dropdown-footer p-2 text-center border-top">
+                    <a href="<?= base_url('/notification') ?>" class="btn btn-link text-primary text-decoration-none fw-semibold small w-100 py-1">
+                        Lihat Semua Notifikasi <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
 
         <!-- User Profile Dropdown -->
         <div class="dropdown">

@@ -18,12 +18,108 @@
     margin-bottom: 0;
 }
 
-/* 2. Top Summary Stat Cards */
+/* 2. Prioritas Utama: Pekerjaan Belum Dikerjakan */
+.arsiparis-priority-card {
+    background-color: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    overflow: hidden;
+    position: relative;
+    border-top: 4px solid #F59E0B;
+}
+
+.arsiparis-priority-card.has-tasks {
+    border-color: #FDE68A;
+    background: linear-gradient(180deg, #FFFDF8 0%, #FFFFFF 100px);
+}
+
+.arsiparis-card-header {
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #F1F5F9;
+    background-color: #FFFFFF;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.arsiparis-card-title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.arsiparis-card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0F172A;
+    margin-bottom: 0;
+}
+
+.arsiparis-card-subtitle {
+    font-size: 12.5px;
+    color: #64748B;
+    margin-top: 2px;
+    margin-bottom: 0;
+}
+
+.arsiparis-badge-priority {
+    background-color: #FFFBEB;
+    color: #B45309;
+    border: 1px solid #FDE68A;
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 50px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.arsiparis-badge-priority .pulse-dot {
+    width: 7px;
+    height: 7px;
+    background-color: #F59E0B;
+    border-radius: 50%;
+    animation: pulseAmber 2s infinite;
+}
+
+@keyframes pulseAmber {
+    0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); }
+    70% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+}
+
+/* 3. Ringkasan Pekerjaan (4 Statistik) */
+.arsiparis-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+@media (max-width: 992px) {
+    .arsiparis-stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .arsiparis-stat-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 .arsiparis-stat-card {
     background-color: #FFFFFF;
     border: 1px solid #E2E8F0;
     border-radius: 14px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
@@ -33,200 +129,261 @@
     border-color: #CBD5E1;
 }
 
-.arsiparis-stat-icon-purple {
-    width: 56px;
-    height: 56px;
+.arsiparis-stat-icon {
+    width: 52px;
+    height: 52px;
     border-radius: 12px;
-    background-color: #FAF5FF;
-    color: #9333EA;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 26px;
+    font-size: 24px;
     flex-shrink: 0;
 }
 
-.arsiparis-stat-icon-blue {
-    width: 56px;
-    height: 56px;
-    border-radius: 12px;
+.icon-blue {
     background-color: #EFF6FF;
     color: #1E60EC;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 26px;
-    flex-shrink: 0;
 }
 
-.arsiparis-stat-icon-green {
-    width: 56px;
-    height: 56px;
-    border-radius: 12px;
+.icon-amber {
+    background-color: #FFFBEB;
+    color: #D97706;
+}
+
+.icon-indigo {
+    background-color: #EEF2FF;
+    color: #4F46E5;
+}
+
+.icon-emerald {
     background-color: #ECFDF5;
-    color: #10B981;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 26px;
-    flex-shrink: 0;
+    color: #059669;
+}
+
+.icon-purple {
+    background-color: #FAF5FF;
+    color: #9333EA;
 }
 
 .arsiparis-stat-label {
-    font-size: 13.5px;
+    font-size: 13px;
     font-weight: 500;
-    color: #475569;
-    margin-bottom: 4px;
+    color: #64748B;
+    margin-bottom: 2px;
 }
 
 .arsiparis-stat-value {
-    font-size: 32px;
+    font-size: 26px;
     font-weight: 700;
     color: #0F172A;
-    line-height: 1;
+    line-height: 1.1;
+    margin-bottom: 2px;
 }
 
-/* 3. Menu Akses Cepat */
-.quick-access-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: #0F172A;
-    margin-bottom: 3px;
+.arsiparis-stat-sub {
+    font-size: 11.5px;
+    color: #94A3B8;
 }
 
-.quick-access-subtitle {
-    font-size: 13.5px;
-    color: #64748B;
-    margin-bottom: 16px;
-}
-
-.quick-access-card {
+/* 4. Table Styles */
+.arsiparis-table-wrapper {
     background-color: #FFFFFF;
     border: 1px solid #E2E8F0;
     border-radius: 14px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    text-decoration: none;
-    color: inherit;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-    height: 100%;
+    overflow: hidden;
 }
 
-.quick-access-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-    border-color: #CBD5E1;
-    color: inherit;
+.arsiparis-table {
+    margin-bottom: 0;
+    font-size: 13px;
+    width: 100%;
+    min-width: 720px;
 }
 
-.quick-access-icon-box {
-    width: 44px;
-    height: 44px;
-    border-radius: 10px;
-    display: flex;
+.arsiparis-table thead th {
+    background-color: #F8FAFC;
+    color: #475569;
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 12px 18px;
+    border-bottom: 1px solid #E2E8F0;
+    white-space: nowrap;
+}
+
+.arsiparis-table tbody td {
+    padding: 14px 18px;
+    color: #334155;
+    border-bottom: 1px solid #F1F5F9;
+    vertical-align: middle;
+}
+
+.arsiparis-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.arsiparis-table tbody tr:hover td {
+    background-color: #FAFAFC;
+}
+
+/* Table Action Buttons */
+.btn-action-start {
+    background-color: #1E60EC;
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 8px;
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    margin-bottom: 14px;
+    gap: 6px;
+    text-decoration: none;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+    border: none;
+    white-space: nowrap;
 }
 
-.quick-access-icon-box.green {
-    background-color: #ECFDF5;
-    color: #10B981;
+.btn-action-start:hover {
+    background-color: #174EC4;
+    color: #FFFFFF;
+    transform: translateY(-1px);
 }
 
-.quick-access-icon-box.amber {
+.btn-action-detail {
+    background-color: #FFFFFF;
+    color: #475569;
+    border: 1px solid #CBD5E1;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-action-detail:hover {
+    background-color: #F1F5F9;
+    color: #0F172A;
+    border-color: #94A3B8;
+}
+
+.btn-action-pdf {
+    background-color: #FEF2F2;
+    color: #DC2626;
+    border: 1px solid #FEE2E2;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 5px 9px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-action-pdf:hover {
+    background-color: #FEE2E2;
+    color: #B91C1C;
+}
+
+.btn-action-edit {
     background-color: #FFFBEB;
-    color: #F59E0B;
+    color: #D97706;
+    border: 1px solid #FEF3C7;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 5px 9px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    white-space: nowrap;
 }
 
-.quick-access-icon-box.blue {
+.btn-action-edit:hover {
+    background-color: #FEF3C7;
+    color: #B45309;
+}
+
+/* Status Badges */
+.badge-status {
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 50px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+.badge-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.badge-status-amber {
+    background-color: #FFFBEB;
+    color: #B45309;
+    border: 1px solid #FDE68A;
+}
+.badge-status-amber .badge-status-dot { background-color: #F59E0B; }
+
+.badge-status-blue {
     background-color: #EFF6FF;
     color: #1E60EC;
+    border: 1px solid #DBEAFE;
 }
+.badge-status-blue .badge-status-dot { background-color: #1E60EC; }
 
-.quick-access-icon-box.purple {
-    background-color: #FAF5FF;
-    color: #8B5CF6;
+.badge-status-green {
+    background-color: #ECFDF5;
+    color: #047857;
+    border: 1px solid #A7F3D0;
 }
+.badge-status-green .badge-status-dot { background-color: #10B981; }
 
-.quick-card-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: #0F172A;
-    margin-bottom: 4px;
+.badge-status-red {
+    background-color: #FEF2F2;
+    color: #B91C1C;
+    border: 1px solid #FECACA;
 }
+.badge-status-red .badge-status-dot { background-color: #EF4444; }
 
-.quick-card-desc {
-    font-size: 12.5px;
-    color: #64748B;
-    line-height: 1.45;
-    margin-bottom: 12px;
-    flex-grow: 1;
+.badge-status-gray {
+    background-color: #F1F5F9;
+    color: #475569;
+    border: 1px solid #E2E8F0;
 }
+.badge-status-gray .badge-status-dot { background-color: #94A3B8; }
 
-.quick-card-arrow {
-    text-align: right;
-    color: #1E60EC;
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 1;
-}
-
-/* 4. Large Panels (Donut Chart & Bar Chart) */
+/* 5. Donut Chart Component */
 .arsiparis-panel-card {
     background-color: #FFFFFF;
     border: 1px solid #E2E8F0;
     border-radius: 14px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-    padding: 24px;
+    padding: 22px;
     height: 100%;
     display: flex;
     flex-direction: column;
 }
 
-.arsiparis-panel-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 20px;
-}
-
-.arsiparis-panel-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: #0F172A;
-    margin-bottom: 2px;
-}
-
-.arsiparis-panel-subtitle {
-    font-size: 12.5px;
-    color: #64748B;
-    margin-bottom: 0;
-}
-
-.arsiparis-pill-badge {
-    background-color: #EFF6FF;
-    color: #1E60EC;
-    border: 1px solid #DBEAFE;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 5px 14px;
-    border-radius: 50px;
-    white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-}
-
-/* Donut Chart with Centered Overlay */
 .donut-chart-container {
     position: relative;
-    width: 170px;
-    height: 170px;
+    width: 160px;
+    height: 160px;
     margin: 0 auto;
 }
 
@@ -240,7 +397,7 @@
 }
 
 .donut-center-number {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 700;
     color: #0F172A;
     line-height: 1;
@@ -251,30 +408,24 @@
     font-size: 11px;
     font-weight: 500;
     color: #64748B;
-    text-transform: capitalize;
 }
 
-/* Stacked Status Pill Cards */
 .status-pill-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
     justify-content: center;
     height: 100%;
 }
 
 .status-pill-item {
     border-radius: 10px;
-    padding: 12px 16px;
+    padding: 10px 14px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-size: 13.5px;
+    font-size: 13px;
     transition: transform 0.15s ease;
-}
-
-.status-pill-item:hover {
-    transform: translateX(2px);
 }
 
 .status-pill-item.green {
@@ -303,17 +454,9 @@
     flex-shrink: 0;
 }
 
-.status-dot.green {
-    background-color: #10B981;
-}
-
-.status-dot.amber {
-    background-color: #F59E0B;
-}
-
-.status-dot.gray {
-    background-color: #94A3B8;
-}
+.status-dot.green { background-color: #10B981; }
+.status-dot.amber { background-color: #F59E0B; }
+.status-dot.gray  { background-color: #94A3B8; }
 
 .status-item-label {
     font-weight: 600;
@@ -332,51 +475,126 @@
     line-height: 1.2;
 }
 
-.status-item-pct {
-    font-size: 11px;
-    opacity: 0.85;
+/* 6. Activity Log Timeline */
+.activity-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-/* Card Footers */
-.arsiparis-card-footer {
-    border-top: 1px solid #F1F5F9;
-    padding-top: 14px;
-    margin-top: auto;
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background-color: #F8FAFC;
+    border: 1px solid #F1F5F9;
+    transition: background-color 0.2s ease;
+}
+
+.activity-item:hover {
+    background-color: #F1F5F9;
+}
+
+.activity-icon-box {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.activity-icon-box.blue {
+    background-color: #EFF6FF;
+    color: #1E60EC;
+}
+
+.activity-icon-box.green {
+    background-color: #ECFDF5;
+    color: #10B981;
+}
+
+.activity-icon-box.amber {
+    background-color: #FFFBEB;
+    color: #F59E0B;
+}
+
+.activity-icon-box.purple {
+    background-color: #FAF5FF;
+    color: #8B5CF6;
+}
+
+.activity-icon-box.gray {
+    background-color: #E2E8F0;
+    color: #475569;
+}
+
+.activity-content {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.activity-desc {
+    font-size: 13px;
+    color: #1E293B;
+    font-weight: 500;
+    margin-bottom: 2px;
+    word-break: break-word;
+}
+
+.activity-meta {
     font-size: 11.5px;
     color: #94A3B8;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
-.realtime-pulse-indicator {
+.activity-badge {
+    background-color: #E2E8F0;
+    color: #475569;
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 1px 7px;
+    border-radius: 4px;
+}
+
+/* 7. Empty State Components */
+.empty-state-box {
+    text-align: center;
+    padding: 36px 20px;
+    color: #64748B;
+}
+
+.empty-state-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background-color: #F1F5F9;
+    color: #94A3B8;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    color: #10B981;
-    font-weight: 600;
-    font-size: 11.5px;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 10px;
 }
 
-.pulse-dot {
-    width: 7px;
-    height: 7px;
-    background-color: #10B981;
-    border-radius: 50%;
-    box-shadow: 0 0 0 rgba(16, 185, 129, 0.4);
-    animation: pulseGlow 2s infinite;
+.empty-state-title {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #1E293B;
+    margin-bottom: 3px;
 }
 
-@keyframes pulseGlow {
-    0% {
-        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
-    }
-    70% {
-        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-    }
+.empty-state-desc {
+    font-size: 12.5px;
+    color: #64748B;
+    margin-bottom: 0;
 }
 
 .footer-report-link {
@@ -393,126 +611,4 @@
 .footer-report-link:hover {
     color: #1545A8;
     gap: 6px;
-}
-
-/* 5. Table Styling for Berita Acara */
-.arsiparis-table-wrapper {
-    background-color: #FFFFFF;
-    border: 1px solid #E2E8F0;
-    border-radius: 14px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-    overflow: hidden;
-}
-
-.arsiparis-table-header {
-    padding: 20px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid #F1F5F9;
-}
-
-.arsiparis-table {
-    margin-bottom: 0;
-    font-size: 13.5px;
-    min-width: 650px;
-}
-
-.arsiparis-table thead th {
-    background-color: #F8FAFC;
-    color: #64748B;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    padding: 12px 20px;
-    border-bottom: 1px solid #E2E8F0;
-}
-
-.arsiparis-table tbody td {
-    padding: 14px 20px;
-    color: #334155;
-    border-bottom: 1px solid #F1F5F9;
-    vertical-align: middle;
-}
-
-.arsiparis-table tbody tr:last-child td {
-    border-bottom: none;
-}
-
-.arsiparis-table tbody tr:hover td {
-    background-color: #F8FAFC;
-}
-
-.ba-empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: #64748B;
-}
-
-.ba-empty-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background-color: #F1F5F9;
-    color: #94A3B8;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    margin-bottom: 12px;
-}
-
-/* Responsive Breakpoints */
-@media (max-width: 768px) {
-    .arsiparis-panel-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-
-    .arsiparis-pill-badge {
-        align-self: flex-start;
-    }
-}
-
-@media (max-width: 576px) {
-    .arsiparis-header-title {
-        font-size: 20px;
-    }
-
-    .arsiparis-header-desc {
-        font-size: 13px;
-    }
-
-    .arsiparis-stat-card .card-body {
-        padding: 16px !important;
-    }
-
-    .arsiparis-stat-icon-purple,
-    .arsiparis-stat-icon-blue,
-    .arsiparis-stat-icon-green {
-        width: 46px;
-        height: 46px;
-        font-size: 22px;
-    }
-
-    .arsiparis-stat-value {
-        font-size: 24px;
-    }
-
-    .quick-access-title {
-        font-size: 16px;
-    }
-
-    .arsiparis-panel-card {
-        padding: 16px;
-    }
-
-    .arsiparis-table-header {
-        padding: 14px 16px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-    }
 }
