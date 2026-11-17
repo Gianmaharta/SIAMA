@@ -39,9 +39,10 @@ class Notification extends BaseController
         // Tambahkan metadata ikon dan waktu relatif
         foreach ($notifications as &$notif) {
             $meta = $this->getNotificationMeta($notif['type'] ?: $notif['action_type']);
-            $notif['meta']      = $meta;
-            $notif['time_ago']  = $this->formatTimeAgo($notif['created_at']);
-            $notif['target_url'] = $this->resolveTargetUrl($notif);
+            $notif['meta']         = $meta;
+            $notif['time_ago']     = $this->formatTimeAgo($notif['created_at']);
+            $notif['target_url']   = $this->resolveTargetUrl($notif);
+            $notif['action_label'] = $this->resolveActionLabel($notif);
         }
         unset($notif);
 
@@ -100,10 +101,16 @@ class Notification extends BaseController
         $formatted = [];
         foreach ($rawNotifs as $notif) {
             $meta = $this->getNotificationMeta($notif['type'] ?: $notif['action_type']);
+            $senderText = '';
+            if (!empty($notif['sender_nama'])) {
+                $roleClean = !empty($notif['sender_role']) ? str_replace('_', ' ', $notif['sender_role']) : '';
+                $senderText = $roleClean ? "{$notif['sender_nama']} ({$roleClean})" : $notif['sender_nama'];
+            }
             $formatted[] = [
                 'id_notification' => $notif['id_notification'],
                 'title'           => esc($notif['title']),
                 'message'         => esc($notif['message']),
+                'sender'          => esc($senderText),
                 'is_read'         => (int) $notif['is_read'],
                 'time_ago'        => $this->formatTimeAgo($notif['created_at']),
                 'type'            => $notif['type'] ?: $notif['action_type'],
@@ -287,6 +294,45 @@ class Notification extends BaseController
             default:
                 return base_url('/notification');
         }
+    }
+
+    /**
+     * Resolusi Label Tombol Aksi Berdasarkan Alur Notifikasi SIAMA
+     */
+    private function resolveActionLabel(array $notif): string
+    {
+        $type = $notif['type'] ?: $notif['action_type'];
+        $title = strtolower($notif['title'] ?? '');
+        $msg = strtolower($notif['message'] ?? '');
+
+        if ($type === 'spt') {
+            if (str_contains($title, 'penugasan') || str_contains($msg, 'penugasan')) {
+                return 'Lihat Penugasan';
+            }
+            if (str_contains($msg, 'dimulai')) {
+                return 'Pantau Pekerjaan';
+            }
+            return 'Lihat Detail SPT';
+        }
+
+        if ($type === 'berita_acara') {
+            if (str_contains($msg, 'perbaikan') || str_contains($title, 'revisi')) {
+                return 'Lihat Catatan Revisi';
+            }
+            if (str_contains($msg, 'kembali')) {
+                return 'Periksa Hasil Revisi';
+            }
+            return 'Lihat Berita Acara';
+        }
+
+        if ($type === 'arsip') {
+            if (str_contains($msg, 'menunggu verifikasi')) {
+                return 'Periksa Hasil';
+            }
+            return 'Lihat Detail Arsip';
+        }
+
+        return 'Buka Dokumen';
     }
 
     /**

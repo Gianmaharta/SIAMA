@@ -198,7 +198,7 @@ class NotificationFeatureTest extends CIUnitTestCase
         $this->assertNotEmpty($notifIdsC2);
         $notifC2 = $db->table('notifications')->where('id_notification', $notifIdsC2[0])->get()->getRowArray();
         $this->assertEquals($ids['arsiparis'], $notifC2['id_user']);
-        $this->assertStringContainsString('Revisi Berita Acara', $notifC2['title']);
+        $this->assertStringContainsString('Permintaan Perbaikan', $notifC2['title']);
         $this->assertStringContainsString('Perbaiki nomor lampiran', $notifC2['message']);
 
         // 5. Skenario E: Pimpinan Tandatangani Berita Acara -> Kirim ke Kabid, Arsiparis, Admin OPD

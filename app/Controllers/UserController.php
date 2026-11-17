@@ -373,12 +373,12 @@ class UserController extends BaseController
     {
         $session = session();
 
-        // Hanya Admin_Pemkab asli yang bisa switch (cek role asli atau role saat ini)
+        // Hanya Admin_Pemkab asli dan yang sedang berada di akun aslinya yang bisa switch
         $currentRole = $session->get('nama_role');
         $isAlreadySwitched = $session->has('original_admin_id');
 
-        if ($currentRole !== 'Admin_Pemkab' && !$isAlreadySwitched) {
-            return redirect()->to('/dashboard')->with('error', 'Akses Ditolak. Hanya Admin Pemkab yang bisa menggunakan fitur ini.');
+        if (!in_array($currentRole, ['Admin_Pemkab', 'Admin Pemkab']) || $isAlreadySwitched) {
+            return redirect()->to('/dashboard')->with('error', 'Akses Ditolak. Fitur Masuk Sebagai hanya dapat digunakan oleh Admin Pemkab.');
         }
 
         // Cari user target

@@ -162,6 +162,13 @@ class Spt extends BaseController
 
         log_activity('SPT', 'CREATE', 'Menerbitkan Surat Perintah Tugas baru: ' . $sptData['nomor_spt']);
 
+        // Skenario A: Kirim Notifikasi ke Kepala Bidang terkait di OPD
+        try {
+            notification_service()->notifySptCreated((string)$id_spt, $session->get('user_id'));
+        } catch (\Throwable $e) {
+            log_message('error', 'Gagal mengirim notifikasi penerbitan SPT: ' . $e->getMessage());
+        }
+
         return redirect()->to('/spt')->with('success', 'SPT berhasil diterbitkan. Menunggu penugasan oleh Kepala Bidang.');
     }
 
@@ -366,6 +373,15 @@ class Spt extends BaseController
 
         // Ubah status assignment ke proses
         $this->sptAssignmentModel->update($assignment['id_assignment'], ['status' => 'proses']);
+
+        log_activity('SPT', 'START', 'Memulai pelaksanaan pekerjaan SPT: ' . $id_spt);
+
+        // Skenario C: Kirim Notifikasi ke Kepala Bidang yang menugaskan bahwa pekerjaan telah dimulai
+        try {
+            notification_service()->notifySptStarted((string)$id_spt, $session->get('user_id'));
+        } catch (\Throwable $e) {
+            log_message('error', 'Gagal mengirim notifikasi pekerjaan SPT dimulai: ' . $e->getMessage());
+        }
 
         // Redirect ke halaman buat arsip dengan param spt_id
         return redirect()->to('/arsip/create?id_spt=' . $id_spt);

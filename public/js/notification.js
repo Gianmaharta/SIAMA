@@ -126,6 +126,7 @@
                             ${unreadDot}
                         </div>
                         <div class="notif-item-desc">${item.message}</div>
+                        ${item.sender ? `<div class="notif-item-sender text-muted small" style="font-size: 11px; margin-top: 2px;"><i class="bi bi-person me-1"></i>${item.sender}</div>` : ''}
                         <div class="notif-item-footer">
                             <span class="badge bg-light text-secondary border px-1.5 py-0.5" style="font-size: 9.5px;">${item.type_label}</span>
                             <span><i class="bi bi-clock me-1"></i>${item.time_ago}</span>

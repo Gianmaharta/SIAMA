@@ -802,10 +802,51 @@ Detail Berita Acara - SIAMA
                 <span>Aksi Pengesahan Pimpinan</span>
             </h2>
         </div>
-        <p class="text-secondary small mb-3">Dokumen telah diverifikasi oleh Kepala Bidang. Klik tombol di bawah untuk membubuhkan tanda tangan elektronik dan mengesahkan Berita Acara secara resmi.</p>
+        <p class="text-secondary small mb-3">Dokumen telah diverifikasi oleh Kepala Bidang. Silakan periksa dokumen dan tentukan keputusan pengesahan atau pengembalian draf Berita Acara.</p>
         <form action="<?= base_url('/berita-acara/ttd-pimpinan/' . $ba['id_berita_acara']) ?>" method="post">
             <?= csrf_field() ?>
-            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-2">
+            <div class="mb-4">
+                <label class="form-label fw-semibold text-dark small mb-2" style="font-size: 13.5px;">Tentukan Keputusan:</label>
+                <div class="row g-3">
+                    <!-- Pilihan 1: Tandatangani & Sahkan -->
+                    <div class="col-12 col-md-6">
+                        <label class="ba-verif-option ba-verif-option-approve h-100" for="pim_approve">
+                            <div class="d-flex align-items-center gap-3 w-100">
+                                <input class="form-check-input ba-verif-radio ba-verif-radio-approve m-0" type="radio" name="keputusan" value="Approve" required id="pim_approve" checked>
+                                <div class="ba-verif-option-content">
+                                    <span class="ba-verif-option-name text-success fw-semibold">
+                                        <i class="bi bi-check2-circle me-1"></i>Tandatangani & Sahkan
+                                    </span>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Pilihan 2: Minta Perbaikan / Tolak -->
+                    <div class="col-12 col-md-6">
+                        <label class="ba-verif-option ba-verif-option-reject h-100" for="pim_reject">
+                            <div class="d-flex align-items-center gap-3 w-100">
+                                <input class="form-check-input ba-verif-radio ba-verif-radio-reject m-0" type="radio" name="keputusan" value="Reject" required id="pim_reject">
+                                <div class="ba-verif-option-content">
+                                    <span class="ba-verif-option-name text-danger fw-semibold">
+                                        <i class="bi bi-arrow-counterclockwise me-1"></i>Minta Perbaikan / Kembalikan
+                                    </span>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wrapper Catatan Revisi Opsional jika memilih Tolak -->
+            <div id="wrapperCatatanRevisi" class="mb-4 d-none">
+                <label for="catatan_revisi" class="form-label fw-semibold text-dark small mb-1" style="font-size: 13px;">
+                    Catatan Revisi / Arahan Pimpinan <span class="text-secondary fw-normal">(Opsional)</span>:
+                </label>
+                <textarea name="catatan_revisi" id="catatan_revisi" rows="3" class="form-control" placeholder="Tuliskan catatan perbaikan atau arahan tindak lanjut untuk Kepala Bidang..." style="font-size: 13.5px; border-radius: 8px;"></textarea>
+            </div>
+
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-3 border-top mt-4">
                 <div>
                     <?php if (!empty($ba['id_berita_acara'])) : ?>
                         <a href="<?= base_url('/berita-acara/cetak/' . $ba['id_berita_acara']) ?>" target="_blank" class="btn btn-outline-primary d-inline-flex align-items-center gap-2 px-3 py-2 fw-medium" style="border-radius: 8px; font-size: 13.5px;">
@@ -815,8 +856,8 @@ Detail Berita Acara - SIAMA
                     <?php endif; ?>
                 </div>
                 <div>
-                    <button type="submit" class="btn btn-primary fw-semibold px-4 py-2" style="border-radius: 8px; font-size: 13.5px; background-color: #1E60EC; border-color: #1E60EC;">
-                        <i class="bi bi-check2-circle me-1"></i> Tandatangani & Sahkan
+                    <button type="submit" class="btn btn-primary fw-semibold px-4 py-2" id="btnSubmitPimpinan" style="border-radius: 8px; font-size: 13.5px; background-color: #1E60EC; border-color: #1E60EC;">
+                        <i class="bi bi-send me-1"></i> Kirim Keputusan
                     </button>
                 </div>
             </div>
@@ -872,6 +913,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (inputCatatan) {
                     inputCatatan.value = '';
                 }
+            }
+        }
+
+        const btnSubmitPimpinan = document.getElementById('btnSubmitPimpinan');
+        if (btnSubmitPimpinan) {
+            if (isReject) {
+                btnSubmitPimpinan.className = 'btn btn-danger fw-semibold px-4 py-2';
+                btnSubmitPimpinan.style.backgroundColor = '';
+                btnSubmitPimpinan.style.borderColor = '';
+                btnSubmitPimpinan.innerHTML = '<i class="bi bi-arrow-counterclockwise me-1"></i> Kembalikan Berita Acara';
+            } else {
+                btnSubmitPimpinan.className = 'btn btn-primary fw-semibold px-4 py-2';
+                btnSubmitPimpinan.style.backgroundColor = '#1E60EC';
+                btnSubmitPimpinan.style.borderColor = '#1E60EC';
+                btnSubmitPimpinan.innerHTML = '<i class="bi bi-check2-circle me-1"></i> Tandatangani & Sahkan';
             }
         }
     }

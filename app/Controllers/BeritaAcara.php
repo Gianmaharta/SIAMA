@@ -277,6 +277,15 @@ class BeritaAcara extends BaseController
 
             log_activity('Berita Acara', 'UPDATE', 'Memperbarui draf Berita Acara nomor: ' . $nomor_ba, $ba, $dataUpdate);
 
+            // Skenario G: Arsiparis mengirim ulang hasil revisi ke Kepala Bidang
+            if ($ba['status_persetujuan'] === 'Revisi') {
+                try {
+                    notification_service()->notifyBaRevisionResubmitted($id, $session->get('user_id'));
+                } catch (\Throwable $e) {
+                    log_message('error', 'Gagal mengirim notifikasi revisi BA dikirim ulang: ' . $e->getMessage());
+                }
+            }
+
             return redirect()->to('/berita-acara')->with('success', 'Draf Berita Acara berhasil diperbarui.');
         } catch (\Exception $e) {
             $db->transRollback();
@@ -377,9 +386,9 @@ class BeritaAcara extends BaseController
         $ba = $this->beritaAcaraModel->find($id);
         log_activity('Berita Acara', 'update', "Kepala Bidang $msg Berita Acara nomor: " . $ba['nomor_ba']);
 
-        // Kirim Notifikasi (Skenario C2 & D)
+        // Kirim Notifikasi (Skenario E & F)
         try {
-            notification_service()->notifyBaKabidVerified($id, $keputusan, $catatan);
+            notification_service()->notifyBaKabidVerified($id, $keputusan, $catatan, session()->get('user_id'));
         } catch (\Throwable $e) {
             log_message('error', 'Gagal mengirim notifikasi verifikasi BA: ' . $e->getMessage());
         }
@@ -404,6 +413,28 @@ class BeritaAcara extends BaseController
             return redirect()->to('/berita-acara/detail/' . $id)->with('error', 'Pelanggaran aturan: Pembuat draf dilarang mengesahkan Berita Acara miliknya sendiri (Anti Self-Approval).');
         }
 
+        $keputusan = $this->request->getPost('keputusan') ?: 'Approve';
+        $catatan = trim((string)$this->request->getPost('catatan_revisi'));
+
+        if ($keputusan === 'Reject') {
+            $this->beritaAcaraModel->update($id, [
+                'status_persetujuan' => 'Revisi',
+                'catatan_revisi'     => $catatan,
+                'id_pimpinan'        => session()->get('user_id')
+            ]);
+
+            log_activity('Berita Acara', 'update', "Pimpinan menolak/meminta perbaikan Berita Acara nomor: " . $ba['nomor_ba']);
+
+            // Skenario I: Pimpinan menolak atau meminta perbaikan Berita Acara → Kepala Bidang
+            try {
+                notification_service()->notifyBaPimpinanRejected($id, session()->get('user_id'), $catatan);
+            } catch (\Throwable $e) {
+                log_message('error', 'Gagal mengirim notifikasi penolakan BA oleh pimpinan: ' . $e->getMessage());
+            }
+
+            return redirect()->to('/berita-acara/detail/' . $id)->with('success', 'Catatan perbaikan berhasil dikirim ke Kepala Bidang.');
+        }
+
         $this->beritaAcaraModel->update($id, [
             'status_persetujuan' => 'Selesai',
             'id_pimpinan' => session()->get('user_id')
@@ -412,7 +443,7 @@ class BeritaAcara extends BaseController
         $ba = $this->beritaAcaraModel->find($id);
         log_activity('Berita Acara', 'update', "Pimpinan mengesahkan Berita Acara nomor: " . $ba['nomor_ba']);
 
-        // Kirim Notifikasi (Skenario E)
+        // Kirim Notifikasi (Skenario H: Pimpinan menandatangani Berita Acara)
         try {
             notification_service()->notifyBaPimpinanSigned($id, session()->get('user_id'));
         } catch (\Throwable $e) {

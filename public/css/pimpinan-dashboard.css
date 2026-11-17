@@ -1,28 +1,31 @@
 :root {
+    --pimpinan-primary-navy: #1E3A6D;
     --pimpinan-primary-blue: #1E60EC;
     --pimpinan-primary-blue-hover: #1752CE;
     --pimpinan-blue-bg: #EFF6FF;
     --pimpinan-purple: #8B5CF6;
     --pimpinan-purple-bg: #F5F3FF;
+    --pimpinan-green: #10B981;
+    --pimpinan-green-bg: #ECFDF5;
+    --pimpinan-amber: #F59E0B;
+    --pimpinan-amber-bg: #FFFBEB;
+    --pimpinan-rose: #EF4444;
+    --pimpinan-rose-bg: #FEF2F2;
     --pimpinan-bg-card: #FFFFFF;
     --pimpinan-border: #E5E7EB;
     --pimpinan-border-light: #F1F5F9;
     --pimpinan-border-subtle: #F8FAFC;
-    --pimpinan-row-hover: #FBFDFF;
+    --pimpinan-row-hover: #F8FAFC;
     --pimpinan-text-main: #0F172A;
-    --pimpinan-text-muted: #64748B;
     --pimpinan-text-sub: #334155;
-
-    /* Status Badge */
-    --pimpinan-badge-orange-bg: #FFF7ED;
-    --pimpinan-badge-orange-text: #C2410C;
-    --pimpinan-badge-orange-dot: #EA580C;
+    --pimpinan-text-muted: #64748B;
 }
 
 .pimpinan-dashboard {
-    padding: 0 0 16px;
+    padding-bottom: 30px;
 }
 
+/* 1. Header */
 .pimpinan-header-title {
     font-family: 'Poppins', sans-serif;
     font-size: 24px;
@@ -36,10 +39,10 @@
 .pimpinan-header-desc {
     font-size: 13.5px;
     color: var(--pimpinan-text-muted);
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
-/* Stat Cards */
+/* 2. Stat Cards */
 .pimpinan-stat-card {
     border-radius: 12px;
     border: 1px solid var(--pimpinan-border);
@@ -49,7 +52,7 @@
 }
 
 .pimpinan-stat-card .card-body {
-    padding: 16px 20px !important;
+    padding: 18px 20px !important;
 }
 
 .pimpinan-stat-card:hover {
@@ -58,8 +61,8 @@
 }
 
 .pimpinan-stat-icon-blue {
-    width: 44px;
-    height: 44px;
+    width: 46px;
+    height: 46px;
     border-radius: 10px;
     background-color: var(--pimpinan-blue-bg);
     color: var(--pimpinan-primary-blue);
@@ -71,11 +74,37 @@
 }
 
 .pimpinan-stat-icon-purple {
-    width: 44px;
-    height: 44px;
+    width: 46px;
+    height: 46px;
     border-radius: 10px;
     background-color: var(--pimpinan-purple-bg);
     color: var(--pimpinan-purple);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.pimpinan-stat-icon-green {
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    background-color: var(--pimpinan-green-bg);
+    color: var(--pimpinan-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.pimpinan-stat-icon-emerald {
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    background-color: #ECFDF5;
+    color: #059669;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -87,81 +116,101 @@
     font-size: 13px;
     font-weight: 500;
     color: var(--pimpinan-text-muted);
-    margin-bottom: 3px;
+    margin-bottom: 4px;
 }
 
 .pimpinan-stat-value {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 700;
     color: var(--pimpinan-text-main);
     line-height: 1;
     letter-spacing: -0.5px;
 }
 
-/* Table Cards */
-.pimpinan-table-card {
+/* 3. Section Cards */
+.pimpinan-section-card {
     border-radius: 12px;
     border: 1px solid var(--pimpinan-border);
     background-color: var(--pimpinan-bg-card);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
     overflow: hidden;
+    margin-bottom: 24px;
 }
 
-.pimpinan-table-header {
-    padding: 12px 18px;
+.pimpinan-section-card.priority-card {
+    border-left: 4px solid var(--pimpinan-purple);
+}
+
+.pimpinan-section-header {
+    padding: 16px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid var(--pimpinan-border-light);
+    background-color: #FFFFFF;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
-.pimpinan-table-title-group {
+.pimpinan-section-title-group {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
-.pimpinan-table-icon-blue {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
+.pimpinan-section-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.pimpinan-section-icon.icon-blue {
     background-color: var(--pimpinan-blue-bg);
     color: var(--pimpinan-primary-blue);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    flex-shrink: 0;
 }
 
-.pimpinan-table-icon-purple {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
+.pimpinan-section-icon.icon-purple {
     background-color: var(--pimpinan-purple-bg);
     color: var(--pimpinan-purple);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    flex-shrink: 0;
 }
 
-.pimpinan-table-title {
-    font-size: 14.5px;
+.pimpinan-section-icon.icon-green {
+    background-color: var(--pimpinan-green-bg);
+    color: var(--pimpinan-green);
+}
+
+.pimpinan-section-icon.icon-amber {
+    background-color: var(--pimpinan-amber-bg);
+    color: var(--pimpinan-amber);
+}
+
+.pimpinan-section-title {
+    font-size: 15px;
     font-weight: 700;
     color: var(--pimpinan-text-main);
     margin-bottom: 0;
 }
 
+.pimpinan-section-subtitle {
+    font-size: 12.5px;
+    color: var(--pimpinan-text-muted);
+    margin-bottom: 0;
+    font-weight: 400;
+}
+
 .pimpinan-link-all {
     color: var(--pimpinan-primary-blue);
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 600;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: 3px;
+    gap: 4px;
     transition: color 0.15s ease, transform 0.15s ease;
 }
 
@@ -170,39 +219,311 @@
     transform: translateX(2px);
 }
 
-.pimpinan-nomor-spt {
+/* 4. Action Buttons & Badges */
+.btn-pimpinan-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background-color: var(--pimpinan-purple);
+    color: #FFFFFF !important;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: none;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.btn-pimpinan-action:hover {
+    background-color: #7C3AED;
+    color: #FFFFFF !important;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(139, 92, 246, 0.3);
+}
+
+.btn-pimpinan-detail {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background-color: #F8FAFC;
+    color: #334155 !important;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--pimpinan-border);
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.btn-pimpinan-detail:hover {
+    background-color: var(--pimpinan-blue-bg);
     color: var(--pimpinan-primary-blue) !important;
+    border-color: #BFDBFE;
+}
+
+/* 5. Clean Tables */
+.pimpinan-table {
+    margin-bottom: 0;
+    font-size: 12.5px;
+    width: 100%;
+}
+
+.pimpinan-table thead th {
+    font-size: 11.5px;
     font-weight: 600;
-    font-size: 12px;
-    text-decoration: none;
+    color: var(--pimpinan-text-muted);
+    background-color: #FAFAFA;
+    border-bottom: 1px solid var(--pimpinan-border-light);
+    padding: 10px 14px;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
-    transition: color 0.15s ease, text-decoration 0.15s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
 }
 
-.pimpinan-nomor-spt:hover {
-    color: var(--pimpinan-primary-blue-hover) !important;
-    text-decoration: underline !important;
+.pimpinan-table tbody td {
+    padding: 12px 14px;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--pimpinan-border-subtle);
+    color: var(--pimpinan-text-sub);
+    font-size: 12.5px;
 }
 
-.pimpinan-nomor-ba {
+.pimpinan-table tbody tr:hover td {
+    background-color: var(--pimpinan-row-hover);
+}
+
+.pimpinan-table-code {
+    font-family: inherit;
+    font-weight: 600;
+    color: var(--pimpinan-primary-blue);
+    text-decoration: none;
+}
+
+.pimpinan-table-code:hover {
+    color: var(--pimpinan-primary-blue-hover);
+    text-decoration: underline;
+}
+
+/* Status Badges */
+.badge-status-pimpinan {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-size: 11.5px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.badge-status-green {
+    background: #DEF7EC;
+    color: #03543F;
+}
+
+.badge-status-purple {
+    background: #F3E8FF;
+    color: #6B21A8;
+}
+
+.badge-status-amber {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.badge-status-blue {
+    background: #EFF6FF;
+    color: #1E60EC;
+}
+
+.badge-status-rose {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+/* 6. Filter Pills for Riwayat Berita Acara */
+.pimpinan-filter-pills {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 12px 20px;
+    background-color: #FAFAFA;
+    border-bottom: 1px solid var(--pimpinan-border-light);
+}
+
+.ba-filter-btn {
+    border: 1px solid var(--pimpinan-border);
+    background-color: #FFFFFF;
+    color: var(--pimpinan-text-sub);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+}
+
+.ba-filter-btn:hover {
+    background-color: #F1F5F9;
     color: var(--pimpinan-text-main);
-    font-weight: 600;
-    font-size: 12px;
-    text-decoration: none;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
-    transition: color 0.15s ease;
 }
 
-.pimpinan-nomor-ba:hover {
+.ba-filter-btn.active {
+    background-color: var(--pimpinan-primary-navy);
+    color: #FFFFFF;
+    border-color: var(--pimpinan-primary-navy);
+}
+
+.ba-filter-badge {
+    background-color: #E2E8F0;
+    color: #334155;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 1px 7px;
+    border-radius: 10px;
+}
+
+.ba-filter-btn.active .ba-filter-badge {
+    background-color: rgba(255, 255, 255, 0.25);
+    color: #FFFFFF;
+}
+
+/* 7. Empty State */
+.pimpinan-empty-state {
+    text-align: center;
+    padding: 36px 20px;
+}
+
+.pimpinan-empty-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 12px;
+}
+
+.pimpinan-empty-icon.icon-green {
+    background-color: var(--pimpinan-green-bg);
+    color: var(--pimpinan-green);
+}
+
+.pimpinan-empty-icon.icon-muted {
+    background-color: #F1F5F9;
+    color: #94A3B8;
+}
+
+.pimpinan-empty-title {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--pimpinan-text-main);
+    margin-bottom: 4px;
+}
+
+.pimpinan-empty-desc {
+    font-size: 12.5px;
+    color: var(--pimpinan-text-muted);
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+/* 8. Activity Timeline / List */
+.pimpinan-activity-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.pimpinan-activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--pimpinan-border-light);
+    transition: background-color 0.15s ease;
+}
+
+.pimpinan-activity-item:last-child {
+    border-bottom: none;
+}
+
+.pimpinan-activity-item:hover {
+    background-color: var(--pimpinan-row-hover);
+}
+
+.pimpinan-activity-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.pimpinan-activity-icon.icon-blue {
+    background-color: var(--pimpinan-blue-bg);
     color: var(--pimpinan-primary-blue);
 }
 
+.pimpinan-activity-icon.icon-purple {
+    background-color: var(--pimpinan-purple-bg);
+    color: var(--pimpinan-purple);
+}
+
+.pimpinan-activity-icon.icon-amber {
+    background-color: var(--pimpinan-amber-bg);
+    color: var(--pimpinan-amber);
+}
+
+.pimpinan-activity-icon.icon-green {
+    background-color: var(--pimpinan-green-bg);
+    color: var(--pimpinan-green);
+}
+
+.pimpinan-activity-icon.icon-rose {
+    background-color: var(--pimpinan-rose-bg);
+    color: var(--pimpinan-rose);
+}
+
+.pimpinan-activity-content {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.pimpinan-activity-desc {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--pimpinan-text-main);
+    margin-bottom: 3px;
+    line-height: 1.4;
+}
+
+.pimpinan-activity-meta {
+    font-size: 11.5px;
+    color: var(--pimpinan-text-muted);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.pimpinan-activity-user {
+    font-weight: 500;
+    color: var(--pimpinan-text-sub);
+}
+
+/* Sidebar Menu styling */
 .sidebar-menu-pimpinan {
     padding-top: 20px !important;
     gap: 8px !important;
@@ -213,128 +534,15 @@
     font-size: 14px;
 }
 
-/* Compact Table Layout */
-.pimpinan-table {
-    margin-bottom: 0;
-    font-size: 12px;
-    width: 100%;
-    min-width: 540px;
-}
-
-.pimpinan-table thead th {
-    font-size: 11.5px;
-    font-weight: 600;
-    color: var(--pimpinan-text-muted);
-    background-color: var(--pimpinan-bg-card);
-    border-bottom: 1px solid var(--pimpinan-border-light);
-    padding: 8px 6px;
-    white-space: nowrap;
-}
-
-.pimpinan-table thead th:first-child {
-    padding-left: 14px;
-}
-
-.pimpinan-table thead th:last-child {
-    padding-right: 14px;
-}
-
-.pimpinan-table tbody td {
-    padding: 8px 6px;
-    vertical-align: middle;
-    border-bottom: 1px solid var(--pimpinan-border-subtle);
-    color: var(--pimpinan-text-sub);
-    font-size: 12px;
-}
-
-.pimpinan-table tbody td:first-child {
-    padding-left: 14px;
-}
-
-.pimpinan-table tbody td:last-child {
-    padding-right: 14px;
-}
-
-.pimpinan-table tbody tr:hover td {
-    background-color: var(--pimpinan-row-hover);
-}
-
-.pimpinan-table .text-truncate {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 0;
-}
-
-/* Badge Draf_Kabid */
-.badge-draf-kabid {
-    background-color: var(--pimpinan-badge-orange-bg);
-    color: var(--pimpinan-badge-orange-text);
-    border-radius: 50px;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 3px 8px;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    white-space: nowrap;
-}
-
-.badge-draf-kabid .dot-orange {
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background-color: var(--pimpinan-badge-orange-dot);
-    display: inline-block;
-}
-
-/* Button Terbitkan SPT di Dashboard */
-.spt-btn-create {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    background-color: #1E3A6D;
-    color: #FFFFFF !important;
-    font-size: 13.5px;
-    font-weight: 600;
-    padding: 8px 18px;
-    border-radius: 8px;
-    border: none;
-    box-shadow: 0 1px 3px rgba(30, 58, 109, 0.25);
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    cursor: pointer;
-    text-decoration: none;
-    white-space: nowrap;
-    height: 38px;
-}
-
-.spt-btn-create:hover,
-.spt-btn-create:focus {
-    background-color: #172F59;
-    color: #FFFFFF !important;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(30, 58, 109, 0.35);
-}
-
-.spt-btn-create:active {
-    background-color: #122648;
-    color: #FFFFFF !important;
-    transform: translateY(0);
-    box-shadow: 0 1px 2px rgba(30, 58, 109, 0.2);
-}
-
-.spt-btn-create i {
-    font-size: 15px;
-    line-height: 1;
-}
-
-/* Responsive Breakpoints */
+/* Responsive adjustments */
 @media (max-width: 768px) {
-    .pimpinan-table-header {
+    .pimpinan-section-header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 8px;
+    }
+
+    .pimpinan-filter-pills {
+        padding: 10px 14px;
     }
 }
 
@@ -343,21 +551,11 @@
         font-size: 20px;
     }
 
-    .pimpinan-header-desc {
-        font-size: 13px;
-    }
-
     .pimpinan-stat-card .card-body {
-        padding: 16px !important;
+        padding: 14px !important;
     }
 
     .pimpinan-stat-value {
-        font-size: 24px;
-    }
-
-    .spt-btn-create {
-        width: 100%;
-        justify-content: center;
+        font-size: 22px;
     }
 }
-

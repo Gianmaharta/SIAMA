@@ -180,7 +180,57 @@ class SwitchRoleTest extends CIUnitTestCase
             ->get('/users/switch/' . $ids['admin_id']);
 
         // Harus redirect ke dashboard dengan error
-        $result->assertRedirect();
+        $result->assertRedirectTo('/dashboard');
+        $this->assertEquals('Akses Ditolak. Fitur Masuk Sebagai hanya dapat digunakan oleh Admin Pemkab.', session()->getFlashdata('error'));
+    }
+
+    public function testAdminOpdCannotSeeSwitchModalOrButton(): void
+    {
+        $ids = $this->setupTestData();
+
+        // Login sebagai Admin OPD
+        $result = $this->withSession($this->sess($ids['target_id'], 'opd@switch.test', 'Admin OPD', 'Admin_OPD', 'opd-test'))
+            ->get('/users');
+
+        $result->assertOK();
+        $body = $result->getBody();
+
+        // Modal switch user tidak boleh dirender untuk Admin OPD
+        $this->assertStringNotContainsString('id="modalSwitchUser"', $body);
+        $this->assertStringNotContainsString('id="btnConfirmSwitchUser"', $body);
+        $this->assertStringNotContainsString('Masuk Sebagai Pengguna?', $body);
+
+        // Flag isCanSwitch harus false
+        $this->assertStringContainsString('const isCanSwitch = false;', $body);
+    }
+
+    public function testImpersonatingAdminOpdCannotSeeSwitchModalOrButton(): void
+    {
+        $ids = $this->setupTestData();
+
+        // Admin Pemkab switch ke Admin OPD
+        $this->withSession($this->sess($ids['admin_id'], 'admin@switch.test', 'Admin Pemkab Test', 'Admin_Pemkab'))
+            ->get('/users/switch/' . $ids['target_id']);
+
+        $switchedSession = session()->get();
+        $this->assertEquals('Admin_OPD', $switchedSession['nama_role']);
+        $this->assertTrue(isset($switchedSession['original_admin_id']));
+
+        // Saat membuka /users dalam mode Admin OPD (walaupun sedang impersonate):
+        $result = $this->withSession($switchedSession)->get('/users');
+        $result->assertOK();
+        $body = $result->getBody();
+
+        // Modal switch user dan tombol "Masuk Sebagai" TIDAK BOLEH MUNCUL
+        $this->assertStringNotContainsString('id="modalSwitchUser"', $body);
+        $this->assertStringNotContainsString('id="btnConfirmSwitchUser"', $body);
+        $this->assertStringNotContainsString('Masuk Sebagai Pengguna?', $body);
+        $this->assertStringContainsString('const isCanSwitch = false;', $body);
+
+        // Jika mencoba switch lagi saat sudah dalam penyamaran, harus ditolak
+        $switchAgain = $this->withSession($switchedSession)->get('/users/switch/' . $ids['arsiparis_id']);
+        $switchAgain->assertRedirectTo('/dashboard');
+        $this->assertEquals('Akses Ditolak. Fitur Masuk Sebagai hanya dapat digunakan oleh Admin Pemkab.', session()->getFlashdata('error'));
     }
 
     public function testModalSwitchUserRendersCorrectly(): void
