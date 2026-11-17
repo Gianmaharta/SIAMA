@@ -216,20 +216,31 @@ Detail Berita Acara - SIAMA
     text-decoration: underline;
 }
 
-/* Riwayat Penandatanganan Horizontal */
+/* Riwayat Penandatanganan Horizontal & Dynamic Slide Bar */
 .ba-sig-container {
     position: relative;
-    padding: 12px 0 6px 0;
+    padding: 14px 0 6px 0;
 }
 
 .ba-sig-track {
     position: absolute;
-    top: 24px;
+    top: 32px;
     left: 16.66%;
     right: 16.66%;
-    height: 2px;
+    height: 4px;
     background-color: #E2E8F0;
+    border-radius: 999px;
     z-index: 1;
+    overflow: hidden;
+}
+
+.ba-sig-track-fill {
+    width: var(--ba-progress, 0%);
+    height: 100%;
+    background: linear-gradient(90deg, #10B981, #16A34A);
+    border-radius: 999px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 8px rgba(22, 163, 74, 0.35);
 }
 
 .ba-sig-step {
@@ -240,17 +251,56 @@ Detail Berita Acara - SIAMA
 }
 
 .ba-sig-icon-wrap {
-    width: 32px;
-    height: 32px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     background-color: #FFFFFF;
-    color: #16A34A;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: 19px;
     margin-bottom: 10px;
-    box-shadow: 0 0 0 4px #FFFFFF;
+    box-shadow: 0 0 0 5px #FFFFFF;
+    transition: all 0.3s ease;
+}
+
+/* Icon States */
+.ba-sig-icon-completed {
+    background-color: #DCFCE7;
+    color: #16A34A;
+    border: 2px solid #86EFAC;
+    box-shadow: 0 0 0 5px #FFFFFF, 0 2px 6px rgba(22, 163, 74, 0.18);
+}
+
+.ba-sig-icon-waiting {
+    background-color: #FEF3C7;
+    color: #D97706;
+    border: 2px solid #FCD34D;
+    box-shadow: 0 0 0 5px #FFFFFF, 0 2px 6px rgba(217, 119, 6, 0.18);
+    animation: baPulseAmber 2s infinite ease-in-out;
+}
+
+@keyframes baPulseAmber {
+    0%, 100% {
+        box-shadow: 0 0 0 5px #FFFFFF, 0 0 0 6px rgba(245, 158, 11, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 0 5px #FFFFFF, 0 0 0 10px rgba(245, 158, 11, 0.35);
+    }
+}
+
+.ba-sig-icon-pending {
+    background-color: #F8FAFC;
+    color: #94A3B8;
+    border: 2px dashed #CBD5E1;
+    box-shadow: 0 0 0 5px #FFFFFF;
+}
+
+.ba-sig-icon-revision {
+    background-color: #FEE2E2;
+    color: #DC2626;
+    border: 2px solid #FCA5A5;
+    box-shadow: 0 0 0 5px #FFFFFF, 0 2px 6px rgba(220, 38, 38, 0.18);
 }
 
 .ba-sig-role {
@@ -277,21 +327,50 @@ Detail Berita Acara - SIAMA
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    background-color: #DCFCE7;
-    color: #15803D;
     font-size: 11.5px;
     font-weight: 600;
     padding: 3px 10px;
     border-radius: 20px;
 }
 
+.ba-sig-badge-success {
+    background-color: #DCFCE7;
+    color: #15803D;
+    border: 1px solid #BBF7D0;
+}
+
+.ba-sig-badge-waiting {
+    background-color: #FEF3C7;
+    color: #B45309;
+    border: 1px solid #FDE68A;
+}
+
+.ba-sig-badge-pending {
+    background-color: #F1F5F9;
+    color: #64748B;
+    border: 1px solid #E2E8F0;
+}
+
+.ba-sig-badge-revision {
+    background-color: #FEE2E2;
+    color: #B91C1C;
+    border: 1px solid #FECACA;
+}
+
 @media (max-width: 767.98px) {
     .ba-sig-track {
         top: 24px;
         bottom: 24px;
-        left: 28px;
-        width: 2px;
+        left: 29px;
+        width: 4px;
         height: auto;
+        right: auto;
+    }
+
+    .ba-sig-track-fill {
+        width: 100% !important;
+        height: var(--ba-progress, 0%);
+        background: linear-gradient(180deg, #10B981, #16A34A);
     }
 
     .ba-sig-step {
@@ -299,7 +378,7 @@ Detail Berita Acara - SIAMA
         align-items: flex-start;
         text-align: left;
         gap: 16px;
-        margin-bottom: 20px;
+        margin-bottom: 24px;
     }
 
     .ba-sig-step:last-child {
@@ -636,16 +715,141 @@ Detail Berita Acara - SIAMA
     </div>
 </div>
 
-<!-- SECTION 3 — RIWAYAT PENANDATANGANAN (HORIZONTAL) -->
+<!-- SECTION 3 — RIWAYAT PENANDATANGANAN (HORIZONTAL & DYNAMIC WORKFLOW) -->
 <?php
-    $pelaksanaName = !empty($ba['nama_pelaksana']) ? esc($ba['nama_pelaksana']) . ' (Arsiparis)' : 'Budi Santoso (Arsiparis)';
+    $cleanStatus = str_replace(['_', ' '], '', strtolower($ba['status_persetujuan'] ?? 'draftkabid'));
+
+    // Format nama penandatangan agar tidak ada duplikasi sufiks role
+    $formatSignerName = function($name, $defaultName, $roleLabel) {
+        $raw = !empty($name) ? trim($name) : $defaultName;
+        if (strcasecmp($raw, $roleLabel) === 0) {
+            return esc($raw);
+        }
+        $clean = preg_replace('/\s*\(' . preg_quote($roleLabel, '/') . '\)\s*$/i', '', $raw);
+        return esc($clean) . ' (' . $roleLabel . ')';
+    };
+
+    $pelaksanaName = $formatSignerName($ba['nama_pelaksana'] ?? null, 'Budi Santoso', 'Arsiparis');
+    $kabidName     = $formatSignerName($ba['nama_kabid'] ?? null, 'Kepala Bidang', 'Kepala Bidang');
+    $pimpinanName  = $formatSignerName($ba['nama_pimpinan'] ?? null, 'Kepala Dinas', 'Pimpinan');
+
+    // Tanggal aktual pembuatan draf
     $pelaksanaDate = !empty($ba['created_at']) ? date('Y-m-d H:i', strtotime($ba['created_at'])) : ($tanggalBa . ' 08:30');
 
-    $kabidName = !empty($ba['nama_kabid']) ? esc($ba['nama_kabid']) : 'Kepala Bidang';
-    $kabidDate = !empty($ba['updated_at']) && $statusBa !== 'Draf_Kabid' && $statusBa !== 'Draft_Kabid' ? date('Y-m-d H:i', strtotime($ba['updated_at'])) : ($tanggalBa . ' 10:15');
+    // Step 1: Pelaksana/Arsiparis selalu selesai (telah mengajukan draf)
+    $step1 = [
+        'icon_class'  => 'ba-sig-icon-completed',
+        'icon'        => 'bi-check-circle-fill',
+        'badge_class' => 'ba-sig-badge-success',
+        'badge_icon'  => 'bi-check-circle-fill',
+        'badge_label' => 'Status: Selesai',
+        'name'        => $pelaksanaName,
+        'date'        => $pelaksanaDate,
+        'date_class'  => 'ba-sig-date',
+    ];
 
-    $pimpinanName = !empty($ba['nama_pimpinan']) ? esc($ba['nama_pimpinan']) . ' (Pimpinan)' : 'Kepala Dinas (Pimpinan)';
-    $pimpinanDate = !empty($ba['updated_at']) && $statusBa === 'Selesai' ? date('Y-m-d H:i', strtotime($ba['updated_at'])) : ($tanggalBa . ' 14:20');
+    // Kondisi dinamis berdasarkan tahapan persetujuan
+    if ($cleanStatus === 'selesai') {
+        // Pimpinan telah menandatangani / ACC (Semua tahapan tuntas)
+        $progressWidth = 100;
+
+        $step2 = [
+            'icon_class'  => 'ba-sig-icon-completed',
+            'icon'        => 'bi-check-circle-fill',
+            'badge_class' => 'ba-sig-badge-success',
+            'badge_icon'  => 'bi-check-circle-fill',
+            'badge_label' => 'Disetujui Kabid',
+            'name'        => $kabidName,
+            'date'        => !empty($ba['updated_at']) ? date('Y-m-d H:i', strtotime($ba['updated_at'])) : ($tanggalBa . ' 10:15'),
+            'date_class'  => 'ba-sig-date',
+        ];
+
+        $step3 = [
+            'icon_class'  => 'ba-sig-icon-completed',
+            'icon'        => 'bi-check-circle-fill',
+            'badge_class' => 'ba-sig-badge-success',
+            'badge_icon'  => 'bi-check-circle-fill',
+            'badge_label' => 'Disahkan (Selesai)',
+            'name'        => $pimpinanName,
+            'date'        => !empty($ba['updated_at']) ? date('Y-m-d H:i', strtotime($ba['updated_at'])) : ($tanggalBa . ' 14:20'),
+            'date_class'  => 'ba-sig-date',
+        ];
+    } elseif ($cleanStatus === 'draftpimpinan' || $cleanStatus === 'drafpimpinan') {
+        // Kabid telah ACC -> Slide bar jalan ke Kabid (50%), Pimpinan sedang menunggu tanda tangan
+        $progressWidth = 50;
+
+        $step2 = [
+            'icon_class'  => 'ba-sig-icon-completed',
+            'icon'        => 'bi-check-circle-fill',
+            'badge_class' => 'ba-sig-badge-success',
+            'badge_icon'  => 'bi-check-circle-fill',
+            'badge_label' => 'Disetujui Kabid',
+            'name'        => $kabidName,
+            'date'        => !empty($ba['updated_at']) ? date('Y-m-d H:i', strtotime($ba['updated_at'])) : date('Y-m-d H:i'),
+            'date_class'  => 'ba-sig-date',
+        ];
+
+        $step3 = [
+            'icon_class'  => 'ba-sig-icon-waiting',
+            'icon'        => 'bi-clock-history',
+            'badge_class' => 'ba-sig-badge-waiting',
+            'badge_icon'  => 'bi-hourglass-split',
+            'badge_label' => 'Menunggu Pengesahan',
+            'name'        => $pimpinanName,
+            'date'        => 'Menunggu Pengesahan',
+            'date_class'  => 'ba-sig-date text-warning fw-medium',
+        ];
+    } elseif ($cleanStatus === 'revisi') {
+        // Kabid meminta revisi kepada Arsiparis
+        $progressWidth = 0;
+
+        $step2 = [
+            'icon_class'  => 'ba-sig-icon-revision',
+            'icon'        => 'bi-arrow-repeat',
+            'badge_class' => 'ba-sig-badge-revision',
+            'badge_icon'  => 'bi-arrow-repeat',
+            'badge_label' => 'Perlu Revisi',
+            'name'        => $kabidName,
+            'date'        => !empty($ba['updated_at']) ? date('Y-m-d H:i', strtotime($ba['updated_at'])) : date('Y-m-d H:i'),
+            'date_class'  => 'ba-sig-date text-danger fw-medium',
+        ];
+
+        $step3 = [
+            'icon_class'  => 'ba-sig-icon-pending',
+            'icon'        => 'bi-dash-circle',
+            'badge_class' => 'ba-sig-badge-pending',
+            'badge_icon'  => 'bi-dash-circle',
+            'badge_label' => 'Belum Diproses',
+            'name'        => $pimpinanName,
+            'date'        => '-',
+            'date_class'  => 'ba-sig-date text-muted',
+        ];
+    } else {
+        // Default: Draft_Kabid / Draf_Kabid (Belum di-ACC Kabid, masih dalam bentuk draf Kabid)
+        $progressWidth = 0;
+
+        $step2 = [
+            'icon_class'  => 'ba-sig-icon-waiting',
+            'icon'        => 'bi-clock-history',
+            'badge_class' => 'ba-sig-badge-waiting',
+            'badge_icon'  => 'bi-hourglass-split',
+            'badge_label' => 'Menunggu Verifikasi',
+            'name'        => $kabidName,
+            'date'        => 'Menunggu Verifikasi',
+            'date_class'  => 'ba-sig-date text-warning fw-medium',
+        ];
+
+        $step3 = [
+            'icon_class'  => 'ba-sig-icon-pending',
+            'icon'        => 'bi-dash-circle',
+            'badge_class' => 'ba-sig-badge-pending',
+            'badge_icon'  => 'bi-dash-circle',
+            'badge_label' => 'Belum Diproses',
+            'name'        => $pimpinanName,
+            'date'        => '-',
+            'date_class'  => 'ba-sig-date text-muted',
+        ];
+    }
 ?>
 
 <div class="ba-detail-card">
@@ -657,23 +861,25 @@ Detail Berita Acara - SIAMA
     </div>
 
     <div class="ba-sig-container">
-        <!-- Garis Tipis Horizontal Penghubung Step -->
-        <div class="ba-sig-track d-none d-md-block"></div>
+        <!-- Slide Bar Penghubung Step dengan Dynamic Progress -->
+        <div class="ba-sig-track d-block" style="--ba-progress: <?= $progressWidth ?>%;">
+            <div class="ba-sig-track-fill"></div>
+        </div>
 
         <div class="row g-4 g-md-0">
             <!-- Step 1: Pelaksana/Arsiparis -->
             <div class="col-12 col-md-4 ba-sig-step">
-                <div class="ba-sig-icon-wrap">
-                    <i class="bi bi-check-circle-fill"></i>
+                <div class="ba-sig-icon-wrap <?= $step1['icon_class'] ?>">
+                    <i class="bi <?= $step1['icon'] ?>"></i>
                 </div>
                 <div>
                     <div class="ba-sig-role">Pelaksana/Arsiparis</div>
-                    <div class="ba-sig-name"><?= $pelaksanaName ?></div>
-                    <div class="ba-sig-date"><?= $pelaksanaDate ?></div>
+                    <div class="ba-sig-name"><?= $step1['name'] ?></div>
+                    <div class="<?= $step1['date_class'] ?>"><?= $step1['date'] ?></div>
                     <div>
-                        <span class="ba-sig-badge">
-                            <i class="bi bi-check-circle-fill"></i>
-                            <span>Status: Selesai</span>
+                        <span class="ba-sig-badge <?= $step1['badge_class'] ?>">
+                            <i class="bi <?= $step1['badge_icon'] ?>"></i>
+                            <span><?= $step1['badge_label'] ?></span>
                         </span>
                     </div>
                 </div>
@@ -681,17 +887,17 @@ Detail Berita Acara - SIAMA
 
             <!-- Step 2: Kepala Bidang -->
             <div class="col-12 col-md-4 ba-sig-step">
-                <div class="ba-sig-icon-wrap">
-                    <i class="bi bi-check-circle-fill"></i>
+                <div class="ba-sig-icon-wrap <?= $step2['icon_class'] ?>">
+                    <i class="bi <?= $step2['icon'] ?>"></i>
                 </div>
                 <div>
                     <div class="ba-sig-role">Kepala Bidang</div>
-                    <div class="ba-sig-name"><?= $kabidName ?></div>
-                    <div class="ba-sig-date"><?= $kabidDate ?></div>
+                    <div class="ba-sig-name"><?= $step2['name'] ?></div>
+                    <div class="<?= $step2['date_class'] ?>"><?= $step2['date'] ?></div>
                     <div>
-                        <span class="ba-sig-badge">
-                            <i class="bi bi-check-circle-fill"></i>
-                            <span>Status: Selesai</span>
+                        <span class="ba-sig-badge <?= $step2['badge_class'] ?>">
+                            <i class="bi <?= $step2['badge_icon'] ?>"></i>
+                            <span><?= $step2['badge_label'] ?></span>
                         </span>
                     </div>
                 </div>
@@ -699,22 +905,32 @@ Detail Berita Acara - SIAMA
 
             <!-- Step 3: Pimpinan -->
             <div class="col-12 col-md-4 ba-sig-step">
-                <div class="ba-sig-icon-wrap">
-                    <i class="bi bi-check-circle-fill"></i>
+                <div class="ba-sig-icon-wrap <?= $step3['icon_class'] ?>">
+                    <i class="bi <?= $step3['icon'] ?>"></i>
                 </div>
                 <div>
                     <div class="ba-sig-role">Pimpinan</div>
-                    <div class="ba-sig-name"><?= $pimpinanName ?></div>
-                    <div class="ba-sig-date"><?= $pimpinanDate ?></div>
+                    <div class="ba-sig-name"><?= $step3['name'] ?></div>
+                    <div class="<?= $step3['date_class'] ?>"><?= $step3['date'] ?></div>
                     <div>
-                        <span class="ba-sig-badge">
-                            <i class="bi bi-check-circle-fill"></i>
-                            <span>Status: Selesai</span>
+                        <span class="ba-sig-badge <?= $step3['badge_class'] ?>">
+                            <i class="bi <?= $step3['badge_icon'] ?>"></i>
+                            <span><?= $step3['badge_label'] ?></span>
                         </span>
                     </div>
                 </div>
             </div>
         </div>
+
+        <?php if ($cleanStatus === 'revisi' && !empty($ba['catatan_revisi'])) : ?>
+            <div class="mt-4 p-3 rounded-3 bg-danger-subtle border border-danger-subtle text-danger d-flex align-items-start gap-2">
+                <i class="bi bi-exclamation-triangle-fill fs-5 mt-n1 flex-shrink-0"></i>
+                <div>
+                    <strong class="d-block mb-1">Catatan Revisi dari Kepala Bidang:</strong>
+                    <div class="small text-danger-emphasis"><?= nl2br(esc($ba['catatan_revisi'])) ?></div>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 
