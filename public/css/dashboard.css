@@ -984,9 +984,22 @@ html, body {
 }
 
 @media (max-width: 991px) {
-    html, body {
+    html {
+        overflow-x: clip;
         overflow-y: auto;
         height: auto;
+        overscroll-behavior: auto;
+        -webkit-overflow-scrolling: touch;
+        background-color: var(--light-bg);
+    }
+
+    body {
+        overflow-x: clip;
+        overflow-y: visible;
+        height: auto;
+        min-height: 100%;
+        overscroll-behavior: auto;
+        touch-action: pan-y;
         background-color: var(--light-bg);
     }
 
@@ -1001,7 +1014,9 @@ html, body {
 
     .main-wrapper {
         height: auto;
+        min-height: 0;
         overflow: visible;
+        overscroll-behavior-y: auto;
     }
 
     .sidebar {

@@ -19,8 +19,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <!-- Custom Dashboard CSS -->
-    <link rel="stylesheet" href="<?= base_url('css/dashboard.css') ?>">
-    <link rel="stylesheet" href="<?= base_url('css/notification-master.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('css/dashboard.css?v=' . (file_exists(FCPATH . 'css/dashboard.css') ? filemtime(FCPATH . 'css/dashboard.css') : time())) ?>">
+    <link rel="stylesheet" href="<?= base_url('css/notification-master.css?v=' . (file_exists(FCPATH . 'css/notification-master.css') ? filemtime(FCPATH . 'css/notification-master.css') : time())) ?>">
     <?= $this->renderSection('styles') ?>
 </head>
 <body>
