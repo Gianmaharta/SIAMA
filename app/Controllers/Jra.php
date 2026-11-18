@@ -95,7 +95,7 @@ class Jra extends BaseController
             return redirect()->back()->withInput()->with('error', 'Kode Klasifikasi tersebut sudah memiliki jadwal JRA.');
         }
 
-        $this->jraModel->insert([
+        $jraData = [
             'id_kode_klasifikasi' => $id_kode_klasifikasi,
             'retensi_aktif'       => $this->request->getPost('retensi_aktif'),
             'retensi_inaktif'     => $this->request->getPost('retensi_inaktif'),
@@ -105,7 +105,10 @@ class Jra extends BaseController
             'akses_publik'        => $this->request->getPost('akses_publik'),
             'dasar_pertimbangan'  => $this->request->getPost('dasar_pertimbangan'),
             'unit_pengolah'       => $this->request->getPost('unit_pengolah')
-        ]);
+        ];
+
+        $this->jraModel->insert($jraData);
+        log_activity('JRA', 'CREATE', "Menambahkan data Master JRA baru: {$kode} - {$nama_klasifikasi}");
 
         return redirect()->to('/jra')->with('success', 'Master JRA berhasil ditambahkan.');
     }
@@ -149,6 +152,17 @@ class Jra extends BaseController
             return redirect()->to('/jra')->with('error', 'Data JRA dengan status Musnah tidak dapat diedit.');
         }
 
+        if (!$this->validate([
+            'kode'                => 'required',
+            'nama_klasifikasi'    => 'required',
+            'retensi_aktif'       => 'required|numeric',
+            'retensi_inaktif'     => 'required|numeric',
+            'keterangan_retensi'  => 'required',
+            'klasifikasi_keamanan'=> 'required',
+        ])) {
+            return redirect()->back()->withInput()->with('error', 'Semua kolom wajib diisi dengan benar.');
+        }
+
         $kode = $this->request->getPost('kode');
         $nama_klasifikasi = $this->request->getPost('nama_klasifikasi');
         $deskripsi = $this->request->getPost('deskripsi');
@@ -178,7 +192,15 @@ class Jra extends BaseController
             ]);
         }
 
-        $this->jraModel->update($id, [
+        // Pastikan kode klasifikasi tidak bentrok dengan JRA lain
+        $conflict = $this->jraModel->where('id_kode_klasifikasi', $id_kode_klasifikasi)
+                                   ->where('id_jra !=', $id)
+                                   ->first();
+        if ($conflict) {
+            return redirect()->back()->withInput()->with('error', 'Kode Klasifikasi tersebut sudah digunakan pada jadwal JRA lain.');
+        }
+
+        $updateData = [
             'id_kode_klasifikasi' => $id_kode_klasifikasi,
             'retensi_aktif'       => $this->request->getPost('retensi_aktif'),
             'retensi_inaktif'     => $this->request->getPost('retensi_inaktif'),
@@ -188,7 +210,10 @@ class Jra extends BaseController
             'akses_publik'        => $this->request->getPost('akses_publik'),
             'dasar_pertimbangan'  => $this->request->getPost('dasar_pertimbangan'),
             'unit_pengolah'       => $this->request->getPost('unit_pengolah')
-        ]);
+        ];
+
+        $this->jraModel->update($id, $updateData);
+        log_activity('JRA', 'UPDATE', "Memperbarui data Master JRA: {$kode} - {$nama_klasifikasi}", $jra, $updateData);
 
         return redirect()->to('/jra')->with('success', 'Master JRA berhasil diperbarui.');
     }
@@ -210,6 +235,7 @@ class Jra extends BaseController
         }
 
         $this->jraModel->delete($id);
+        log_activity('JRA', 'DELETE', 'Menghapus data Master JRA ID: ' . $id);
         return redirect()->to('/jra')->with('success', 'Data JRA berhasil dihapus.');
     }
 

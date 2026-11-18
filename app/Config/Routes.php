@@ -78,7 +78,7 @@ $routes->group('jra', ['filter' => 'auth'], static function ($routes) {
     $routes->post('store', 'Jra::store', ['filter' => 'role:Admin_Pemkab,Admin_OPD,Administrator OPD']);
     $routes->get('edit/(:segment)', 'Jra::edit/$1', ['filter' => 'role:Admin_Pemkab,Admin_OPD,Administrator OPD']);
     $routes->post('update/(:segment)', 'Jra::update/$1', ['filter' => 'role:Admin_Pemkab,Admin_OPD,Administrator OPD']);
-    $routes->get('delete/(:segment)', 'Jra::delete/$1', ['filter' => 'role:Admin_Pemkab,Admin_OPD,Administrator OPD']);
+    $routes->match(['get', 'post'], 'delete/(:segment)', 'Jra::delete/$1', ['filter' => 'role:Admin_Pemkab,Admin_OPD,Administrator OPD']);
     // API untuk dropdown (Bisa diakses oleh Arsiparis saat create arsip)
     $routes->get('get_by_klasifikasi/(:segment)', 'Jra::get_by_klasifikasi/$1');
 });

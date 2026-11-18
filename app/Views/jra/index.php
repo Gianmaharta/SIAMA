@@ -57,7 +57,7 @@ $totalData = count($jra_list);
 <!-- Header Halaman -->
 <div class="jra-page-header">
     <h1 class="jra-page-title">Master Jadwal Retensi Arsip (JRA)</h1>
-    <p class="jra-page-subtitle">Kelola data jadwal retensi arsip pada OPD Anda.</p>
+    <p class="jra-page-subtitle"><?= session()->get('nama_role') === 'Admin_Pemkab' ? 'Kelola data master jadwal retensi arsip (JRA) dan kode klasifikasi seluruh perangkat daerah.' : 'Kelola data jadwal retensi arsip pada OPD Anda.' ?></p>
 </div>
 
 <!-- Card Utama: Toolbar & Tabel Data JRA -->
@@ -167,7 +167,7 @@ $totalData = count($jra_list);
                 ?>
                     <tr class="jra-row" 
                         data-no="<?= $no ?>"
-                        data-kode="<?= esc(strtolower($kodeText)) ?>"
+                        data-kode="<?= esc(strtolower($kodeText . ' ' . $deskripsi)) ?>"
                         data-retensi-aktif="<?= esc(strtolower($retensiAktifText)) ?>"
                         data-retensi-inaktif="<?= esc(strtolower($retensiInaktifText)) ?>"
                         data-keterangan="<?= esc(strtolower($keterangan)) ?>"
@@ -278,9 +278,9 @@ $totalData = count($jra_list);
     <!-- Table Footer & Pagination -->
     <div class="jra-table-footer">
         <div class="jra-pagination-info" id="jraPaginationInfo">
-            Menampilkan 1 - <?= $totalData ?> dari <?= $totalData ?> data
+            Menampilkan 1 - <?= min(25, $totalData) ?> dari <?= $totalData ?> data
         </div>
-        <ul class="jra-pagination">
+        <ul class="jra-pagination" id="jraPaginationList">
             <li>
                 <button type="button" class="jra-page-btn disabled" aria-label="Halaman Sebelumnya">
                     <i class="bi bi-chevron-left"></i>
@@ -670,21 +670,101 @@ document.addEventListener('DOMContentLoaded', function() {
     const tableBody = document.getElementById('jraTableBody');
     const emptyState = document.getElementById('jraEmptyState');
     const paginationInfo = document.getElementById('jraPaginationInfo');
-    const tableRows = Array.from(document.querySelectorAll('.jra-row'));
+    const paginationList = document.getElementById('jraPaginationList');
+    let tableRows = Array.from(document.querySelectorAll('.jra-row'));
     const totalData = tableRows.length;
+    const rowsPerPage = 25;
+    let currentPage = 1;
+    let filteredRows = [...tableRows];
+
+    function renderPagination() {
+        const totalFiltered = filteredRows.length;
+        const totalPages = Math.max(1, Math.ceil(totalFiltered / rowsPerPage));
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+
+        const startIdx = (currentPage - 1) * rowsPerPage;
+        const endIdx = Math.min(startIdx + rowsPerPage, totalFiltered);
+
+        // Hide all rows first, then show current page slice
+        tableRows.forEach(r => { r.style.display = 'none'; });
+        for (let i = startIdx; i < endIdx; i++) {
+            filteredRows[i].style.display = '';
+            const noCell = filteredRows[i].querySelector('.col-no');
+            if (noCell) noCell.textContent = (i + 1);
+        }
+
+        if (totalFiltered === 0) {
+            emptyState.classList.remove('d-none');
+            if (paginationInfo) paginationInfo.textContent = 'Menampilkan 0 data';
+        } else {
+            emptyState.classList.add('d-none');
+            if (paginationInfo) {
+                paginationInfo.textContent = `Menampilkan ${startIdx + 1} - ${endIdx} dari ${totalFiltered} data`;
+            }
+        }
+
+        if (!paginationList) return;
+        paginationList.innerHTML = '';
+
+        const addBtn = (html, page, disabled = false, active = false, ariaLabel = '') => {
+            const li = document.createElement('li');
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'jra-page-btn' + (disabled ? ' disabled' : '') + (active ? ' active' : '');
+            if (ariaLabel) btn.setAttribute('aria-label', ariaLabel);
+            btn.innerHTML = html;
+            if (!disabled && !active && page !== null) {
+                btn.addEventListener('click', function() {
+                    currentPage = page;
+                    renderPagination();
+                });
+            }
+            li.appendChild(btn);
+            paginationList.appendChild(li);
+        };
+
+        addBtn('<i class="bi bi-chevron-left"></i>', currentPage - 1, currentPage <= 1, false, 'Halaman Sebelumnya');
+
+        // Build compact page number list with ellipsis
+        const pages = [];
+        if (totalPages <= 7) {
+            for (let p = 1; p <= totalPages; p++) pages.push(p);
+        } else {
+            pages.push(1);
+            if (currentPage > 3) pages.push('...');
+            const pStart = Math.max(2, currentPage - 1);
+            const pEnd = Math.min(totalPages - 1, currentPage + 1);
+            for (let p = pStart; p <= pEnd; p++) pages.push(p);
+            if (currentPage < totalPages - 2) pages.push('...');
+            pages.push(totalPages);
+        }
+
+        pages.forEach(p => {
+            if (p === '...') {
+                addBtn('...', null, true, false);
+            } else {
+                addBtn(String(p), p, false, p === currentPage, 'Halaman ' + p);
+            }
+        });
+
+        addBtn('<i class="bi bi-chevron-right"></i>', currentPage + 1, currentPage >= totalPages, false, 'Halaman Selanjutnya');
+    }
 
     // Filter Pencarian Real-Time
     function filterTable() {
-        const query = searchInput.value.trim().toLowerCase();
+        const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
         
-        if (query.length > 0) {
-            clearBtn.classList.remove('d-none');
-        } else {
-            clearBtn.classList.add('d-none');
+        if (clearBtn) {
+            if (query.length > 0) {
+                clearBtn.classList.remove('d-none');
+            } else {
+                clearBtn.classList.add('d-none');
+            }
         }
 
-        let visibleCount = 0;
-        tableRows.forEach(row => {
+        filteredRows = tableRows.filter(row => {
+            if (!query) return true;
             const kode = row.getAttribute('data-kode') || '';
             const retensiAktif = row.getAttribute('data-retensi-aktif') || '';
             const retensiInaktif = row.getAttribute('data-retensi-inaktif') || '';
@@ -692,34 +772,19 @@ document.addEventListener('DOMContentLoaded', function() {
             const keamanan = row.getAttribute('data-keamanan') || '';
             const dasar = row.getAttribute('data-dasar') || '';
 
-            const match = kode.includes(query) ||
-                          retensiAktif.includes(query) ||
-                          retensiInaktif.includes(query) ||
-                          keterangan.includes(query) ||
-                          keamanan.includes(query) ||
-                          dasar.includes(query);
-
-            if (match) {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-            }
+            return kode.includes(query) ||
+                   retensiAktif.includes(query) ||
+                   retensiInaktif.includes(query) ||
+                   keterangan.includes(query) ||
+                   keamanan.includes(query) ||
+                   dasar.includes(query);
         });
 
-        // Update Empty State & Info Pagination
-        if (visibleCount === 0) {
-            emptyState.classList.remove('d-none');
-            if (paginationInfo) {
-                paginationInfo.textContent = 'Menampilkan 0 data';
-            }
-        } else {
-            emptyState.classList.add('d-none');
-            if (paginationInfo) {
-                paginationInfo.textContent = `Menampilkan 1 - ${visibleCount} dari ${totalData} data`;
-            }
-        }
+        currentPage = 1;
+        renderPagination();
     }
+
+    renderPagination();
 
     if (searchInput) {
         searchInput.addEventListener('input', filterTable);
@@ -752,7 +817,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const id = button.getAttribute('data-id');
             const formEdit = document.getElementById('formEditJra');
             if (formEdit) {
-                formEdit.action = '<?= base_url('/jra/update/') ?>/' + id;
+                formEdit.action = '<?= rtrim(base_url('/jra/update'), '/') ?>/' + id;
             }
 
             document.getElementById('edit_kode').value = button.getAttribute('data-kode') || '';
@@ -796,7 +861,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (deleteKodeEl) deleteKodeEl.textContent = kode || '-';
             if (deleteKetEl) deleteKetEl.textContent = ketVal || '-';
             if (btnConfirm) {
-                btnConfirm.href = '<?= base_url('/jra/delete/') ?>/' + id;
+                btnConfirm.href = '<?= rtrim(base_url('/jra/delete'), '/') ?>/' + id;
             }
         });
     }
@@ -837,13 +902,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 return isAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
             });
 
-            // Re-append sorted rows and re-index column No
-            let newNo = 1;
-            rows.forEach(r => {
-                const noCell = r.querySelector('.col-no');
-                if (noCell) noCell.textContent = newNo++;
-                tableBody.appendChild(r);
-            });
+            // Re-append sorted rows and re-render pagination
+            rows.forEach(r => tableBody.appendChild(r));
+            tableRows = rows;
+            filterTable();
         });
     });
 
