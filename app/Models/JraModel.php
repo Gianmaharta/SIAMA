@@ -28,11 +28,14 @@ class JraModel extends BaseModel
 
     protected $useTimestamps = true;
     protected $beforeInsert  = ['generateUuid'];
+    protected $beforeUpdate  = [];
     
     public function getJraWithKlasifikasi($id = null)
     {
-        $builder = $this->select('jra.*, kode_klasifikasi.kode, kode_klasifikasi.nama_klasifikasi')
-                        ->join('kode_klasifikasi', 'kode_klasifikasi.id_kode_klasifikasi = jra.id_kode_klasifikasi');
+        $builder = $this->select('jra.*, kode_klasifikasi.kode, kode_klasifikasi.nama_klasifikasi, kode_klasifikasi.deskripsi')
+                        ->join('kode_klasifikasi', 'kode_klasifikasi.id_kode_klasifikasi = jra.id_kode_klasifikasi')
+                        ->orderBy('jra.created_at', 'ASC')
+                        ->orderBy('kode_klasifikasi.kode', 'ASC');
         if ($id) {
             return $builder->where('jra.id_jra', $id)->first();
         }

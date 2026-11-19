@@ -89,6 +89,12 @@ if (session()->get('user_id')) {
                         <span>Master Bidang</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="<?= base_url('/jra') ?>" class="nav-link <?= ($currentSegment === 'jra') ? 'active' : '' ?>">
+                        <i class="bi bi-folder"></i>
+                        <span>Master JRA</span>
+                    </a>
+                </li>
             <?php endif; ?>
 
             <li class="menu-group-label">PELAKSANAAN ALIH MEDIA</li>
@@ -118,14 +124,6 @@ if (session()->get('user_id')) {
                     <span>Berita Acara</span>
                 </a>
             </li>
-            <?php if (in_array($role, ['Admin_OPD', 'Administrator OPD'])) : ?>
-                <li class="nav-item">
-                    <a href="<?= base_url('/jra') ?>" class="nav-link <?= ($currentSegment === 'jra') ? 'active' : '' ?>">
-                        <i class="bi bi-folder"></i>
-                        <span>Master JRA</span>
-                    </a>
-                </li>
-            <?php endif; ?>
 
         <?php if ($role === 'Admin_Pemkab') : ?>
             <li class="menu-group-label">AUDIT LOG</li>

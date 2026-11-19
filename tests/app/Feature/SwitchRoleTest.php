@@ -433,6 +433,7 @@ class SwitchRoleTest extends CIUnitTestCase
         // Seluruh menu Admin Pemkab harus tampil lengkap kembali
         $dashRes->assertSee('Master OPD');
         $dashRes->assertSee('Master Bidang');
+        $dashRes->assertSee('Master JRA');
         $dashRes->assertSee('Manajemen Akun');
         $dashRes->assertSee('Penilaian Arsip');
         $dashRes->assertSee('Access Log');
@@ -441,5 +442,73 @@ class SwitchRoleTest extends CIUnitTestCase
         // Admin Pemkab asli bisa mengakses /opd dengan sukses (Status 200)
         $opdRes = $this->withSession($adminSession)->get('/opd');
         $opdRes->assertOK();
+    }
+
+    public function testAdminPemkabCanPerformFullCrudOnMasterJra(): void
+    {
+        $ids = $this->setupTestData();
+        $adminSession = $this->sess($ids['admin_id'], 'admin@switch.test', 'Admin Pemkab Test', 'Admin_Pemkab');
+
+        // 1. Read (GET /jra)
+        $indexRes = $this->withSession($adminSession)->get('/jra');
+        $indexRes->assertOK();
+        $indexRes->assertSee('Master Jadwal Retensi Arsip (JRA)');
+        $indexRes->assertSee('Tambah JRA Baru');
+
+        // 2. Create (POST /jra/store)
+        $uniqueKode = '999.8.' . time();
+        $storeRes = $this->withSession($adminSession)->post('/jra/store', [
+            'kode'                 => $uniqueKode,
+            'nama_klasifikasi'     => 'Klasifikasi Uji Admin Pemkab',
+            'deskripsi'            => 'Deskripsi awal JRA',
+            'retensi_aktif'        => 3,
+            'retensi_inaktif'      => 2,
+            'keterangan_retensi'   => 'Permanen',
+            'klasifikasi_keamanan' => 'Biasa',
+            'hak_akses'            => 'Terbuka',
+            'akses_publik'         => 'Umum',
+            'dasar_pertimbangan'   => 'Perbup Buleleng',
+            'unit_pengolah'        => 'Sekretariat',
+        ]);
+        $storeRes->assertRedirectTo('/jra');
+
+        $db = \Config\Database::connect('tests');
+        $klas = $db->table('kode_klasifikasi')->where('kode', $uniqueKode)->get()->getRowArray();
+        $this->assertNotNull($klas);
+
+        $jra = $db->table('jra')->where('id_kode_klasifikasi', $klas['id_kode_klasifikasi'])->get()->getRowArray();
+        $this->assertNotNull($jra);
+        $this->assertEquals(3, (int) $jra['retensi_aktif']);
+        $this->assertEquals('Permanen', $jra['keterangan_retensi']);
+
+        // 3. Update (POST /jra/update/{id})
+        $updateRes = $this->withSession($adminSession)->post('/jra/update/' . $jra['id_jra'], [
+            'kode'                 => $uniqueKode,
+            'nama_klasifikasi'     => 'Klasifikasi Uji Admin Pemkab Updated',
+            'deskripsi'            => 'Deskripsi diperbarui',
+            'retensi_aktif'        => 5,
+            'retensi_inaktif'      => 5,
+            'keterangan_retensi'   => 'Dinilai Kembali',
+            'klasifikasi_keamanan' => 'Terbatas',
+            'hak_akses'            => 'Internal',
+            'akses_publik'         => 'Terbatas',
+            'dasar_pertimbangan'   => 'Perbup Baru',
+            'unit_pengolah'        => 'Bidang Kearsipan',
+        ]);
+        $updateRes->assertRedirectTo('/jra');
+
+        $jraUpdated = $db->table('jra')->where('id_jra', $jra['id_jra'])->get()->getRowArray();
+        $this->assertEquals(5, (int) $jraUpdated['retensi_aktif']);
+        $this->assertEquals('Dinilai Kembali', $jraUpdated['keterangan_retensi']);
+
+        // 4. Delete (GET /jra/delete/{id})
+        $deleteRes = $this->withSession($adminSession)->get('/jra/delete/' . $jra['id_jra']);
+        $deleteRes->assertRedirectTo('/jra');
+
+        $jraDeleted = $db->table('jra')->where('id_jra', $jra['id_jra'])->get()->getRowArray();
+        $this->assertNull($jraDeleted);
+
+        // Cleanup kode_klasifikasi
+        $db->table('kode_klasifikasi')->where('id_kode_klasifikasi', $klas['id_kode_klasifikasi'])->delete();
     }
 }
