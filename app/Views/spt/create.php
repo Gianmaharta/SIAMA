@@ -55,7 +55,9 @@ Terbitkan SPT Baru - SIAMA
         <br><small style="color: #666;">Format yang didukung hanya PDF. Maksimal 5MB.</small>
     </div>
 
-    <button type="submit">Terbitkan SPT</button>
-    <a href="<?= base_url('/spt') ?>"><button type="button">Batal</button></a>
+    <div class="d-flex align-items-center justify-content-end gap-2 pt-3 border-top mt-4">
+        <a href="<?= base_url('/spt') ?>" class="btn btn-light border px-4 py-2 rounded-3 text-secondary fw-medium" style="font-size: 13.5px;">Batal</a>
+        <button type="submit" class="btn btn-primary px-4 py-2 rounded-3 fw-medium" style="background-color: #1E60EC; border-color: #1E60EC; font-size: 13.5px;">Terbitkan SPT</button>
+    </div>
 </form>
 <?= $this->endSection() ?>

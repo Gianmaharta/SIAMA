@@ -2,8 +2,8 @@
     --user-navy-sidebar: #0B1528;
     --user-primary-blue: #1E60EC;
     --user-primary-blue-hover: #1752CE;
-    --user-navy-btn: #203D75;
-    --user-navy-btn-hover: #172F5D;
+    --user-navy-btn: #1E60EC;
+    --user-navy-btn-hover: #1752CE;
     --user-bg-page: #FFFFFF;
     --user-bg-table-header: #F8FAFC;
     --user-border: #E5E7EB;
@@ -288,23 +288,23 @@
 
 /* Toolbar primary add button styling */
 .user-table-toolbar .user-btn-add {
-    background-color: #1E3A6D !important;
-    border-color: #1E3A6D !important;
+    background-color: #1E60EC !important;
+    border-color: #1E60EC !important;
     color: #FFFFFF !important;
 }
 
 .user-table-toolbar .user-btn-add:hover,
 .user-table-toolbar .user-btn-add:focus {
-    background-color: #172F59 !important;
-    border-color: #172F59 !important;
+    background-color: #1752CE !important;
+    border-color: #1752CE !important;
     color: #FFFFFF !important;
-    box-shadow: 0 4px 12px rgba(30, 58, 109, 0.25);
+    box-shadow: 0 4px 12px rgba(30, 96, 236, 0.25);
     transform: translateY(-1px);
 }
 
 .user-table-toolbar .user-btn-add:active {
-    background-color: #122648 !important;
-    border-color: #122648 !important;
+    background-color: #1346AF !important;
+    border-color: #1346AF !important;
     color: #FFFFFF !important;
     transform: translateY(0);
 }
@@ -338,6 +338,7 @@
     border-bottom: 1px solid var(--user-border);
     vertical-align: middle;
     white-space: nowrap;
+    text-align: center;
 }
 
 .user-table tbody td {
@@ -448,12 +449,14 @@
 .col-status {
     width: 135px;
     white-space: nowrap;
+    text-align: center;
 }
 
 .user-status-wrap {
     display: inline-flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    justify-content: center;
     gap: 1px;
 }
 
@@ -493,7 +496,8 @@
     font-size: 11px;
     color: var(--user-text-sub);
     font-weight: 400;
-    padding-left: 12px;
+    padding-left: 0;
+    text-align: center;
 }
 
 /* Action Buttons with Icon + Text */

@@ -248,6 +248,8 @@ class NotificationFeatureTest extends CIUnitTestCase
         $result->assertSee('Pusat Notifikasi');
         $result->assertSee('Tugas Baru');
         $result->assertSee('Tugas Selesai');
+        $result->assertSee('notif-time-ago');
+        $result->assertSee('data-timestamp');
 
         // 2. GET /notification?filter=unread
         $resultUnread = $this->withSession($sessionArsiparis)->get('/notification?filter=unread');
@@ -259,6 +261,7 @@ class NotificationFeatureTest extends CIUnitTestCase
         $resultCount->assertOK();
         $jsonCount = json_decode($resultCount->getJSON(), true);
         $this->assertEquals(1, $jsonCount['unread']);
+        $this->assertNotEmpty($jsonCount['server_time']);
 
         // 4. GET /notification/dropdown
         $resultDropdown = $this->withSession($sessionArsiparis)->get('/notification/dropdown');
@@ -266,20 +269,209 @@ class NotificationFeatureTest extends CIUnitTestCase
         $jsonDropdown = json_decode($resultDropdown->getJSON(), true);
         $this->assertEquals('success', $jsonDropdown['status']);
         $this->assertCount(2, $jsonDropdown['notifications']);
+        $this->assertNotEmpty($jsonDropdown['server_time']);
+        $this->assertNotEmpty($jsonDropdown['notifications'][0]['created_at']);
 
-        // 5. POST /notification/mark-read/notif-1
+        // 5. GET /notification/feed (Real-time polling endpoint)
+        $resultFeed = $this->withSession($sessionArsiparis)->get('/notification/feed?filter=all');
+        $resultFeed->assertOK();
+        $jsonFeed = json_decode($resultFeed->getJSON(), true);
+        $this->assertEquals('success', $jsonFeed['status']);
+        $this->assertEquals(1, $jsonFeed['unread']);
+        $this->assertEquals(2, $jsonFeed['counts']['all']);
+        $this->assertNotEmpty($jsonFeed['server_time']);
+        $this->assertCount(2, $jsonFeed['notifications']);
+
+        // 6. POST /notification/mark-read/notif-1
         $resultMark = $this->withSession($sessionArsiparis)->post('/notification/mark-read/notif-1');
         $resultMark->assertRedirect();
         $notif1 = $db->table('notifications')->where('id_notification', 'notif-1')->get()->getRowArray();
         $this->assertEquals(1, (int)$notif1['is_read']);
 
-        // 6. POST /notification/mark-all-read
+        // 7. POST /notification/mark-all-read
         $resultMarkAll = $this->withSession($sessionArsiparis)->post('/notification/mark-all-read');
         $resultMarkAll->assertRedirect();
 
-        // 7. GET /notification/read-and-redirect/notif-1
+        // 8. GET /notification/read-and-redirect/notif-1
         $resultRedirect = $this->withSession($sessionArsiparis)->get('/notification/read-and-redirect/notif-1');
         $resultRedirect->assertRedirect();
+    }
+
+    public function testNotificationTimeFormatting(): void
+    {
+        $ids = $this->setupUsersAndRoles();
+        $db = $this->db();
+
+        $controller = new \App\Controllers\Notification();
+        $reflector = new \ReflectionClass($controller);
+
+        $methodFormatTimeAgo = $reflector->getMethod('formatTimeAgo');
+        $methodFormatTimeAgo->setAccessible(true);
+
+        $now = time();
+
+        // 1. Baru saja (< 60s)
+        $time1 = date('Y-m-d H:i:s', $now - 20);
+        $this->assertEquals('Baru saja', $methodFormatTimeAgo->invoke($controller, $time1));
+
+        // 2. 5 menit yang lalu
+        $time2 = date('Y-m-d H:i:s', $now - (5 * 60));
+        $this->assertEquals('5 menit yang lalu', $methodFormatTimeAgo->invoke($controller, $time2));
+
+        // 3. 30 menit yang lalu
+        $time3 = date('Y-m-d H:i:s', $now - (30 * 60));
+        $this->assertEquals('30 menit yang lalu', $methodFormatTimeAgo->invoke($controller, $time3));
+
+        // 4. 1 jam yang lalu
+        $time4 = date('Y-m-d H:i:s', $now - 3600);
+        $this->assertEquals('1 jam yang lalu', $methodFormatTimeAgo->invoke($controller, $time4));
+
+        // 5. 2 jam yang lalu
+        $time5 = date('Y-m-d H:i:s', $now - 7200);
+        $this->assertEquals('2 jam yang lalu', $methodFormatTimeAgo->invoke($controller, $time5));
+
+        // 6. Kemarin
+        $time6 = date('Y-m-d H:i:s', $now - 86400);
+        $this->assertEquals('Kemarin', $methodFormatTimeAgo->invoke($controller, $time6));
+
+        // 7. Notifikasi lama (> 1 hari) -> format d M Y, H:i WITA
+        $time7 = '2026-11-10 16:05:00';
+        $formattedOld = $methodFormatTimeAgo->invoke($controller, $time7);
+        $this->assertEquals('10 Nov 2026, 16:05 WITA', $formattedOld);
+    }
+
+    public function testNotifyArsipDisahkanForPenilaianSendsNotificationToAdminPemkab(): void
+    {
+        $ids = $this->setupUsersAndRoles();
+        $db = $this->db();
+        $service = new NotificationService();
+
+        $idArsip = 'arsip-disahkan-001';
+        $db->table('arsip')->insert([
+            'id_arsip'          => $idArsip,
+            'id_opd'            => $ids['opd_id'],
+            'nomor_arsip'       => 'ARSIP/DISKOMINFO/2026/001',
+            'nama_arsip'        => 'Berkas Surat Keputusan Kegiatan Alih Media',
+            'file_arsip'        => 'scan_arsip_001.pdf',
+            'id_user_upload'    => $ids['arsiparis'],
+            'status_verifikasi' => 'Selesai',
+            'status_autentikasi'=> 'Belum Dinilai',
+            'created_at'        => '2026-11-18 09:00:00',
+        ]);
+
+        $sentIds = $service->notifyArsipDisahkanForPenilaian($idArsip, $ids['kabid'], '2026-11-18');
+        $this->assertNotEmpty($sentIds);
+        $this->assertCount(1, $sentIds);
+
+        $notif = $db->table('notifications')->where('id_notification', $sentIds[0])->get()->getRowArray();
+        $this->assertNotNull($notif);
+        $this->assertEquals($ids['pemkab_id'], $notif['id_user']);
+        $this->assertEquals('Arsip Menunggu Penilaian', $notif['title']);
+        $this->assertEquals('penilaian', $notif['type']);
+        $this->assertEquals('arsip', $notif['reference_type']);
+        $this->assertEquals($idArsip, $notif['reference_id']);
+        $this->assertStringContainsString('Terdapat arsip yang telah selesai dialihmediakan dan disahkan. Silakan lakukan penilaian arsip.', $notif['message']);
+        $this->assertStringContainsString('• OPD: Dinas Kearsipan Test', $notif['message']);
+        $this->assertStringContainsString('• Nomor Arsip: ARSIP/DISKOMINFO/2026/001', $notif['message']);
+        $this->assertStringContainsString('• Nama Arsip: Berkas Surat Keputusan Kegiatan Alih Media', $notif['message']);
+        $this->assertStringContainsString('• Tanggal Pengesahan: 18/11/2026', $notif['message']);
+        $this->assertStringContainsString('• Arsiparis: Arsiparis Test', $notif['message']);
+
+        // Pastikan url mengarah ke /penilaian/form/{idArsip}
+        $this->assertStringContainsString('/penilaian/form/' . $idArsip, $notif['url']);
+
+        // Verifikasi dari sisi Admin Pemkab: Cek feed notifikasi dan action label 'Lihat Detail'
+        $sessPemkab = $this->sess($ids['pemkab_id'], 'adm.pemkab@test.com', 'Admin Pemkab', 'Admin_Pemkab');
+        $feedResult = $this->withSession($sessPemkab)->get('/notification/feed?filter=all');
+        $feedResult->assertOK();
+        $feedJson = json_decode($feedResult->getJSON(), true);
+        $this->assertEquals('success', $feedJson['status']);
+        $this->assertGreaterThanOrEqual(1, $feedJson['unread']);
+
+        $feedNotif = null;
+        foreach ($feedJson['notifications'] as $item) {
+            if ($item['id_notification'] === $sentIds[0]) {
+                $feedNotif = $item;
+                break;
+            }
+        }
+        $this->assertNotNull($feedNotif);
+        $this->assertEquals('Lihat Detail', $feedNotif['action_label']);
+        $this->assertEquals('Penilaian Arsip', $feedNotif['meta']['label']);
+
+        // Verifikasi tombol Lihat Detail pada halaman /notification
+        $pageResult = $this->withSession($sessPemkab)->get('/notification');
+        $pageResult->assertOK();
+        $pageResult->assertSee('Lihat Detail');
+        $pageResult->assertSee('Arsip Menunggu Penilaian');
+
+        // Verifikasi read-and-redirect mengarahkan ke form penilaian arsip
+        $redirectResult = $this->withSession($sessPemkab)->get('/notification/read-and-redirect/' . $sentIds[0]);
+        $redirectResult->assertRedirectTo(base_url('/penilaian/form/' . $idArsip));
+    }
+
+    public function testNotifyArsipDisahkanForPenilaianPreventsDuplicate(): void
+    {
+        $ids = $this->setupUsersAndRoles();
+        $db = $this->db();
+        $service = new NotificationService();
+
+        $idArsip = 'arsip-anti-duplicate';
+        $db->table('arsip')->insert([
+            'id_arsip'          => $idArsip,
+            'id_opd'            => $ids['opd_id'],
+            'nomor_arsip'       => 'ARSIP/DUP/2026/002',
+            'nama_arsip'        => 'Berkas Anti Duplicate Test',
+            'file_arsip'        => 'dup_test.pdf',
+            'id_user_upload'    => $ids['arsiparis'],
+            'status_verifikasi' => 'Selesai',
+            'status_autentikasi'=> 'Belum Dinilai',
+            'created_at'        => '2026-11-18 10:00:00',
+        ]);
+
+        // Panggilan pertama: berhasil terkirim
+        $firstCall = $service->notifyArsipDisahkanForPenilaian($idArsip, $ids['kabid'], '2026-11-18');
+        $this->assertCount(1, $firstCall);
+
+        // Panggilan kedua untuk arsip yang sama: harus dicegah (return empty, tidak duplicate di DB)
+        $secondCall = $service->notifyArsipDisahkanForPenilaian($idArsip, $ids['kabid'], '2026-11-18');
+        $this->assertEmpty($secondCall);
+
+        $totalNotif = $db->table('notifications')
+            ->where('id_user', $ids['pemkab_id'])
+            ->where('type', 'penilaian')
+            ->where('reference_id', $idArsip)
+            ->countAllResults();
+        $this->assertEquals(1, $totalNotif);
+    }
+
+    public function testNotifyArsipDisahkanNotSentWhenStatusNotApproved(): void
+    {
+        $ids = $this->setupUsersAndRoles();
+        $db = $this->db();
+        $service = new NotificationService();
+
+        $idArsip = 'arsip-unapproved';
+        $db->table('arsip')->insert([
+            'id_arsip'          => $idArsip,
+            'id_opd'            => $ids['opd_id'],
+            'nomor_arsip'       => 'ARSIP/UNAPPROVED/2026/003',
+            'nama_arsip'        => 'Berkas Masih Menunggu Verifikasi',
+            'file_arsip'        => 'unapproved.pdf',
+            'id_user_upload'    => $ids['arsiparis'],
+            'status_verifikasi' => 'Menunggu',
+            'status_autentikasi'=> 'Belum Dinilai',
+            'created_at'        => '2026-11-18 10:00:00',
+        ]);
+
+        $sentIds = $service->notifyArsipDisahkanForPenilaian($idArsip, $ids['kabid'], '2026-11-18');
+        $this->assertEmpty($sentIds);
+
+        $count = $db->table('notifications')
+            ->where('type', 'penilaian')
+            ->where('reference_id', $idArsip)
+            ->countAllResults();
+        $this->assertEquals(0, $count);
     }
 }
 

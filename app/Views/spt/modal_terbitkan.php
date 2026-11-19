@@ -145,13 +145,13 @@
                     </div>
                 </div>
 
-                <!-- Footer Tombol Aksi (Kiri Sesuai Mockup) -->
-                <div class="modal-footer border-0 px-4 pt-1 pb-4 justify-content-start gap-2">
-                    <button type="submit" class="spt-btn-modal-submit" id="btnSubmitTerbitkanSpt">
-                        Terbitkan SPT
-                    </button>
+                <!-- Footer Tombol Aksi (Kanan & Biru Tua Sidebar) -->
+                <div class="modal-footer border-0 px-4 pt-1 pb-4 justify-content-end gap-2">
                     <button type="button" class="spt-btn-modal-cancel" data-bs-dismiss="modal">
                         Batal
+                    </button>
+                    <button type="submit" class="spt-btn-modal-submit" id="btnSubmitTerbitkanSpt">
+                        Terbitkan SPT
                     </button>
                 </div>
             </form>

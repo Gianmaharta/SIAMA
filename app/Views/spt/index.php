@@ -1,7 +1,7 @@
 <?= $this->extend('layouts/main') ?>
 
 <?= $this->section('title') ?>
-Surat Perintah Tugas - SIAMA
+<?= ($user_role === 'Arsiparis') ? 'Tugas Alih Media - SIAMA' : 'Surat Perintah Tugas - SIAMA' ?>
 <?= $this->endSection() ?>
 
 <?= $this->section('styles') ?>
@@ -34,71 +34,71 @@ Surat Perintah Tugas - SIAMA
 
 <!-- Header Halaman -->
 <div class="spt-page-header">
-    <h1 class="spt-page-title">Surat Perintah Tugas</h1>
-    <p class="spt-page-subtitle">Kelola surat perintah tugas alih media arsip.</p>
+    <h1 class="spt-page-title"><?= ($user_role === 'Arsiparis') ? 'Tugas Alih Media' : 'Surat Perintah Tugas' ?></h1>
+    <p class="spt-page-subtitle"><?= ($user_role === 'Arsiparis') ? 'Kelola dan tindak lanjuti penugasan alih media arsip yang ditugaskan kepada Anda.' : 'Kelola surat perintah tugas alih media arsip.' ?></p>
 </div>
 
 <!-- Kotak Informasi / Empat Kartu Statistik SPT -->
 <div class="row g-3 g-xl-4 mb-4">
-    <!-- Kartu 1: Total Semua SPT -->
+    <!-- Kartu 1: Total Semua SPT / Total Tugas -->
     <div class="col-12 col-sm-6 col-xl-3">
         <div class="spt-stat-card">
             <div class="spt-stat-icon-wrapper bg-icon-blue">
                 <i class="bi bi-file-earmark-text-fill"></i>
             </div>
             <div class="spt-stat-body">
-                <span class="spt-stat-title">Total Semua SPT</span>
+                <span class="spt-stat-title"><?= ($user_role === 'Arsiparis') ? 'Total Tugas' : 'Total Semua SPT' ?></span>
                 <div class="spt-stat-number-wrap">
                     <span class="spt-stat-number" id="statTotalSpt"><?= number_format($totalSpt ?? 0, 0, ',', '.') ?></span>
-                    <span class="spt-stat-unit">SPT</span>
+                    <span class="spt-stat-unit"><?= ($user_role === 'Arsiparis') ? 'Tugas' : 'SPT' ?></span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Kartu 2: Belum Ditugaskan -->
+    <!-- Kartu 2: Belum Ditugaskan / Belum Dikerjakan -->
     <div class="col-12 col-sm-6 col-xl-3">
         <div class="spt-stat-card">
             <div class="spt-stat-icon-wrapper bg-icon-orange">
                 <i class="bi bi-hourglass-split"></i>
             </div>
             <div class="spt-stat-body">
-                <span class="spt-stat-title">Belum Ditugaskan</span>
+                <span class="spt-stat-title"><?= ($user_role === 'Arsiparis') ? 'Belum Dikerjakan' : 'Belum Ditugaskan' ?></span>
                 <div class="spt-stat-number-wrap">
                     <span class="spt-stat-number" id="statBelumDitugaskan"><?= number_format($belumDitugaskan ?? 0, 0, ',', '.') ?></span>
-                    <span class="spt-stat-unit">SPT</span>
+                    <span class="spt-stat-unit"><?= ($user_role === 'Arsiparis') ? 'Tugas' : 'SPT' ?></span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Kartu 3: Sedang Ditugaskan -->
+    <!-- Kartu 3: Sedang Ditugaskan / Sedang Diproses -->
     <div class="col-12 col-sm-6 col-xl-3">
         <div class="spt-stat-card">
             <div class="spt-stat-icon-wrapper bg-icon-indigo">
                 <i class="bi bi-person-check-fill"></i>
             </div>
             <div class="spt-stat-body">
-                <span class="spt-stat-title">Sedang Ditugaskan</span>
+                <span class="spt-stat-title"><?= ($user_role === 'Arsiparis') ? 'Sedang Diproses' : 'Sedang Ditugaskan' ?></span>
                 <div class="spt-stat-number-wrap">
                     <span class="spt-stat-number" id="statDitugaskan"><?= number_format($ditugaskan ?? 0, 0, ',', '.') ?></span>
-                    <span class="spt-stat-unit">SPT</span>
+                    <span class="spt-stat-unit"><?= ($user_role === 'Arsiparis') ? 'Tugas' : 'SPT' ?></span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Kartu 4: Selesai Dilaksanakan -->
+    <!-- Kartu 4: Selesai Dilaksanakan / Selesai Dikerjakan -->
     <div class="col-12 col-sm-6 col-xl-3">
         <div class="spt-stat-card">
             <div class="spt-stat-icon-wrapper bg-icon-green">
                 <i class="bi bi-check-circle-fill"></i>
             </div>
             <div class="spt-stat-body">
-                <span class="spt-stat-title">Selesai Dilaksanakan</span>
+                <span class="spt-stat-title"><?= ($user_role === 'Arsiparis') ? 'Selesai Dikerjakan' : 'Selesai Dilaksanakan' ?></span>
                 <div class="spt-stat-number-wrap">
                     <span class="spt-stat-number" id="statSelesai"><?= number_format($selesai ?? 0, 0, ',', '.') ?></span>
-                    <span class="spt-stat-unit">SPT</span>
+                    <span class="spt-stat-unit"><?= ($user_role === 'Arsiparis') ? 'Tugas' : 'SPT' ?></span>
                 </div>
             </div>
         </div>
@@ -116,7 +116,7 @@ Surat Perintah Tugas - SIAMA
                 type="text" 
                 id="sptSearchInput" 
                 class="spt-search-input" 
-                placeholder="Cari nomor SPT atau perihal..."
+                placeholder="<?= ($user_role === 'Arsiparis') ? 'Cari nomor SPT atau uraian pekerjaan...' : 'Cari nomor SPT atau perihal...' ?>"
                 autocomplete="off"
             >
             <button type="button" class="spt-clear-search d-none" id="sptClearSearchBtn" title="Bersihkan pencarian">
@@ -138,14 +138,20 @@ Surat Perintah Tugas - SIAMA
                 </select>
             </div>
 
-            <!-- Filter Penugasan -->
+            <!-- Filter Penugasan / Status -->
             <div class="spt-filter-wrap">
-                <label for="sptPenugasanFilter" class="spt-filter-label">Penugasan</label>
-                <select id="sptPenugasanFilter" class="spt-filter-select" aria-label="Filter Status Penugasan">
-                    <option value="all" selected>Semua</option>
-                    <option value="belum_ditugaskan">Belum Ditugaskan</option>
-                    <option value="ditugaskan">Ditugaskan</option>
-                    <option value="selesai">Selesai</option>
+                <label for="sptPenugasanFilter" class="spt-filter-label">Status</label>
+                <select id="sptPenugasanFilter" class="spt-filter-select" aria-label="Filter Status">
+                    <option value="all" selected>Semua Status</option>
+                    <?php if ($user_role === 'Arsiparis') : ?>
+                        <option value="belum_dimulai">Belum Dikerjakan</option>
+                        <option value="sedang_diproses">Sedang Diproses</option>
+                        <option value="selesai">Selesai</option>
+                    <?php else : ?>
+                        <option value="belum_ditugaskan">Belum Ditugaskan</option>
+                        <option value="ditugaskan">Ditugaskan</option>
+                        <option value="selesai">Selesai</option>
+                    <?php endif; ?>
                 </select>
             </div>
 
@@ -158,32 +164,54 @@ Surat Perintah Tugas - SIAMA
         </div>
     </div>
 
-    <!-- Tabel Surat Perintah Tugas -->
+    <!-- Tabel Surat Perintah Tugas / Tugas Alih Media -->
     <div class="table-responsive spt-table-responsive">
         <table class="table spt-table align-middle" id="sptTable">
             <thead>
-                <tr>
-                    <th scope="col" class="col-no">NO</th>
-                    <th scope="col" class="col-nomor-spt sortable-th" data-sort-key="nomor_spt" title="Klik untuk mengurutkan berdasarkan Nomor SPT">
-                        NOMOR SPT <i class="bi bi-arrow-down-up spt-sort-icon"></i>
-                    </th>
-                    <th scope="col" class="col-tanggal-spt sortable-th" data-sort-key="tanggal_spt" title="Klik untuk mengurutkan berdasarkan Tanggal SPT">
-                        TANGGAL SPT <i class="bi bi-arrow-down-up spt-sort-icon"></i>
-                    </th>
-                    <th scope="col" class="col-perihal sortable-th" data-sort-key="perihal" title="Klik untuk mengurutkan berdasarkan Perihal">
-                        PERIHAL <i class="bi bi-arrow-down-up spt-sort-icon"></i>
-                    </th>
-                    <th scope="col" class="col-periode sortable-th" data-sort-key="tanggal_mulai" title="Klik untuk mengurutkan berdasarkan Periode Pelaksanaan">
-                        PERIODE PELAKSANAAN <i class="bi bi-arrow-down-up spt-sort-icon"></i>
-                    </th>
-                    <th scope="col" class="col-status-spt sortable-th" data-sort-key="status" title="Klik untuk mengurutkan berdasarkan Status SPT">
-                        STATUS SPT <i class="bi bi-arrow-down-up spt-sort-icon"></i>
-                    </th>
-                    <th scope="col" class="col-status-penugasan sortable-th" data-sort-key="status_penugasan" title="Klik untuk mengurutkan berdasarkan Status Penugasan">
-                        STATUS PENUGASAN <i class="bi bi-arrow-down-up spt-sort-icon"></i>
-                    </th>
-                    <th scope="col" class="col-aksi text-center">AKSI</th>
-                </tr>
+                <?php if ($user_role === 'Arsiparis') : ?>
+                    <tr>
+                        <th scope="col" class="col-no">NO</th>
+                        <th scope="col" class="col-nomor-spt sortable-th" data-sort-key="nomor_spt" title="Klik untuk mengurutkan berdasarkan Nomor SPT">
+                            NOMOR SPT <i class="bi bi-arrow-down-up spt-sort-icon"></i>
+                        </th>
+                        <th scope="col" class="col-tanggal-penugasan sortable-th" data-sort-key="tanggal_penugasan" title="Klik untuk mengurutkan berdasarkan Tanggal Penugasan">
+                            TANGGAL PENUGASAN <i class="bi bi-arrow-down-up spt-sort-icon"></i>
+                        </th>
+                        <th scope="col" class="col-perihal sortable-th" data-sort-key="perihal" title="Klik untuk mengurutkan berdasarkan Uraian Pekerjaan">
+                            URAIAN PEKERJAAN <i class="bi bi-arrow-down-up spt-sort-icon"></i>
+                        </th>
+                        <th scope="col" class="col-jumlah-arsip text-center sortable-th" data-sort-key="jumlah_arsip" title="Klik untuk mengurutkan berdasarkan Jumlah Arsip">
+                            JUMLAH ARSIP <i class="bi bi-arrow-down-up spt-sort-icon"></i>
+                        </th>
+                        <th scope="col" class="col-status-pekerjaan text-center sortable-th" data-sort-key="status_pekerjaan" title="Klik untuk mengurutkan berdasarkan Status Pekerjaan">
+                            STATUS PEKERJAAN <i class="bi bi-arrow-down-up spt-sort-icon"></i>
+                        </th>
+                        <th scope="col" class="col-aksi text-center">AKSI</th>
+                    </tr>
+                <?php else : ?>
+                    <tr>
+                        <th scope="col" class="col-no">NO</th>
+                        <th scope="col" class="col-nomor-spt sortable-th" data-sort-key="nomor_spt" title="Klik untuk mengurutkan berdasarkan Nomor SPT">
+                            NOMOR SPT <i class="bi bi-arrow-down-up spt-sort-icon"></i>
+                        </th>
+                        <th scope="col" class="col-tanggal-spt sortable-th" data-sort-key="tanggal_spt" title="Klik untuk mengurutkan berdasarkan Tanggal SPT">
+                            TANGGAL SPT <i class="bi bi-arrow-down-up spt-sort-icon"></i>
+                        </th>
+                        <th scope="col" class="col-perihal sortable-th" data-sort-key="perihal" title="Klik untuk mengurutkan berdasarkan Perihal">
+                            PERIHAL <i class="bi bi-arrow-down-up spt-sort-icon"></i>
+                        </th>
+                        <th scope="col" class="col-periode sortable-th" data-sort-key="tanggal_mulai" title="Klik untuk mengurutkan berdasarkan Periode Pelaksanaan">
+                            PERIODE PELAKSANAAN <i class="bi bi-arrow-down-up spt-sort-icon"></i>
+                        </th>
+                        <th scope="col" class="col-status-spt sortable-th" data-sort-key="status" title="Klik untuk mengurutkan berdasarkan Status SPT">
+                            STATUS SPT <i class="bi bi-arrow-down-up spt-sort-icon"></i>
+                        </th>
+                        <th scope="col" class="col-status-penugasan sortable-th" data-sort-key="status_penugasan" title="Klik untuk mengurutkan berdasarkan Status Penugasan">
+                            STATUS PENUGASAN <i class="bi bi-arrow-down-up spt-sort-icon"></i>
+                        </th>
+                        <th scope="col" class="col-aksi text-center">AKSI</th>
+                    </tr>
+                <?php endif; ?>
             </thead>
             <tbody id="sptTableBody">
                 <!-- Baris tabel dirender secara dinamis oleh JavaScript -->
@@ -261,6 +289,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const rawData = <?= json_encode($spt_list ?? [], JSON_UNESCAPED_SLASHES) ?>;
     const baseDetailUrl = "<?= base_url('/spt/detail') ?>";
     const baseAssignUrl = "<?= base_url('/spt/assign') ?>";
+    const baseArsipCreateUrl = "<?= base_url('/arsip/create') ?>";
     const baseFileUrl   = "<?= base_url('uploads/spt') ?>";
     const currentUserRole = "<?= esc($user_role ?? session()->get('nama_role') ?? '') ?>";
 
@@ -296,13 +325,24 @@ document.addEventListener('DOMContentLoaded', function() {
         let selesai = 0;
 
         rawData.forEach(function(item) {
-            const s = String(item.status_penugasan || '').trim().toLowerCase();
-            if (s === 'selesai') {
-                selesai++;
-            } else if (s === 'ditugaskan' || s === 'proses' || s === 'dalam proses') {
-                tugas++;
+            if (currentUserRole === 'Arsiparis') {
+                const sp = String(item.status_pekerjaan || '').trim().toLowerCase();
+                if (sp === 'selesai') {
+                    selesai++;
+                } else if (sp === 'sedang diproses') {
+                    tugas++;
+                } else {
+                    belum++;
+                }
             } else {
-                belum++;
+                const s = String(item.status_penugasan || '').trim().toLowerCase();
+                if (s === 'selesai') {
+                    selesai++;
+                } else if (s === 'ditugaskan' || s === 'proses' || s === 'dalam proses') {
+                    tugas++;
+                } else {
+                    belum++;
+                }
             }
         });
 
@@ -330,6 +370,24 @@ document.addEventListener('DOMContentLoaded', function() {
             "'": '&#039;'
         };
         return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+
+    /**
+     * Format Tanggal & Jam (WITA)
+     */
+    function formatDateTime(dtStr) {
+        if (!dtStr) return '-';
+        const d = new Date(dtStr.replace(/-/g, '/'));
+        if (isNaN(d.getTime())) {
+            return escapeHtml(dtStr.substring(0, 16));
+        }
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = months[d.getMonth()];
+        const year = d.getFullYear();
+        const hours = String(d.getHours()).padStart(2, '0');
+        const mins = String(d.getMinutes()).padStart(2, '0');
+        return `${day} ${month} ${year}, ${hours}:${mins} WITA`;
     }
 
     /**
@@ -364,7 +422,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
-     * Render Badge Status Penugasan
+     * Render Badge Status Penugasan (Kepala Bidang / Umum)
      */
     function renderStatusPenugasanBadge(status) {
         const val = String(status || '').trim().toLowerCase();
@@ -401,6 +459,36 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
+     * Render Badge Status Pekerjaan (Role Arsiparis)
+     */
+    function renderStatusPekerjaanBadge(status) {
+        const val = String(status || '').trim().toLowerCase();
+
+        if (val === 'selesai') {
+            return `
+                <span class="spt-badge spt-badge-success">
+                    <span class="spt-badge-dot"></span>
+                    Selesai
+                </span>
+            `;
+        } else if (val === 'sedang diproses' || val === 'proses') {
+            return `
+                <span class="spt-badge spt-badge-info">
+                    <span class="spt-badge-dot"></span>
+                    Sedang Diproses
+                </span>
+            `;
+        } else {
+            return `
+                <span class="spt-badge spt-badge-warning">
+                    <span class="spt-badge-dot"></span>
+                    Belum Dimulai
+                </span>
+            `;
+        }
+    }
+
+    /**
      * Render Format Periode Pelaksanaan
      */
     function formatPeriode(mulai, selesai) {
@@ -416,20 +504,33 @@ document.addEventListener('DOMContentLoaded', function() {
         const query = searchQuery.trim().toLowerCase();
 
         filteredData = rawData.filter(function(item) {
-            // Filter Penugasan
+            // Filter Penugasan / Status
             if (filterPenugasan !== 'all') {
-                const itemStatusPenugasan = String(item.status_penugasan || '').toLowerCase();
-                if (filterPenugasan === 'belum_ditugaskan') {
-                    if (itemStatusPenugasan !== 'belum_ditugaskan' && itemStatusPenugasan !== 'pending') {
+                if (currentUserRole === 'Arsiparis') {
+                    const itemStatusPekerjaan = String(item.status_pekerjaan || '').toLowerCase();
+                    if (filterPenugasan === 'belum_dimulai' && itemStatusPekerjaan !== 'belum dimulai') {
                         return false;
                     }
-                } else if (filterPenugasan === 'ditugaskan') {
-                    if (itemStatusPenugasan !== 'ditugaskan' && itemStatusPenugasan !== 'proses' && itemStatusPenugasan !== 'dalam proses') {
+                    if (filterPenugasan === 'sedang_diproses' && itemStatusPekerjaan !== 'sedang diproses') {
                         return false;
                     }
-                } else if (filterPenugasan === 'selesai') {
-                    if (itemStatusPenugasan !== 'selesai') {
+                    if (filterPenugasan === 'selesai' && itemStatusPekerjaan !== 'selesai') {
                         return false;
+                    }
+                } else {
+                    const itemStatusPenugasan = String(item.status_penugasan || '').toLowerCase();
+                    if (filterPenugasan === 'belum_ditugaskan') {
+                        if (itemStatusPenugasan !== 'belum_ditugaskan' && itemStatusPenugasan !== 'pending') {
+                            return false;
+                        }
+                    } else if (filterPenugasan === 'ditugaskan') {
+                        if (itemStatusPenugasan !== 'ditugaskan' && itemStatusPenugasan !== 'proses' && itemStatusPenugasan !== 'dalam proses') {
+                            return false;
+                        }
+                    } else if (filterPenugasan === 'selesai') {
+                        if (itemStatusPenugasan !== 'selesai') {
+                            return false;
+                        }
                     }
                 }
             }
@@ -461,15 +562,22 @@ document.addEventListener('DOMContentLoaded', function() {
         const dir = currentSort.direction;
 
         filteredData.sort(function(a, b) {
-            let valA = (a[key] !== null && a[key] !== undefined) ? String(a[key]).toLowerCase() : '';
-            let valB = (b[key] !== null && b[key] !== undefined) ? String(b[key]).toLowerCase() : '';
-
             // Handle sorting untuk tanggal
-            if (key === 'tanggal_spt' || key === 'tanggal_mulai') {
-                const dateA = new Date(valA).getTime() || 0;
-                const dateB = new Date(valB).getTime() || 0;
+            if (key === 'tanggal_spt' || key === 'tanggal_mulai' || key === 'tanggal_penugasan') {
+                const dateA = new Date(String(a[key] || '').replace(/-/g, '/')).getTime() || 0;
+                const dateB = new Date(String(b[key] || '').replace(/-/g, '/')).getTime() || 0;
                 return dir === 'asc' ? dateA - dateB : dateB - dateA;
             }
+
+            // Handle sorting untuk jumlah arsip
+            if (key === 'jumlah_arsip') {
+                const countA = parseInt(a.jumlah_arsip || 0, 10);
+                const countB = parseInt(b.jumlah_arsip || 0, 10);
+                return dir === 'asc' ? countA - countB : countB - countA;
+            }
+
+            let valA = (a[key] !== null && a[key] !== undefined) ? String(a[key]).toLowerCase() : '';
+            let valB = (b[key] !== null && b[key] !== undefined) ? String(b[key]).toLowerCase() : '';
 
             if (valA < valB) return dir === 'asc' ? -1 : 1;
             if (valA > valB) return dir === 'asc' ? 1 : -1;
@@ -505,70 +613,139 @@ document.addEventListener('DOMContentLoaded', function() {
 
         emptyState.classList.add('d-none');
 
-        // Render Baris Data
+        // Render Baris Data Sesuai Role
         pageData.forEach(function(row, idx) {
             const rowNumber = startIndex + idx + 1;
             const detailUrl = baseDetailUrl + '/' + encodeURIComponent(row.id_spt);
             const assignUrl = baseAssignUrl + '/' + encodeURIComponent(row.id_spt);
             const tr = document.createElement('tr');
 
+            const isArsiparis = (currentUserRole === 'Arsiparis');
             const statusPenugasanLower = String(row.status_penugasan || '').trim().toLowerCase();
             const isBelumDitugaskan = !statusPenugasanLower || statusPenugasanLower === 'belum_ditugaskan' || statusPenugasanLower === 'pending';
             const canAssign = ['Kepala_Bidang', 'Kepala Bidang', 'Kabid'].includes(currentUserRole);
 
-            let actionHtml = `<div class="spt-action-group">`;
-            if (row.file_spt && String(row.file_spt).trim() !== '') {
-                const fileUrl = baseFileUrl + '/' + encodeURIComponent(row.file_spt);
-                const safeNomorSpt = escapeHtml(row.nomor_spt || 'SPT').replace(/'/g, "\\'");
-                actionHtml += `
-                    <button type="button" class="spt-action-btn spt-btn-doc" onclick="viewSptPdf('${safeNomorSpt}', '${fileUrl}')" title="Lihat Dokumen SPT (PDF)">
-                        <i class="bi bi-file-earmark-pdf"></i> <span>Dokumen</span>
-                    </button>
-                `;
-            }
-            if (canAssign && isBelumDitugaskan) {
-                actionHtml += `
-                    <a href="${assignUrl}" class="spt-action-btn spt-btn-assign" title="Tugaskan Arsiparis">
-                        <i class="bi bi-person-plus"></i> <span>Tugaskan</span>
-                    </a>
-                `;
-            }
-            actionHtml += `
-                <a href="${detailUrl}" class="spt-action-btn spt-btn-detail" title="Lihat Detail SPT">
-                    <i class="bi bi-eye"></i> <span>Detail</span>
-                </a>
-            </div>`;
+            if (isArsiparis) {
+                // Tampilan Baris Khusus Role Arsiparis (Halaman Tugas Alih Media)
+                const isBelumMulai = (row.status_pekerjaan === 'Belum Dimulai');
 
-            tr.innerHTML = `
-                <td class="col-no">${rowNumber}</td>
-                <td class="col-nomor-spt">
-                    <a href="${detailUrl}" class="spt-link" title="Buka Detail SPT">
-                        ${escapeHtml(row.nomor_spt)}
+                let actionHtml = `<div class="spt-action-group">`;
+                if (isBelumMulai) {
+                    actionHtml += `
+                        <a href="${baseArsipCreateUrl}?id_spt=${encodeURIComponent(row.id_spt)}" class="spt-action-btn spt-btn-assign" style="background-color: #1E60EC; color: #FFFFFF;" title="Mulai Alih Media">
+                            <i class="bi bi-folder-plus"></i> <span>Mulai Alih Media</span>
+                        </a>
+                    `;
+                }
+                actionHtml += `
+                    <a href="${detailUrl}" class="spt-action-btn spt-btn-detail" title="Lihat Detail SPT">
+                        <i class="bi bi-eye"></i> <span>Detail</span>
                     </a>
-                </td>
-                <td class="col-tanggal-spt">
-                    <span class="spt-date-text">${escapeHtml(row.tanggal_spt ? row.tanggal_spt.substring(0, 10) : '-')}</span>
-                </td>
-                <td class="col-perihal">
-                    <span class="spt-perihal-text" title="${escapeHtml(row.perihal)}">
-                        ${escapeHtml(row.perihal)}
-                    </span>
-                </td>
-                <td class="col-periode">
-                    <span class="spt-period-text">
-                        ${formatPeriode(row.tanggal_mulai, row.tanggal_selesai)}
-                    </span>
-                </td>
-                <td class="col-status-spt">
-                    ${renderStatusSptBadge(row.status)}
-                </td>
-                <td class="col-status-penugasan">
-                    ${renderStatusPenugasanBadge(row.status_penugasan)}
-                </td>
-                <td class="col-aksi text-center">
-                    ${actionHtml}
-                </td>
-            `;
+                `;
+                if (row.file_spt && String(row.file_spt).trim() !== '') {
+                    const fileUrl = baseFileUrl + '/' + encodeURIComponent(row.file_spt);
+                    const safeNomorSpt = escapeHtml(row.nomor_spt || 'SPT').replace(/'/g, "\\'");
+                    actionHtml += `
+                        <button type="button" class="spt-action-btn spt-btn-doc" onclick="viewSptPdf('${safeNomorSpt}', '${fileUrl}')" title="Lihat Dokumen SPT (PDF)">
+                            <i class="bi bi-file-earmark-pdf"></i> <span>Dokumen</span>
+                        </button>
+                    `;
+                }
+                actionHtml += `</div>`;
+
+                let kabidInfo = '';
+                if (row.nama_kabid) {
+                    kabidInfo = `<div class="text-muted small mt-0.5" style="font-size: 11px;"><i class="bi bi-person me-1"></i>Oleh: ${escapeHtml(row.nama_kabid)}</div>`;
+                }
+
+                tr.innerHTML = `
+                    <td class="col-no">${rowNumber}</td>
+                    <td class="col-nomor-spt">
+                        <a href="${detailUrl}" class="spt-link fw-semibold" title="Buka Detail SPT">
+                            ${escapeHtml(row.nomor_spt)}
+                        </a>
+                    </td>
+                    <td class="col-tanggal-penugasan">
+                        <div class="spt-date-text fw-medium">${formatDateTime(row.tanggal_penugasan)}</div>
+                        ${kabidInfo}
+                    </td>
+                    <td class="col-perihal">
+                        <div class="spt-perihal-text fw-medium text-dark" title="${escapeHtml(row.perihal)}">
+                            ${escapeHtml(row.perihal || 'Tugas Alih Media Arsip')}
+                        </div>
+                        <div class="text-muted small" style="font-size: 11px;">
+                            Periode: ${formatPeriode(row.tanggal_mulai, row.tanggal_selesai)}
+                        </div>
+                    </td>
+                    <td class="col-jumlah-arsip text-center">
+                        <span class="badge bg-light text-secondary border px-2.5 py-1 rounded-pill fw-medium" style="font-size: 11.5px;">
+                            ${parseInt(row.jumlah_arsip || 0, 10)} Arsip
+                        </span>
+                    </td>
+                    <td class="col-status-pekerjaan text-center">
+                        ${renderStatusPekerjaanBadge(row.status_pekerjaan)}
+                    </td>
+                    <td class="col-aksi text-center">
+                        ${actionHtml}
+                    </td>
+                `;
+            } else {
+                // Tampilan Baris Role Kepala Bidang / Pimpinan / Admin OPD
+                let actionHtml = `<div class="spt-action-group">`;
+                if (canAssign && isBelumDitugaskan) {
+                    actionHtml += `
+                        <a href="${assignUrl}" class="spt-action-btn spt-btn-assign" title="Tugaskan Arsiparis">
+                            <i class="bi bi-person-plus"></i> <span>Tugaskan</span>
+                        </a>
+                    `;
+                }
+                actionHtml += `
+                    <a href="${detailUrl}" class="spt-action-btn spt-btn-detail" title="Lihat Detail SPT">
+                        <i class="bi bi-eye"></i> <span>Detail</span>
+                    </a>
+                `;
+                if (row.file_spt && String(row.file_spt).trim() !== '') {
+                    const fileUrl = baseFileUrl + '/' + encodeURIComponent(row.file_spt);
+                    const safeNomorSpt = escapeHtml(row.nomor_spt || 'SPT').replace(/'/g, "\\'");
+                    actionHtml += `
+                        <button type="button" class="spt-action-btn spt-btn-doc" onclick="viewSptPdf('${safeNomorSpt}', '${fileUrl}')" title="Lihat Dokumen SPT (PDF)">
+                            <i class="bi bi-file-earmark-pdf"></i> <span>Dokumen</span>
+                        </button>
+                    `;
+                }
+                actionHtml += `</div>`;
+
+                tr.innerHTML = `
+                    <td class="col-no">${rowNumber}</td>
+                    <td class="col-nomor-spt">
+                        <a href="${detailUrl}" class="spt-link fw-semibold" title="Buka Detail SPT">
+                            ${escapeHtml(row.nomor_spt)}
+                        </a>
+                    </td>
+                    <td class="col-tanggal-spt">
+                        <span class="spt-date-text">${escapeHtml(row.tanggal_spt ? row.tanggal_spt.substring(0, 10) : '-')}</span>
+                    </td>
+                    <td class="col-perihal">
+                        <span class="spt-perihal-text" title="${escapeHtml(row.perihal)}">
+                            ${escapeHtml(row.perihal)}
+                        </span>
+                    </td>
+                    <td class="col-periode">
+                        <span class="spt-period-text">
+                            ${formatPeriode(row.tanggal_mulai, row.tanggal_selesai)}
+                        </span>
+                    </td>
+                    <td class="col-status-spt">
+                        ${renderStatusSptBadge(row.status)}
+                    </td>
+                    <td class="col-status-penugasan">
+                        ${renderStatusPenugasanBadge(row.status_penugasan)}
+                    </td>
+                    <td class="col-aksi text-center">
+                        ${actionHtml}
+                    </td>
+                `;
+            }
 
             tableBody.appendChild(tr);
         });

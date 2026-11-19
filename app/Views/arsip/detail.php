@@ -288,20 +288,6 @@ Detail Arsip - SIAMA
         $isOpdMatch = ($roleSession === 'Admin_Pemkab') || empty($userOpd) || ($userOpd == ($arsip['id_opd'] ?? ''));
         $canVerify = $isKabid && $isOpdMatch && ($stVerifLower === 'menunggu' || $stVerifLower === 'draft');
         ?>
-
-        <?php if ($canVerify) : ?>
-            <button type="button" class="btn btn-success d-inline-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalVerifikasiArsip" style="background-color: #0E9F6E; border-color: #0E9F6E; font-size: 13.5px; padding: 8px 18px; border-radius: 8px; font-weight: 600; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);">
-                <i class="bi bi-patch-check-fill fs-6"></i>
-                <span>Verifikasi Arsip</span>
-            </button>
-        <?php endif; ?>
-
-        <?php if ($isArsiparis) : ?>
-            <a href="<?= base_url('/arsip/edit/' . $arsip['id_arsip']) ?>" class="btn btn-primary d-inline-flex align-items-center gap-2" style="background-color: #1E60EC; border-color: #1E60EC; font-size: 13.5px; padding: 8px 16px; border-radius: 8px;">
-                <i class="bi bi-pencil-square"></i>
-                <span>Edit Data Arsip</span>
-            </a>
-        <?php endif; ?>
     </div>
 </div>
 
@@ -561,7 +547,7 @@ Detail Arsip - SIAMA
                 <strong>Berkas Telah Dimusnahkan:</strong> Berkas fisik dan digital arsip ini telah dimusnahkan secara sistem sesuai Jadwal Retensi Arsip (JRA).
             </div>
         </div>
-    <?php elseif ($file_url !== null) : ?>
+    <?php elseif ($file_url !== null && !empty($has_file)) : ?>
         <div class="arsip-file-box">
             <div class="arsip-file-info">
                 <div class="arsip-file-icon">
@@ -649,7 +635,7 @@ Detail Arsip - SIAMA
     <?php else : ?>
         <div class="p-4 text-center text-muted bg-light rounded-3 border">
             <i class="bi bi-folder-x fs-1 d-block mb-2 text-secondary opacity-50"></i>
-            <span class="fw-medium">Belum ada berkas digital yang diunggah untuk arsip ini.</span>
+            <span class="fw-medium">Dokumen hasil alih media belum tersedia.</span>
         </div>
     <?php endif; ?>
 </div>

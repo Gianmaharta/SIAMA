@@ -168,13 +168,13 @@ Tugaskan Arsiparis - SIAMA
                         </div>
                     </div>
 
-                    <div class="d-flex align-items-center gap-2 pt-2 border-top">
-                        <button type="submit" class="btn btn-primary px-4 py-2 d-inline-flex align-items-center gap-2 rounded-3 shadow-sm fw-medium" style="background-color: #1E60EC; border-color: #1E60EC; font-size: 13.5px;">
-                            <i class="bi bi-person-check-fill"></i> Simpan & Tugaskan Arsiparis
-                        </button>
-                        <a href="<?= base_url('/spt') ?>" class="btn btn-light border px-3 py-2 rounded-3 text-secondary fw-medium" style="font-size: 13.5px;">
+                    <div class="d-flex align-items-center justify-content-end gap-2 pt-3 border-top">
+                        <a href="<?= base_url('/spt') ?>" class="btn btn-light border px-4 py-2 rounded-3 text-secondary fw-medium" style="font-size: 13.5px;">
                             Batal
                         </a>
+                        <button type="submit" class="btn text-white px-4 py-2 d-inline-flex align-items-center gap-2 rounded-3 shadow-sm fw-medium" style="background-color: #1E60EC; border-color: #1E60EC; font-size: 13.5px;">
+                            <i class="bi bi-person-check-fill"></i> Simpan & Tugaskan Arsiparis
+                        </button>
                     </div>
                 </form>
             <?php else : ?>

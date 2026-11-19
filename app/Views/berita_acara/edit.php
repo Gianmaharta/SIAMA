@@ -267,14 +267,14 @@ Edit Draf Berita Acara - SIAMA
     </div>
 
     <!-- Tombol Aksi Simpan Perubahan & Batal -->
-    <div class="d-flex align-items-center gap-2 mt-4 mb-5">
+    <div class="d-flex align-items-center justify-content-end gap-2 mt-4 mb-5">
+        <a href="<?= base_url('/berita-acara') ?>" class="btn ba-btn-cancel" id="btnBatalBA">
+            Batal
+        </a>
         <button type="submit" class="btn ba-btn-save" id="btnSimpanEditBA">
             <i class="bi bi-floppy"></i>
             <span>Simpan Perubahan</span>
         </button>
-        <a href="<?= base_url('/berita-acara') ?>" class="btn ba-btn-cancel" id="btnBatalBA">
-            Batal
-        </a>
     </div>
 </form>
 

@@ -479,7 +479,7 @@ $totalData = count($jra_list);
                     <button type="button" class="btn btn-light border px-4 py-2 rounded-3 text-secondary fw-medium" data-bs-dismiss="modal" style="font-size: 13.5px;">
                         Batal
                     </button>
-                    <button type="submit" class="btn btn-primary px-4 py-2 rounded-3 fw-medium d-inline-flex align-items-center gap-2" style="background-color: #1E60EC; border-color: #1E60EC; font-size: 13.5px;">
+                    <button type="submit" class="btn text-white px-4 py-2 rounded-3 fw-medium d-inline-flex align-items-center gap-2" style="background-color: #1E60EC; border-color: #1E60EC; font-size: 13.5px;">
                         <i class="bi bi-check2 fs-6"></i>
                         <span>Simpan JRA</span>
                     </button>
@@ -610,7 +610,7 @@ $totalData = count($jra_list);
                     <button type="button" class="btn btn-light border px-4 py-2 rounded-3 text-secondary fw-medium" data-bs-dismiss="modal" style="font-size: 13.5px;">
                         Batal
                     </button>
-                    <button type="submit" class="btn btn-primary px-4 py-2 rounded-3 fw-medium d-inline-flex align-items-center gap-2" style="background-color: #1E60EC; border-color: #1E60EC; font-size: 13.5px;">
+                    <button type="submit" class="btn text-white px-4 py-2 rounded-3 fw-medium d-inline-flex align-items-center gap-2" style="background-color: #1E60EC; border-color: #1E60EC; font-size: 13.5px;">
                         <i class="bi bi-check2 fs-6"></i>
                         <span>Simpan Perubahan</span>
                     </button>

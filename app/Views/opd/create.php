@@ -173,13 +173,13 @@ Tambah Data OPD - SIAMA
                     </select>
                 </div>
 
-                <div class="d-flex align-items-center gap-2 pt-3 border-top">
-                    <button type="submit" class="opd-btn-add px-4">
-                        <i class="bi bi-check2 me-1"></i> Simpan Data OPD
-                    </button>
+                <div class="d-flex align-items-center justify-content-end gap-2 pt-3 border-top">
                     <a href="<?= base_url('/opd') ?>" class="btn btn-light border px-4" style="height: 42px; border-radius: 8px; font-weight: 500; display: inline-flex; align-items: center;">
                         Batal
                     </a>
+                    <button type="submit" class="opd-btn-add px-4">
+                        <i class="bi bi-check2 me-1"></i> Simpan Data OPD
+                    </button>
                 </div>
             </form>
         </div>

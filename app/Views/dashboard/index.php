@@ -1009,6 +1009,36 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // Auto-sync data workflow secara berkala (polling setiap 30 detik & visibility change)
+    let lastWorkflowHash = null;
+    function pollWorkflowUpdates() {
+        fetch('<?= base_url('/dashboard/workflow-data') ?>', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => {
+            if (!response.ok) return null;
+            return response.json();
+        })
+        .then(data => {
+            if (!data || data.status !== 'success') return;
+            const currentHash = JSON.stringify(data.workflow_monitoring_list.map(w => w.id_spt + ':' + w.status_proses + ':' + w.tahap_num));
+            if (lastWorkflowHash !== null && lastWorkflowHash !== currentHash) {
+                window.location.reload();
+            } else {
+                lastWorkflowHash = currentHash;
+            }
+        })
+        .catch(err => console.debug('Workflow poll silent error:', err));
+    }
+
+    setInterval(pollWorkflowUpdates, 30000);
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            pollWorkflowUpdates();
+        }
+    });
+    pollWorkflowUpdates();
 });
 </script>
 <?= $this->endSection() ?>

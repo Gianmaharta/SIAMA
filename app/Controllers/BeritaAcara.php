@@ -71,7 +71,11 @@ class BeritaAcara extends BaseController
         if (!empty($id_opd)) {
             $arsipQuery = $arsipQuery->where('id_opd', $id_opd);
         }
-        $data['arsip_list'] = $arsipQuery->where('id_berita_acara', null)->findAll();
+        $data['arsip_list'] = $arsipQuery->where('id_berita_acara', null)
+            ->orderBy('COALESCE(created_at, updated_at)', 'DESC', false)
+            ->orderBy('created_at', 'DESC')
+            ->orderBy('id_arsip', 'DESC')
+            ->findAll();
         $data['user_role'] = $role;
 
         return view('berita_acara/create', $data);
@@ -114,6 +118,17 @@ class BeritaAcara extends BaseController
             if (empty($id_opd)) {
                 $firstArsip = $this->arsipModel->find($arsip_ids[0]);
                 $id_opd = $firstArsip['id_opd'] ?? null;
+            }
+
+            // Jika id_spt tidak disertakan dari form, deteksi dari arsip yang dipilih
+            if (empty($id_spt) && !empty($arsip_ids)) {
+                $firstArsipWithSpt = $this->arsipModel->whereIn('id_arsip', $arsip_ids)
+                    ->where('id_spt IS NOT NULL')
+                    ->where('id_spt !=', '')
+                    ->first();
+                if ($firstArsipWithSpt) {
+                    $id_spt = $firstArsipWithSpt['id_spt'];
+                }
             }
 
             $headerData = [
@@ -437,10 +452,35 @@ class BeritaAcara extends BaseController
 
         $this->beritaAcaraModel->update($id, [
             'status_persetujuan' => 'Selesai',
-            'id_pimpinan' => session()->get('user_id')
+            'id_pimpinan'        => session()->get('user_id'),
+            'updated_at'         => date('Y-m-d H:i:s'),
         ]);
 
         $ba = $this->beritaAcaraModel->find($id);
+
+        // Sinkronkan status SPT terkait agar berstatus Selesai di database
+        $idSpt = $ba['id_spt'] ?? null;
+        if (empty($idSpt)) {
+            $db = \Config\Database::connect();
+            $firstArsip = $db->table('berita_acara_detail bad')
+                ->join('arsip a', 'a.id_arsip = bad.id_arsip')
+                ->where('bad.id_berita_acara', $id)
+                ->where('a.id_spt IS NOT NULL')
+                ->where('a.id_spt !=', '')
+                ->select('a.id_spt')
+                ->get()
+                ->getRowArray();
+            $idSpt = $firstArsip['id_spt'] ?? null;
+        }
+
+        if (!empty($idSpt)) {
+            $this->sptModel->update($idSpt, [
+                'status'           => 'Selesai',
+                'status_penugasan' => 'selesai',
+                'updated_at'       => date('Y-m-d H:i:s'),
+            ]);
+        }
+
         log_activity('Berita Acara', 'update', "Pimpinan mengesahkan Berita Acara nomor: " . $ba['nomor_ba']);
 
         // Kirim Notifikasi (Skenario H: Pimpinan menandatangani Berita Acara)
@@ -448,6 +488,22 @@ class BeritaAcara extends BaseController
             notification_service()->notifyBaPimpinanSigned($id, session()->get('user_id'));
         } catch (\Throwable $e) {
             log_message('error', 'Gagal mengirim notifikasi pengesahan BA: ' . $e->getMessage());
+        }
+
+        // Kirim Notifikasi Penilaian Arsip ke Admin Pemkab untuk arsip yang disahkan dalam BA ini
+        try {
+            $arsipInBa = $this->beritaAcaraDetailModel->getDetailArsipByBaId($id);
+            foreach ($arsipInBa as $itemArsip) {
+                $idArsip = $itemArsip['id_arsip'];
+                // Pastikan status verifikasi arsip berstatus Selesai di database
+                $this->arsipModel->update($idArsip, [
+                    'status_verifikasi' => 'Selesai',
+                    'updated_by'        => session()->get('user_id'),
+                ]);
+                notification_service()->notifyArsipDisahkanForPenilaian($idArsip, session()->get('user_id'), $ba['tanggal_ba'] ?? date('Y-m-d'));
+            }
+        } catch (\Throwable $e) {
+            log_message('error', 'Gagal mengirim notifikasi penilaian arsip ke Admin Pemkab: ' . $e->getMessage());
         }
 
         return redirect()->to('/berita-acara/detail/' . $id)->with('success', 'Berita Acara berhasil disahkan.');

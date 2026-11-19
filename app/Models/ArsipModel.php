@@ -83,8 +83,10 @@ class ArsipModel extends BaseModel
             $builder->where('arsip.id_bidang', $id_bidang);
         }
 
-        $builder->orderBy('arsip.nomor_arsip', 'ASC');
-        $builder->orderBy('arsip.created_at', 'ASC');
+        $builder->orderBy('COALESCE(arsip.created_at, arsip.updated_at)', 'DESC', false);
+        $builder->orderBy('arsip.created_at', 'DESC');
+        $builder->orderBy('arsip.id_arsip', 'DESC');
+        $builder->orderBy('arsip.nomor_arsip', 'DESC');
         return $builder->get()->getResultArray();
     }
 
@@ -107,12 +109,18 @@ class ArsipModel extends BaseModel
 
     public function getArsipBelumDinilai()
     {
-        return $this->where('status_autentikasi', 'Belum Dinilai')->findAll();
+        return $this->where('status_autentikasi', 'Belum Dinilai')
+                    ->orderBy('created_at', 'DESC')
+                    ->orderBy('id_arsip', 'DESC')
+                    ->findAll();
     }
 
     public function getArsipSudahDinilai()
     {
-        return $this->where('status_autentikasi !=', 'Belum Dinilai')->findAll();
+        return $this->where('status_autentikasi !=', 'Belum Dinilai')
+                    ->orderBy('created_at', 'DESC')
+                    ->orderBy('id_arsip', 'DESC')
+                    ->findAll();
     }
 
     public function simpanPenilaian($id_arsip, $dataPenilaian)

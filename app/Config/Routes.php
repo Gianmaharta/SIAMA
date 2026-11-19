@@ -18,6 +18,7 @@ $routes->post('change-password/process', 'Auth::processChangePassword');
 $routes->get('dashboard', 'Dashboard::index', ['filter' => 'auth']);
 $routes->get('dashboard/chart-data', 'Dashboard::chartData', ['filter' => 'auth']);
 $routes->get('dashboard/kabid-chart-data', 'Dashboard::kabidChartData', ['filter' => 'auth']);
+$routes->get('dashboard/workflow-data', 'Dashboard::workflowData', ['filter' => 'auth']);
 
 // --- Rute Terproteksi dengan Role Khusus ---
 // Contoh dummy rute untuk Admin_Pemkab
@@ -88,6 +89,7 @@ $routes->group('notification', ['filter' => 'auth'], static function ($routes) {
     $routes->get('/', 'Notification::index');
     $routes->get('unread-count', 'Notification::unreadCount');
     $routes->get('dropdown', 'Notification::getDropdownList');
+    $routes->get('feed', 'Notification::getFeed');
     $routes->get('read-and-redirect/(:segment)', 'Notification::readAndRedirect/$1');
     $routes->post('mark-read/(:segment)', 'Notification::markRead/$1');
     $routes->post('mark-all-read', 'Notification::markAllRead');
@@ -109,7 +111,7 @@ $routes->group('berita-acara', ['filter' => 'auth'], function($routes) {
 });
 
 // --- Rute Penilaian Arsip (Hanya Admin Pemkab) ---
-$routes->group('penilaian', ['filter' => 'role:Admin_Pemkab'], function($routes) {
+$routes->group('penilaian', ['filter' => ['auth', 'role:Admin_Pemkab']], function($routes) {
     $routes->get('/', 'PenilaianArsip::index');
     $routes->get('form/(:segment)', 'PenilaianArsip::form/$1');
     $routes->post('store/(:segment)', 'PenilaianArsip::store/$1');
@@ -152,6 +154,10 @@ $routes->group('arsip', ['filter' => 'auth'], static function ($routes) {
     $routes->post('verify/(:segment)', 'Arsip::verify/$1', ['filter' => 'role:Kepala_Bidang,Admin_Pemkab']);
 });
 
+// --- Rute Akses / Streaming File Unggahan ---
+$routes->get('uploads/arsip/(:any)', 'Arsip::serveFile/$1');
+$routes->get('uploads/spt/(:any)', 'Spt::serveFile/$1');
+
 // --- Modul Manajemen Pengguna ---
 $routes->group('users', ['filter' => ['auth', 'role:Admin_Pemkab,Admin_OPD']], static function ($routes) {
     $routes->get('/', 'UserController::index');
@@ -173,4 +179,10 @@ $routes->group('audit-log', ['filter' => ['auth', 'role:Admin_Pemkab']], static 
     $routes->get('access/export', 'AuditLog::exportAccessCsv');
     $routes->get('activity', 'AuditLog::activityLog');
     $routes->get('activity/export', 'AuditLog::exportActivityCsv');
+});
+
+// --- Reset Data / Data Cleansing (Khusus Admin_Pemkab) ---
+$routes->group('system-cleanse', ['filter' => ['auth', 'role:Admin_Pemkab']], static function ($routes) {
+    $routes->get('/', 'SystemMaintenance::index');
+    $routes->post('execute', 'SystemMaintenance::execute');
 });

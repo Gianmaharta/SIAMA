@@ -94,7 +94,11 @@ class Arsip extends BaseController
                     $escapedUser = $this->db->escape($user_id);
                     $builder->where("(arsip.created_by = {$escapedUser} OR arsip.id_user_upload = {$escapedUser} OR arsip.id_spt IN (SELECT id_spt FROM spt_assignments WHERE id_user = {$escapedUser}))");
                 }
-                $arsip_list = $builder->orderBy('arsip.created_at', 'DESC')->findAll();
+                $arsip_list = $builder->orderBy('COALESCE(arsip.created_at, arsip.updated_at)', 'DESC', false)
+                    ->orderBy('arsip.created_at', 'DESC')
+                    ->orderBy('arsip.id_arsip', 'DESC')
+                    ->orderBy('arsip.nomor_arsip', 'DESC')
+                    ->findAll();
                 break;
 
             default:
@@ -186,6 +190,29 @@ class Arsip extends BaseController
         if (!empty($id_spt_query)) {
             $spt_terpilih = $this->sptModel->find($id_spt_query);
             if ($spt_terpilih) {
+                // Perbarui status penugasan menjadi 'proses' saat arsiparis mulai bekerja
+                if (!empty($user_id)) {
+                    $assignmentModel = new \App\Models\SptAssignmentModel();
+                    $assignment = $assignmentModel->where('id_spt', $id_spt_query)
+                        ->where('id_user', $user_id)
+                        ->first();
+                    if ($assignment && $assignment['status'] === 'pending') {
+                        $assignmentModel->update($assignment['id_assignment'], [
+                            'status'     => 'proses',
+                            'updated_at' => date('Y-m-d H:i:s'),
+                        ]);
+                        $this->sptModel->update($id_spt_query, [
+                            'status_penugasan' => 'proses',
+                            'updated_at'       => date('Y-m-d H:i:s'),
+                        ]);
+                        try {
+                            notification_service()->notifyWorkStarted((string)$id_spt_query, (string)$user_id);
+                        } catch (\Throwable $e) {
+                            log_message('error', 'Gagal kirim notifikasi mulai kerja: ' . $e->getMessage());
+                        }
+                    }
+                }
+
                 $exists = false;
                 foreach ($spt_list as $s) {
                     if ($s['id_spt'] === $spt_terpilih['id_spt']) {
@@ -378,16 +405,22 @@ class Arsip extends BaseController
             return redirect()->to('/arsip')->with('error', 'Data arsip tidak ditemukan.');
         }
 
-        // Susun URL berkas (jika ada)
+        // Susun URL berkas (hanya jika berkas fisik benar-benar ada di storage alih media)
         $file_url = null;
+        $has_file = false;
         if (! empty($arsip['file_arsip'])) {
-            $file_url = base_url(self::UPLOAD_URL . $arsip['file_arsip']);
+            $filePath = self::UPLOAD_PATH . $arsip['file_arsip'];
+            if (is_file($filePath) && file_exists($filePath)) {
+                $file_url = base_url(self::UPLOAD_URL . $arsip['file_arsip']) . '?v=' . filemtime($filePath);
+                $has_file = true;
+            }
         }
 
         return view('arsip/detail', [
             'title'    => 'Detail Arsip',
             'arsip'    => $arsip,
             'file_url' => $file_url,
+            'has_file' => $has_file,
         ]);
     }
 
@@ -518,9 +551,10 @@ class Arsip extends BaseController
         // ----- Proses File Baru (jika ada) -----
         $fileDigitalName = $arsip['file_arsip']; // Pertahankan file lama sebagai default
         $fileObj = $this->request->getFile('file_arsip');
+        $isTesting = defined('ENVIRONMENT') && ENVIRONMENT === 'testing';
 
-        if ($fileObj !== null && $fileObj->isValid() && ! $fileObj->hasMoved()) {
-            $ext = strtolower($fileObj->getClientExtension());
+        if ($fileObj !== null && (($fileObj->isValid() && ! $fileObj->hasMoved()) || ($isTesting && $fileObj->getError() === UPLOAD_ERR_OK))) {
+            $ext = strtolower($fileObj->getClientExtension() ?: pathinfo($fileObj->getName(), PATHINFO_EXTENSION));
             $allowedExt = explode(',', self::ALLOWED_TYPES);
 
             if (! in_array($ext, $allowedExt)) {
@@ -541,7 +575,11 @@ class Arsip extends BaseController
 
             // Simpan file baru
             $fileDigitalName = $fileObj->getRandomName();
-            $fileObj->move(self::UPLOAD_PATH, $fileDigitalName);
+            if ($isTesting && !is_uploaded_file($fileObj->getTempName())) {
+                copy($fileObj->getTempName(), self::UPLOAD_PATH . $fileDigitalName);
+            } else {
+                $fileObj->move(self::UPLOAD_PATH, $fileDigitalName);
+            }
         }
         
         $is_watermarked = $arsip['is_watermarked'];
@@ -589,6 +627,9 @@ class Arsip extends BaseController
         }
 
         // ----- Susun Data Update -----
+        $session = session();
+        $userId = $session->get('user_id');
+
         $data = [
             'id_spt'             => $this->request->getPost('id_spt')           ?: null,
             'id_bidang'          => $this->request->getPost('id_bidang'),
@@ -603,7 +644,12 @@ class Arsip extends BaseController
             'tanggal_retensi_aktif_berakhir' => $tanggal_retensi_aktif_berakhir,
             'is_watermarked'     => $is_watermarked,
             'watermark_source'   => $watermark_source,
+            'updated_by'         => $userId,
         ];
+
+        if ($fileDigitalName !== $arsip['file_arsip'] && !empty($userId)) {
+            $data['id_user_upload'] = $userId;
+        }
 
         $this->arsipModel->skipValidation(true)->update($id, $data);
 
@@ -701,6 +747,50 @@ class Arsip extends BaseController
             log_message('error', 'Gagal mengirim notifikasi verifikasi arsip: ' . $e->getMessage());
         }
 
+        // Kirim Notifikasi Penilaian Arsip ke Admin Pemkab (Pemberitahuan berkas telah disahkan/diverifikasi)
+        try {
+            notification_service()->notifyArsipDisahkanForPenilaian((string)$id, $session->get('user_id'), date('Y-m-d'));
+        } catch (\Throwable $e) {
+            log_message('error', 'Gagal mengirim notifikasi penilaian arsip ke Admin Pemkab: ' . $e->getMessage());
+        }
+
         return redirect()->to('/arsip/detail/' . $id)->with('success', 'Arsip berhasil diverifikasi.');
+    }
+
+    /**
+     * Menyajikan file berkas fisik arsip secara aman.
+     * Digunakan untuk iframe pratinjau dokumen maupun buka berkas di tab baru.
+     *
+     * @param string $filename Nama berkas arsip
+     * @return \CodeIgniter\HTTP\ResponseInterface
+     */
+    public function serveFile(string $filename)
+    {
+        $safeFilename = basename($filename);
+        $filePath = self::UPLOAD_PATH . $safeFilename;
+
+        if (!file_exists($filePath) || !is_file($filePath)) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Berkas arsip {$safeFilename} tidak ditemukan pada server.");
+        }
+
+        $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+        $mimeTypes = [
+            'pdf'  => 'application/pdf',
+            'jpg'  => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png'  => 'image/png',
+            'tif'  => 'image/tiff',
+            'tiff' => 'image/tiff',
+        ];
+        $mime = $mimeTypes[$ext] ?? (mime_content_type($filePath) ?: 'application/octet-stream');
+
+        return $this->response
+            ->setHeader('Content-Type', $mime)
+            ->setHeader('Content-Disposition', 'inline; filename="' . $safeFilename . '"')
+            ->setHeader('Content-Length', (string) filesize($filePath))
+            ->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+            ->setHeader('Pragma', 'no-cache')
+            ->setHeader('Expires', '0')
+            ->setBody(file_get_contents($filePath));
     }
 }

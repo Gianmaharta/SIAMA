@@ -119,7 +119,8 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background-color: #1E3A6D;
+    background-color: #1E60EC !important;
+    border-color: #1E60EC !important;
     color: #FFFFFF !important;
     border: none;
     border-radius: 8px;
@@ -134,14 +135,16 @@
 
 .jra-btn-add:hover,
 .jra-btn-add:focus {
-    background-color: #172F59;
+    background-color: #1752CE !important;
+    border-color: #1752CE !important;
     color: #FFFFFF !important;
-    box-shadow: 0 4px 12px rgba(30, 58, 109, 0.25);
+    box-shadow: 0 4px 12px rgba(30, 96, 236, 0.25);
     transform: translateY(-1px);
 }
 
 .jra-btn-add:active {
-    background-color: #122648;
+    background-color: #1346AF !important;
+    border-color: #1346AF !important;
     color: #FFFFFF !important;
     transform: translateY(0);
 }

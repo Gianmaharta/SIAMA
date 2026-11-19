@@ -49,6 +49,20 @@ if ($currentSkor > 100) $currentSkor = 100;
 <?php endif; ?>
 
 <div class="row g-4 align-items-stretch">
+    <?php
+    $isMediaReady = !empty($has_file_alih_media);
+    $docUrl = $file_url ?? null;
+    $docExt = $file_ext ?? null;
+
+    if (!$isMediaReady && !empty($arsip['file_arsip'])) {
+        $checkPath = FCPATH . 'uploads/arsip/' . $arsip['file_arsip'];
+        if (is_file($checkPath) && file_exists($checkPath)) {
+            $isMediaReady = true;
+            $docExt = strtolower(pathinfo($checkPath, PATHINFO_EXTENSION));
+            $docUrl = base_url('uploads/arsip/' . $arsip['file_arsip']) . '?v=' . filemtime($checkPath);
+        }
+    }
+    ?>
     <!-- Kolom Kiri: Panel Pratinjau Dokumen -->
     <div class="col-12 col-lg-7 d-flex flex-column">
         <div class="penilaian-form-card flex-grow-1 mb-0 d-flex flex-column">
@@ -59,28 +73,31 @@ if ($currentSkor > 100) $currentSkor = 100;
                     </div>
                     <span>Pratinjau Dokumen</span>
                 </div>
-                <?php if (!empty($arsip['file_arsip'])) : ?>
-                    <a href="<?= base_url('uploads/arsip/' . $arsip['file_arsip']) ?>" target="_blank" class="btn btn-sm btn-outline-primary" style="font-size: 12.5px; border-radius: 6px;">
+                <?php if ($isMediaReady && !empty($docUrl)) : ?>
+                    <a href="<?= $docUrl ?>" target="_blank" class="btn btn-sm btn-outline-primary" style="font-size: 12.5px; border-radius: 6px;">
                         <i class="bi bi-box-arrow-up-right me-1"></i> Buka di Tab Baru
                     </a>
                 <?php endif; ?>
             </div>
 
             <div class="penilaian-preview-box flex-grow-1">
-                <?php if (!empty($arsip['file_arsip'])) : ?>
-                    <iframe src="<?= base_url('uploads/arsip/' . $arsip['file_arsip']) ?>" width="100%" height="100%" style="min-height: 520px; border: none; border-radius: 8px;"></iframe>
-                <?php else : ?>
-                    <div class="preview-empty-center">
-                        <div class="preview-circle-icon">
-                            <i class="bi bi-file-earmark"></i>
-                            <span class="badge-alert-dot">
-                                <i class="bi bi-exclamation-lg"></i>
-                            </span>
+                <?php if ($isMediaReady && !empty($docUrl)) : ?>
+                    <?php if (in_array($docExt, ['jpg', 'jpeg', 'png', 'tif', 'tiff'])) : ?>
+                        <div class="d-flex justify-content-center align-items-center h-100 p-2" style="background: #525659; border-radius: 8px; min-height: 520px;">
+                            <img src="<?= $docUrl ?>" alt="Hasil Alih Media: <?= esc($arsip['nama_arsip'] ?? '') ?>" class="img-fluid rounded shadow-sm" style="max-height: 72vh; object-fit: contain;">
                         </div>
-                    </div>
-                    <div class="preview-warning-alert">
-                        <div class="alert-heading">Berkas arsip digital tidak ditemukan atau belum diunggah.</div>
-                        <div class="alert-sub">Pastikan berkas telah dialihmediakan dan unggah melalui menu pengelolaan arsip.</div>
+                    <?php else : ?>
+                        <iframe src="<?= $docUrl ?>" width="100%" height="100%" style="min-height: 520px; border: none; border-radius: 8px;" title="Pratinjau Dokumen Hasil Alih Media"></iframe>
+                    <?php endif; ?>
+                <?php else : ?>
+                    <div class="preview-empty-center py-5 d-flex flex-column align-items-center justify-content-center text-center my-auto">
+                        <div class="preview-circle-icon mb-3">
+                            <i class="bi bi-file-earmark-x text-secondary" style="font-size: 3rem;"></i>
+                        </div>
+                        <div class="preview-warning-alert px-3">
+                            <div class="alert-heading fw-bold text-dark fs-6 mb-1">Dokumen hasil alih media belum tersedia.</div>
+                            <div class="alert-sub text-muted small">Arsiparis belum melakukan proses alih media atau berkas pindaian digital belum diunggah untuk arsip ini.</div>
+                        </div>
                     </div>
                 <?php endif; ?>
             </div>

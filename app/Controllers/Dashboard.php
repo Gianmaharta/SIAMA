@@ -207,11 +207,27 @@ class Dashboard extends BaseController
                     $totalBerkas = $db->table('arsip')->where('id_spt', $idSpt)->countAllResults();
 
                     // Ambil BA terbaru terkait SPT
-                    $baLatest = $db->table('berita_acara')
-                        ->where('id_spt', $idSpt)
-                        ->orderBy('created_at', 'DESC')
+                    $baLatest = $db->table('berita_acara ba')
+                        ->groupStart()
+                            ->where('ba.id_spt', $idSpt)
+                            ->orWhereIn('ba.id_berita_acara', function($subQuery) use ($idSpt) {
+                                return $subQuery->select('bad.id_berita_acara')
+                                    ->from('berita_acara_detail bad')
+                                    ->join('arsip a', 'a.id_arsip = bad.id_arsip')
+                                    ->where('a.id_spt', $idSpt);
+                            })
+                        ->groupEnd()
+                        ->orderBy('ba.created_at', 'DESC')
                         ->get()
                         ->getRowArray();
+
+                    $menungguArsip = $db->table('arsip')
+                        ->where('id_spt', $idSpt)
+                        ->whereIn('status_verifikasi', ['Menunggu', 'Belum_Diproses', 'Belum Diproses'])
+                        ->countAllResults();
+
+                    $hasAssignments = (!empty($sptItem['status_penugasan']) && $sptItem['status_penugasan'] !== 'belum_ditugaskan')
+                        || ($db->table('spt_assignments')->where('id_spt', $idSpt)->countAllResults() > 0);
 
                     // Penentuan status pelaksanaan alur secara dinamis
                     if ($sptItem['status_spt'] === 'Selesai' || (!empty($baLatest) && $baLatest['status_persetujuan'] === 'Selesai')) {
@@ -226,21 +242,15 @@ class Dashboard extends BaseController
                     } elseif (!empty($baLatest) && $baLatest['status_persetujuan'] === 'Revisi') {
                         $statusProses = 'Perbaikan Draf (Revisi)';
                         $statusClass  = 'badge-status-rose';
-                    } elseif ($sptItem['status_penugasan'] === 'ditugaskan') {
-                        $menungguArsip = $db->table('arsip')
-                            ->where('id_spt', $idSpt)
-                            ->whereIn('status_verifikasi', ['Menunggu', 'Belum_Diproses'])
-                            ->countAllResults();
-                        if ($totalBerkas === 0) {
-                            $statusProses = 'Menunggu Mulai Alih Media';
-                            $statusClass  = 'badge-status-blue';
-                        } elseif ($menungguArsip > 0) {
-                            $statusProses = 'Menunggu Verifikasi Arsip';
-                            $statusClass  = 'badge-status-amber';
-                        } else {
-                            $statusProses = 'Sedang Alih Media';
-                            $statusClass  = 'badge-status-blue';
-                        }
+                    } elseif ($menungguArsip > 0) {
+                        $statusProses = 'Menunggu Verifikasi Arsip';
+                        $statusClass  = 'badge-status-amber';
+                    } elseif ($totalBerkas > 0) {
+                        $statusProses = 'Sedang Alih Media';
+                        $statusClass  = 'badge-status-blue';
+                    } elseif ($hasAssignments) {
+                        $statusProses = 'Menunggu Mulai Alih Media';
+                        $statusClass  = 'badge-status-blue';
                     } else {
                         $statusProses = 'Menunggu Penugasan Arsiparis';
                         $statusClass  = 'badge-status-amber';
@@ -1199,13 +1209,21 @@ class Dashboard extends BaseController
             $totalArsip   = (int)($arsipStats['total'] ?? 0);
             $menungguArsip= (int)($arsipStats['menunggu'] ?? 0);
 
-            // 3. Ambil Berita Acara terbaru terkait SPT
+            // 3. Ambil Berita Acara terbaru terkait SPT (baik direct link id_spt maupun via relasi arsip)
             $ba = $db->table('berita_acara ba')
                 ->select('ba.*, u_pelaksana.nama as nama_pelaksana, u_kabid.nama as nama_kabid, u_pimpinan.nama as nama_pimpinan_ba')
                 ->join('users u_pelaksana', 'u_pelaksana.id_user = ba.id_pelaksana', 'left')
                 ->join('users u_kabid', 'u_kabid.id_user = ba.id_kabid', 'left')
                 ->join('users u_pimpinan', 'u_pimpinan.id_user = ba.id_pimpinan', 'left')
-                ->where('ba.id_spt', $idSpt)
+                ->groupStart()
+                    ->where('ba.id_spt', $idSpt)
+                    ->orWhereIn('ba.id_berita_acara', function($subQuery) use ($idSpt) {
+                        return $subQuery->select('bad.id_berita_acara')
+                            ->from('berita_acara_detail bad')
+                            ->join('arsip a', 'a.id_arsip = bad.id_arsip')
+                            ->where('a.id_spt', $idSpt);
+                    })
+                ->groupEnd()
                 ->orderBy('ba.created_at', 'DESC')
                 ->get()
                 ->getRowArray();
@@ -1221,7 +1239,11 @@ class Dashboard extends BaseController
                 ->getRowArray();
             $namaKabidOpd = !empty($kabidUser['nama']) ? trim($kabidUser['nama']) : null;
 
-            // Tentukan Tahapan, Petugas, Status berdasarkan alur SIAMA
+            // Periksa keberadaan penugasan arsiparis
+            $hasAssignments = !empty($assignedNames) 
+                || in_array(strtolower(trim((string)$spt['status_penugasan'])), ['ditugaskan', 'proses', 'selesai']);
+
+            // Tentukan Tahapan, Petugas, Status berdasarkan alur proses aktual SIAMA
             $tahapNum     = 1;
             $tahapLabel   = 'Penerbitan SPT';
             $tahapFull    = 'Tahap 1: Penerbitan SPT oleh Pimpinan';
@@ -1229,6 +1251,7 @@ class Dashboard extends BaseController
             $petugasRole  = 'Kepala Bidang';
             $statusProses = 'Menunggu Penugasan Arsiparis';
             $statusClass  = 'badge-status-amber';
+            $kondisiProses = 'menunggu_penugasan';
             $lastUpdated  = $spt['updated_at'] ?? $spt['created_at'];
 
             if (!empty($ba)) {
@@ -1240,72 +1263,78 @@ class Dashboard extends BaseController
             }
 
             if ($spt['status_spt'] === 'Selesai' || (!empty($ba) && $ba['status_persetujuan'] === 'Selesai')) {
-                $tahapNum     = 5;
-                $tahapLabel   = 'Selesai';
-                $tahapFull    = 'Tahap 5: Persetujuan Pimpinan (Selesai)';
-                $petugasRaw   = !empty($ba['nama_pimpinan_ba']) ? $ba['nama_pimpinan_ba'] : (!empty($spt['nama_pimpinan']) ? $spt['nama_pimpinan'] : null);
-                $petugasRole  = 'Pimpinan';
-                $statusProses = 'Selesai';
-                $statusClass  = 'badge-status-green';
+                $tahapNum      = 5;
+                $tahapLabel    = 'Selesai';
+                $tahapFull     = 'Tahap 5: Persetujuan Pimpinan (Selesai)';
+                $petugasRaw    = !empty($ba['nama_pimpinan_ba']) ? $ba['nama_pimpinan_ba'] : (!empty($spt['nama_pimpinan']) ? $spt['nama_pimpinan'] : null);
+                $petugasRole   = 'Pimpinan';
+                $statusProses  = 'Selesai';
+                $statusClass   = 'badge-status-green';
+                $kondisiProses = 'selesai';
             } elseif (!empty($ba) && in_array($ba['status_persetujuan'], ['Draf_Pimpinan', 'Menunggu_Pimpinan'])) {
-                $tahapNum     = 5;
-                $tahapLabel   = 'Persetujuan Pimpinan';
-                $tahapFull    = 'Tahap 5: Persetujuan Pimpinan';
-                $petugasRaw   = !empty($ba['nama_pimpinan_ba']) ? $ba['nama_pimpinan_ba'] : (!empty($spt['nama_pimpinan']) ? $spt['nama_pimpinan'] : null);
-                $petugasRole  = 'Pimpinan';
-                $statusProses = 'Menunggu TTD Pimpinan';
-                $statusClass  = 'badge-status-purple';
+                $tahapNum      = 5;
+                $tahapLabel    = 'Persetujuan Pimpinan';
+                $tahapFull     = 'Tahap 5: Persetujuan Pimpinan';
+                $petugasRaw    = !empty($ba['nama_pimpinan_ba']) ? $ba['nama_pimpinan_ba'] : (!empty($spt['nama_pimpinan']) ? $spt['nama_pimpinan'] : null);
+                $petugasRole   = 'Pimpinan';
+                $statusProses  = 'Menunggu TTD Pimpinan';
+                $statusClass   = 'badge-status-purple';
+                $kondisiProses = 'menunggu_verifikasi';
             } elseif (!empty($ba) && $ba['status_persetujuan'] === 'Draf_Kabid') {
-                $tahapNum     = 4;
-                $tahapLabel   = 'Verifikasi Kabid';
-                $tahapFull    = 'Tahap 4: Verifikasi oleh Kepala Bidang';
-                $petugasRaw   = !empty($ba['nama_kabid']) ? $ba['nama_kabid'] : (!empty($namaKabidOpd) ? $namaKabidOpd : null);
-                $petugasRole  = 'Kepala Bidang';
-                $statusProses = 'Menunggu Verifikasi Kabid';
-                $statusClass  = 'badge-status-amber';
+                $tahapNum      = 4;
+                $tahapLabel    = 'Verifikasi Kabid';
+                $tahapFull     = 'Tahap 4: Verifikasi oleh Kepala Bidang';
+                $petugasRaw    = !empty($ba['nama_kabid']) ? $ba['nama_kabid'] : (!empty($namaKabidOpd) ? $namaKabidOpd : null);
+                $petugasRole   = 'Kepala Bidang';
+                $statusProses  = 'Menunggu Verifikasi Kabid';
+                $statusClass   = 'badge-status-amber';
+                $kondisiProses = 'menunggu_verifikasi';
             } elseif (!empty($ba) && $ba['status_persetujuan'] === 'Revisi') {
-                $tahapNum     = 3;
-                $tahapLabel   = 'Proses Alih Media';
-                $tahapFull    = 'Tahap 3: Proses Alih Media oleh Arsiparis';
-                $petugasRaw   = !empty($ba['nama_pelaksana']) ? $ba['nama_pelaksana'] : (!empty($assignedNames) ? implode(', ', $assignedNames) : null);
-                $petugasRole  = 'Arsiparis';
-                $statusProses = 'Perbaikan Draf (Revisi)';
-                $statusClass  = 'badge-status-rose';
-            } elseif ($spt['status_penugasan'] === 'ditugaskan') {
-                if ($totalArsip === 0) {
-                    $tahapNum     = 2;
-                    $tahapLabel   = 'Penugasan Arsiparis';
-                    $tahapFull    = 'Tahap 2: Penugasan Arsiparis oleh Kepala Bidang';
-                    $petugasRaw   = !empty($assignedNames) ? implode(', ', $assignedNames) : null;
-                    $petugasRole  = 'Arsiparis';
-                    $statusProses = 'Menunggu Mulai Alih Media';
-                    $statusClass  = 'badge-status-blue';
-                } elseif ($menungguArsip > 0) {
-                    $tahapNum     = 4;
-                    $tahapLabel   = 'Verifikasi Kabid';
-                    $tahapFull    = 'Tahap 4: Verifikasi oleh Kepala Bidang';
-                    $petugasRaw   = !empty($namaKabidOpd) ? $namaKabidOpd : null;
-                    $petugasRole  = 'Kepala Bidang';
-                    $statusProses = 'Menunggu Verifikasi Arsip';
-                    $statusClass  = 'badge-status-amber';
-                } else {
-                    $tahapNum     = 3;
-                    $tahapLabel   = 'Proses Alih Media';
-                    $tahapFull    = 'Tahap 3: Proses Alih Media oleh Arsiparis';
-                    $petugasRaw   = !empty($assignedNames) ? implode(', ', $assignedNames) : null;
-                    $petugasRole  = 'Arsiparis';
-                    $statusProses = 'Sedang Alih Media';
-                    $statusClass  = 'badge-status-blue';
-                }
+                $tahapNum      = 3;
+                $tahapLabel    = 'Proses Alih Media';
+                $tahapFull     = 'Tahap 3: Proses Alih Media oleh Arsiparis';
+                $petugasRaw    = !empty($ba['nama_pelaksana']) ? $ba['nama_pelaksana'] : (!empty($assignedNames) ? implode(', ', $assignedNames) : null);
+                $petugasRole   = 'Arsiparis';
+                $statusProses  = 'Perbaikan Draf (Revisi)';
+                $statusClass   = 'badge-status-rose';
+                $kondisiProses = 'sedang_diproses';
+            } elseif ($menungguArsip > 0) {
+                $tahapNum      = 4;
+                $tahapLabel    = 'Verifikasi Kabid';
+                $tahapFull     = 'Tahap 4: Verifikasi oleh Kepala Bidang';
+                $petugasRaw    = !empty($namaKabidOpd) ? $namaKabidOpd : null;
+                $petugasRole   = 'Kepala Bidang';
+                $statusProses  = 'Menunggu Verifikasi Arsip';
+                $statusClass   = 'badge-status-amber';
+                $kondisiProses = 'menunggu_verifikasi';
+            } elseif ($totalArsip > 0) {
+                $tahapNum      = 3;
+                $tahapLabel    = 'Proses Alih Media';
+                $tahapFull     = 'Tahap 3: Proses Alih Media oleh Arsiparis';
+                $petugasRaw    = !empty($assignedNames) ? implode(', ', $assignedNames) : null;
+                $petugasRole   = 'Arsiparis';
+                $statusProses  = 'Sedang Alih Media';
+                $statusClass   = 'badge-status-blue';
+                $kondisiProses = 'sedang_diproses';
+            } elseif ($hasAssignments) {
+                $tahapNum      = 2;
+                $tahapLabel    = 'Penugasan Arsiparis';
+                $tahapFull     = 'Tahap 2: Penugasan Arsiparis oleh Kepala Bidang';
+                $petugasRaw    = !empty($assignedNames) ? implode(', ', $assignedNames) : null;
+                $petugasRole   = 'Arsiparis';
+                $statusProses  = 'Menunggu Mulai Alih Media';
+                $statusClass   = 'badge-status-blue';
+                $kondisiProses = 'sudah_ditugaskan';
             } else {
-                // Belum ditugaskan
-                $tahapNum     = 1;
-                $tahapLabel   = 'Penerbitan SPT';
-                $tahapFull    = 'Tahap 1: Penerbitan SPT oleh Pimpinan';
-                $petugasRaw   = !empty($namaKabidOpd) ? $namaKabidOpd : null;
-                $petugasRole  = 'Kepala Bidang';
-                $statusProses = 'Menunggu Penugasan Arsiparis';
-                $statusClass  = 'badge-status-amber';
+                // Belum ditugaskan oleh Kepala Bidang
+                $tahapNum      = 1;
+                $tahapLabel    = 'Penerbitan SPT';
+                $tahapFull     = 'Tahap 1: Penerbitan SPT oleh Pimpinan';
+                $petugasRaw    = !empty($namaKabidOpd) ? $namaKabidOpd : null;
+                $petugasRole   = 'Kepala Bidang';
+                $statusProses  = 'Menunggu Penugasan Arsiparis';
+                $statusClass   = 'badge-status-amber';
+                $kondisiProses = 'menunggu_penugasan';
             }
 
             // Bersihkan suffix role dalam kurung jika ada (misal: "Kepala Dinas (Pimpinan)" -> "Kepala Dinas", "Budi Santoso (Arsiparis)" -> "Budi Santoso")
@@ -1369,7 +1398,9 @@ class Dashboard extends BaseController
             ];
         }
 
-        // Ambil juga Berita Acara mandiri (tanpa id_spt) agar pemantauan alur mencakup seluruh dokumen workflow
+        // Ambil juga Berita Acara mandiri (tanpa id_spt dan belum terikat di SPT) agar pemantauan alur mencakup seluruh dokumen tanpa duplikasi
+        $linkedBaIds = array_filter(array_column($workflowList, 'id_berita_acara'));
+
         $baBuilder = $db->table('berita_acara ba')
             ->select('
                 ba.id_berita_acara,
@@ -1392,6 +1423,10 @@ class Dashboard extends BaseController
                 ->where('ba.id_spt', null)
                 ->orWhere('ba.id_spt', '')
             ->groupEnd();
+
+        if (!empty($linkedBaIds)) {
+            $baBuilder->whereNotIn('ba.id_berita_acara', $linkedBaIds);
+        }
 
         if (!empty($idOpd) && $idOpd !== 'all') {
             $baBuilder->where('ba.id_opd', $idOpd);
@@ -1499,21 +1534,33 @@ class Dashboard extends BaseController
 
             $activeSptCount = 0;
             $opdJobs = []; // Daftar pekerjaan alur workflow aktif di OPD ini
+            $linkedBaIdsInOpd = [];
 
             foreach ($spts as $spt) {
                 $idSpt = $spt['id_spt'];
 
-                // Ambil Berita Acara terbaru terkait SPT ini jika ada
-                $ba = $db->table('berita_acara')
-                    ->where('id_spt', $idSpt)
-                    ->orderBy('created_at', 'DESC')
+                // Ambil Berita Acara terbaru terkait SPT ini jika ada (direct link maupun via relasi arsip)
+                $ba = $db->table('berita_acara ba')
+                    ->groupStart()
+                        ->where('ba.id_spt', $idSpt)
+                        ->orWhereIn('ba.id_berita_acara', function($subQuery) use ($idSpt) {
+                            return $subQuery->select('bad.id_berita_acara')
+                                ->from('berita_acara_detail bad')
+                                ->join('arsip a', 'a.id_arsip = bad.id_arsip')
+                                ->where('a.id_spt', $idSpt);
+                        })
+                    ->groupEnd()
+                    ->orderBy('ba.created_at', 'DESC')
                     ->get()
                     ->getRowArray();
 
+                if (!empty($ba['id_berita_acara'])) {
+                    $linkedBaIdsInOpd[] = $ba['id_berita_acara'];
+                }
+
                 // Cek apakah pekerjaan SPT ini sudah selesai
                 $isSelesai = ($spt['status'] === 'Selesai') 
-                    || (!empty($ba) && $ba['status_persetujuan'] === 'Selesai')
-                    || ($spt['status_penugasan'] === 'selesai' && !empty($ba) && $ba['status_persetujuan'] === 'Selesai');
+                    || (!empty($ba) && $ba['status_persetujuan'] === 'Selesai');
 
                 if ($isSelesai) {
                     // Dokumen yang sudah selesai TIDAK boleh dihitung sebagai pekerjaan tertunda
@@ -1537,6 +1584,10 @@ class Dashboard extends BaseController
                 $totalArsipInSpt   = (int)($arsipStats['total'] ?? 0);
                 $menungguArisInSpt = (int)($arsipStats['menunggu'] ?? 0);
 
+                // Cek status penugasan arsiparis
+                $hasAssignments = (!empty($spt['status_penugasan']) && $spt['status_penugasan'] !== 'belum_ditugaskan')
+                    || ($db->table('spt_assignments')->where('id_spt', $idSpt)->countAllResults() > 0);
+
                 // Pemetaan tahapan aktual berdasarkan alur proses SIAMA
                 if (!empty($ba) && in_array($ba['status_persetujuan'], ['Draf_Pimpinan', 'Menunggu_Pimpinan'])) {
                     $tahapKey   = 'persetujuan_pimpinan';
@@ -1550,20 +1601,18 @@ class Dashboard extends BaseController
                     $tahapKey   = 'perbaikan_revisi';
                     $tahapLabel = 'Perbaikan Revisi';
                     $tahapBadge = 'badge-status-rose';
-                } elseif ($spt['status_penugasan'] === 'ditugaskan') {
-                    if ($totalArsipInSpt === 0) {
-                        $tahapKey   = 'penugasan_arsiparis';
-                        $tahapLabel = 'Penugasan Arsiparis';
-                        $tahapBadge = 'badge-status-blue';
-                    } elseif ($menungguArisInSpt > 0) {
-                        $tahapKey   = 'verifikasi_kabid';
-                        $tahapLabel = 'Verifikasi Kepala Bidang';
-                        $tahapBadge = 'badge-status-amber';
-                    } else {
-                        $tahapKey   = 'proses_alih_media';
-                        $tahapLabel = 'Proses Alih Media';
-                        $tahapBadge = 'badge-status-blue';
-                    }
+                } elseif ($menungguArisInSpt > 0) {
+                    $tahapKey   = 'verifikasi_kabid';
+                    $tahapLabel = 'Verifikasi Kepala Bidang';
+                    $tahapBadge = 'badge-status-amber';
+                } elseif ($totalArsipInSpt > 0) {
+                    $tahapKey   = 'proses_alih_media';
+                    $tahapLabel = 'Proses Alih Media';
+                    $tahapBadge = 'badge-status-blue';
+                } elseif ($hasAssignments) {
+                    $tahapKey   = 'penugasan_arsiparis';
+                    $tahapLabel = 'Penugasan Arsiparis';
+                    $tahapBadge = 'badge-status-blue';
                 } else {
                     // Belum ditugaskan oleh Kepala Bidang
                     $tahapKey   = 'penugasan_arsiparis';
@@ -1578,16 +1627,20 @@ class Dashboard extends BaseController
                 ];
             }
 
-            // 2. Cek Berita Acara mandiri (tanpa id_spt) yang belum selesai di OPD ini
-            $standaloneBas = $db->table('berita_acara')
+            // 2. Cek Berita Acara mandiri (tanpa id_spt dan belum terikat di SPT) yang belum selesai di OPD ini
+            $saBuilder = $db->table('berita_acara')
                 ->where('id_opd', $idOpd)
                 ->groupStart()
                     ->where('id_spt', null)
                     ->orWhere('id_spt', '')
                 ->groupEnd()
-                ->whereIn('status_persetujuan', ['Draf_Kabid', 'Draf_Pimpinan', 'Revisi', 'Menunggu_Pimpinan'])
-                ->get()
-                ->getResultArray();
+                ->whereIn('status_persetujuan', ['Draf_Kabid', 'Draf_Pimpinan', 'Revisi', 'Menunggu_Pimpinan']);
+
+            if (!empty($linkedBaIdsInOpd)) {
+                $saBuilder->whereNotIn('id_berita_acara', $linkedBaIdsInOpd);
+            }
+
+            $standaloneBas = $saBuilder->get()->getResultArray();
 
             foreach ($standaloneBas as $sba) {
                 if (in_array($sba['status_persetujuan'], ['Draf_Pimpinan', 'Menunggu_Pimpinan'])) {
@@ -1674,6 +1727,29 @@ class Dashboard extends BaseController
         }
 
         return $pendingSummary;
+    }
+
+    /**
+     * Endpoint API JSON untuk polling / pembaruan data workflow real-time
+     */
+    public function workflowData()
+    {
+        $idOpd = session()->get('id_opd');
+        $role = session()->get('nama_role') ?? session()->get('role');
+
+        $isGlobal = in_array($role, ['Admin_Pemkab', 'Pimpinan', 'Admin Pemkab']);
+        $workflowList = $isGlobal
+            ? $this->getWorkflowMonitoring()
+            : $this->getWorkflowMonitoring($idOpd);
+
+        $pendingSummary = $this->getPendingWorkSummary();
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'workflow_monitoring_list' => $workflowList,
+            'pending_work_summary' => $pendingSummary,
+            'timestamp' => date('Y-m-d H:i:s'),
+        ]);
     }
 }
 

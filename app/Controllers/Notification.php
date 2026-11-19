@@ -39,10 +39,11 @@ class Notification extends BaseController
         // Tambahkan metadata ikon dan waktu relatif
         foreach ($notifications as &$notif) {
             $meta = $this->getNotificationMeta($notif['type'] ?: $notif['action_type']);
-            $notif['meta']         = $meta;
-            $notif['time_ago']     = $this->formatTimeAgo($notif['created_at']);
-            $notif['target_url']   = $this->resolveTargetUrl($notif);
-            $notif['action_label'] = $this->resolveActionLabel($notif);
+            $notif['meta']           = $meta;
+            $notif['time_ago']       = $this->formatTimeAgo($notif['created_at']);
+            $notif['formatted_date'] = $this->formatWitaDateTime($notif['created_at']);
+            $notif['target_url']     = $this->resolveTargetUrl($notif);
+            $notif['action_label']   = $this->resolveActionLabel($notif);
         }
         unset($notif);
 
@@ -70,14 +71,19 @@ class Notification extends BaseController
     {
         $userId = session()->get('user_id');
         if (empty($userId)) {
-            return $this->response->setJSON(['status' => 'error', 'unread' => 0]);
+            return $this->response->setJSON([
+                'status'      => 'error',
+                'unread'      => 0,
+                'server_time' => date('c'),
+            ]);
         }
 
         $count = $this->notifModel->getUnreadCount($userId);
 
         return $this->response->setJSON([
-            'status' => 'success',
-            'unread' => (int) $count
+            'status'      => 'success',
+            'unread'      => (int) $count,
+            'server_time' => date('c'),
         ]);
     }
 
@@ -91,6 +97,7 @@ class Notification extends BaseController
             return $this->response->setJSON([
                 'status'        => 'error',
                 'unread'        => 0,
+                'server_time'   => date('c'),
                 'notifications' => []
             ]);
         }
@@ -112,6 +119,7 @@ class Notification extends BaseController
                 'message'         => esc($notif['message']),
                 'sender'          => esc($senderText),
                 'is_read'         => (int) $notif['is_read'],
+                'created_at'      => $notif['created_at'],
                 'time_ago'        => $this->formatTimeAgo($notif['created_at']),
                 'type'            => $notif['type'] ?: $notif['action_type'],
                 'icon'            => $meta['icon'],
@@ -125,6 +133,74 @@ class Notification extends BaseController
         return $this->response->setJSON([
             'status'        => 'success',
             'unread'        => (int) $unreadCount,
+            'server_time'   => date('c'),
+            'notifications' => $formatted
+        ]);
+    }
+
+    /**
+     * Endpoint API: Mengambil feed notifikasi dinamis untuk pembaruan realtime halaman notifikasi
+     */
+    public function getFeed(): ResponseInterface
+    {
+        $userId = session()->get('user_id');
+        if (empty($userId)) {
+            return $this->response->setJSON([
+                'status'        => 'error',
+                'message'       => 'Unauthorized',
+                'unread'        => 0,
+                'counts'        => ['all' => 0, 'unread' => 0, 'read' => 0],
+                'server_time'   => date('c'),
+                'notifications' => []
+            ]);
+        }
+
+        $filter = $this->request->getGet('filter') ?: 'all';
+        if (!in_array($filter, ['all', 'unread', 'read'])) {
+            $filter = 'all';
+        }
+
+        $notifications = $this->notifModel->getByUser($userId, $filter);
+
+        $formatted = [];
+        foreach ($notifications as $notif) {
+            $meta = $this->getNotificationMeta($notif['type'] ?: $notif['action_type']);
+            $senderRoleClean = !empty($notif['sender_role']) ? ucwords(str_replace('_', ' ', $notif['sender_role'])) : '';
+
+            $formatted[] = [
+                'id_notification' => $notif['id_notification'],
+                'title'           => $notif['title'],
+                'message'         => $notif['message'],
+                'type'            => $notif['type'],
+                'action_type'     => $notif['action_type'] ?? '',
+                'reference_type'  => $notif['reference_type'] ?? '',
+                'reference_id'    => $notif['reference_id'] ?? '',
+                'is_read'         => (int) $notif['is_read'],
+                'sender_nama'     => $notif['sender_nama'] ?? '',
+                'sender_role'     => $senderRoleClean,
+                'created_at'      => $notif['created_at'],
+                'formatted_date'  => $this->formatWitaDateTime($notif['created_at']),
+                'time_ago'        => $this->formatTimeAgo($notif['created_at']),
+                'target_url'      => $this->resolveTargetUrl($notif),
+                'action_label'    => $this->resolveActionLabel($notif),
+                'meta'            => $meta,
+            ];
+        }
+
+        $totalAll    = count($this->notifModel->getByUser($userId, 'all'));
+        $totalUnread = $this->notifModel->getUnreadCount($userId);
+        $totalRead   = max(0, $totalAll - $totalUnread);
+
+        return $this->response->setJSON([
+            'status'        => 'success',
+            'filter'        => $filter,
+            'unread'        => (int) $totalUnread,
+            'counts'        => [
+                'all'    => $totalAll,
+                'unread' => $totalUnread,
+                'read'   => $totalRead,
+            ],
+            'server_time'   => date('c'),
             'notifications' => $formatted
         ]);
     }
@@ -289,6 +365,8 @@ class Notification extends BaseController
                 return !empty($refId) ? base_url('/arsip/detail/' . $refId) : base_url('/arsip');
             case 'berita_acara':
                 return !empty($refId) ? base_url('/berita-acara/detail/' . $refId) : base_url('/berita-acara');
+            case 'penilaian':
+                return !empty($refId) ? base_url('/penilaian/form/' . $refId) : base_url('/penilaian');
             case 'user':
                 return base_url('/users');
             default:
@@ -304,6 +382,10 @@ class Notification extends BaseController
         $type = $notif['type'] ?: $notif['action_type'];
         $title = strtolower($notif['title'] ?? '');
         $msg = strtolower($notif['message'] ?? '');
+
+        if ($type === 'penilaian' || str_contains($title, 'penilaian') || str_contains($msg, 'penilaian')) {
+            return 'Lihat Detail';
+        }
 
         if ($type === 'spt') {
             if (str_contains($title, 'penugasan') || str_contains($msg, 'penugasan')) {
@@ -362,6 +444,13 @@ class Notification extends BaseController
                     'color' => '#10B981',
                     'label' => 'Berita Acara'
                 ];
+            case 'penilaian':
+                return [
+                    'icon'  => 'bi-award-fill',
+                    'bg'    => '#EEF2FF',
+                    'color' => '#4F46E5',
+                    'label' => 'Penilaian Arsip'
+                ];
             case 'user':
                 return [
                     'icon'  => 'bi-person-badge-fill',
@@ -388,6 +477,26 @@ class Notification extends BaseController
     }
 
     /**
+     * Format Tanggal Lengkap (WITA)
+     * Contoh: 17 Nov 2026, 16:05 WITA
+     */
+    private function formatWitaDateTime(?string $datetime): string
+    {
+        if (empty($datetime)) {
+            return '-';
+        }
+        $time = strtotime($datetime);
+        $months = [
+            1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'Mei', 6 => 'Jun',
+            7 => 'Jul', 8 => 'Agu', 9 => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Des'
+        ];
+        $m = (int) date('n', $time);
+        $monthName = $months[$m] ?? date('M', $time);
+
+        return date('d ', $time) . $monthName . date(' Y, H:i', $time) . ' WITA';
+    }
+
+    /**
      * Format Waktu Relatif Human Readable (Bahasa Indonesia)
      */
     private function formatTimeAgo(?string $datetime): string
@@ -397,31 +506,28 @@ class Notification extends BaseController
         }
 
         $time = strtotime($datetime);
-        $diff = time() - $time;
+        $now  = time();
+        $diff = max(0, $now - $time);
 
         if ($diff < 60) {
             return 'Baru saja';
         }
 
-        $mins = round($diff / 60);
+        $mins = (int) floor($diff / 60);
         if ($mins < 60) {
-            return $mins . ' menit lalu';
+            return $mins . ' menit yang lalu';
         }
 
-        $hours = round($diff / 3600);
+        $hours = (int) floor($diff / 3600);
         if ($hours < 24) {
-            return $hours . ' jam lalu';
+            return $hours . ' jam yang lalu';
         }
 
-        $days = round($diff / 86400);
-        if ($days === 1) {
-            return 'Kemarin, ' . date('H:i', $time);
+        $days = (int) floor($diff / 86400);
+        if ($days === 1 || date('Y-m-d', $now - 86400) === date('Y-m-d', $time)) {
+            return 'Kemarin';
         }
 
-        if ($days < 7) {
-            return $days . ' hari lalu';
-        }
-
-        return date('d M Y, H:i', $time);
+        return $this->formatWitaDateTime($datetime);
     }
 }

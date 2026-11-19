@@ -73,7 +73,27 @@ class PenilaianArsip extends BaseController
             return redirect()->to('/penilaian')->with('error', 'Data arsip tidak ditemukan.');
         }
 
-        $data['arsip'] = $arsip;
+        // Validasi ketersediaan fisik dokumen hasil alih media (bukan dokumen sumber/SPT)
+        $hasFileAlihMedia = false;
+        $fileUrl = null;
+        $fileExt = null;
+
+        if (!empty($arsip['file_arsip'])) {
+            $filePath = FCPATH . 'uploads/arsip/' . $arsip['file_arsip'];
+            if (is_file($filePath) && file_exists($filePath)) {
+                $hasFileAlihMedia = true;
+                $fileExt = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+                // Cache-buster query param agar pembaruan file langsung tercermin di pratinjau
+                $fileUrl = base_url('uploads/arsip/' . $arsip['file_arsip']) . '?v=' . filemtime($filePath);
+            }
+        }
+
+        $data = [
+            'arsip'               => $arsip,
+            'has_file_alih_media' => $hasFileAlihMedia,
+            'file_url'            => $fileUrl,
+            'file_ext'            => $fileExt,
+        ];
         return view('penilaian/form', $data);
     }
 
@@ -131,7 +151,22 @@ class PenilaianArsip extends BaseController
             $arsip['nama_penilai'] = '-';
         }
 
-        $data['arsip'] = $arsip;
+        // Validasi fisik dokumen hasil alih media
+        $hasFileAlihMedia = false;
+        $fileUrl = null;
+        if (!empty($arsip['file_arsip'])) {
+            $filePath = FCPATH . 'uploads/arsip/' . $arsip['file_arsip'];
+            if (is_file($filePath) && file_exists($filePath)) {
+                $hasFileAlihMedia = true;
+                $fileUrl = base_url('uploads/arsip/' . $arsip['file_arsip']) . '?v=' . filemtime($filePath);
+            }
+        }
+
+        $data = [
+            'arsip'               => $arsip,
+            'has_file_alih_media' => $hasFileAlihMedia,
+            'file_url'            => $fileUrl,
+        ];
         return view('penilaian/detail', $data);
     }
 }

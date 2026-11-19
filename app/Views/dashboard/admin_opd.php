@@ -590,5 +590,35 @@ document.addEventListener('DOMContentLoaded', function() {
             applyOpdWorkflowFilters();
         });
     }
+
+    // Auto-sync data workflow secara berkala (polling setiap 30 detik & visibility change)
+    let lastAdminOpdWfHash = null;
+    function pollAdminOpdWorkflowUpdates() {
+        fetch('<?= base_url('/dashboard/workflow-data') ?>', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => {
+            if (!response.ok) return null;
+            return response.json();
+        })
+        .then(data => {
+            if (!data || data.status !== 'success') return;
+            const currentHash = JSON.stringify(data.workflow_monitoring_list.map(w => w.id_spt + ':' + w.status_proses + ':' + w.tahap_num));
+            if (lastAdminOpdWfHash !== null && lastAdminOpdWfHash !== currentHash) {
+                window.location.reload();
+            } else {
+                lastAdminOpdWfHash = currentHash;
+            }
+        })
+        .catch(err => console.debug('Admin OPD workflow poll silent error:', err));
+    }
+
+    setInterval(pollAdminOpdWorkflowUpdates, 30000);
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            pollAdminOpdWorkflowUpdates();
+        }
+    });
+    pollAdminOpdWorkflowUpdates();
 });
 </script>

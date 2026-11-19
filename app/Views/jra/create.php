@@ -108,13 +108,13 @@ Tambah Master JRA - SIAMA
                     <textarea name="dasar_pertimbangan" class="jra-form-control" rows="2" placeholder="Dasar hukum / peraturan pertimbangan retensi..."><?= old('dasar_pertimbangan') ?></textarea>
                 </div>
 
-                <div class="d-flex align-items-center gap-2 pt-2 border-top">
-                    <button type="submit" class="btn btn-primary px-4 py-2 rounded-3 fw-medium" style="background-color: #1E60EC; border-color: #1E60EC; font-size: 13.5px;">
-                        <i class="bi bi-save me-1"></i> Simpan JRA
-                    </button>
+                <div class="d-flex align-items-center justify-content-end gap-2 pt-2 border-top">
                     <a href="<?= base_url('/jra') ?>" class="btn btn-light border px-4 py-2 rounded-3 text-secondary fw-medium" style="font-size: 13.5px;">
                         Batal
                     </a>
+                    <button type="submit" class="btn btn-primary px-4 py-2 rounded-3 fw-medium" style="background-color: #1E60EC; border-color: #1E60EC; font-size: 13.5px;">
+                        <i class="bi bi-save me-1"></i> Simpan JRA
+                    </button>
                 </div>
             </form>
         </div>

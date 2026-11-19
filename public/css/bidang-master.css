@@ -2,8 +2,8 @@
     --bidang-navy-sidebar: #0B1528;
     --bidang-primary-blue: #1E60EC;
     --bidang-primary-blue-hover: #1752CE;
-    --bidang-navy-btn: #203D75;
-    --bidang-navy-btn-hover: #172F5D;
+    --bidang-navy-btn: #1E60EC;
+    --bidang-navy-btn-hover: #1752CE;
     --bidang-bg-page: #FFFFFF;
     --bidang-bg-table-header: #F8FAFC;
     --bidang-border: #E5E7EB;
@@ -159,23 +159,23 @@
 
 /* Toolbar primary add button styling */
 .bidang-table-toolbar .bidang-btn-add {
-    background-color: #1E3A6D !important;
-    border-color: #1E3A6D !important;
+    background-color: #1E60EC !important;
+    border-color: #1E60EC !important;
     color: #FFFFFF !important;
 }
 
 .bidang-table-toolbar .bidang-btn-add:hover,
 .bidang-table-toolbar .bidang-btn-add:focus {
-    background-color: #172F59 !important;
-    border-color: #172F59 !important;
+    background-color: #1752CE !important;
+    border-color: #1752CE !important;
     color: #FFFFFF !important;
-    box-shadow: 0 4px 12px rgba(30, 58, 109, 0.25);
+    box-shadow: 0 4px 12px rgba(30, 96, 236, 0.25);
     transform: translateY(-1px);
 }
 
 .bidang-table-toolbar .bidang-btn-add:active {
-    background-color: #122648 !important;
-    border-color: #122648 !important;
+    background-color: #1346AF !important;
+    border-color: #1346AF !important;
     color: #FFFFFF !important;
     transform: translateY(0);
 }

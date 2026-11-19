@@ -708,5 +708,35 @@ document.addEventListener('DOMContentLoaded', function() {
             applyKabidWorkflowFilters();
         });
     }
+
+    // Auto-sync data workflow secara berkala (polling setiap 30 detik & visibility change)
+    let lastKabidWfHash = null;
+    function pollKabidWorkflowUpdates() {
+        fetch('<?= base_url('/dashboard/workflow-data') ?>', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => {
+            if (!response.ok) return null;
+            return response.json();
+        })
+        .then(data => {
+            if (!data || data.status !== 'success') return;
+            const currentHash = JSON.stringify(data.workflow_monitoring_list.map(w => w.id_spt + ':' + w.status_proses + ':' + w.tahap_num));
+            if (lastKabidWfHash !== null && lastKabidWfHash !== currentHash) {
+                window.location.reload();
+            } else {
+                lastKabidWfHash = currentHash;
+            }
+        })
+        .catch(err => console.debug('Kabid workflow poll silent error:', err));
+    }
+
+    setInterval(pollKabidWorkflowUpdates, 30000);
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            pollKabidWorkflowUpdates();
+        }
+    });
+    pollKabidWorkflowUpdates();
 });
 </script>

@@ -229,6 +229,15 @@
 }
 
 /* Table Action Buttons */
+.table-action-group {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    row-gap: 8px;
+    flex-wrap: wrap;
+}
+
 .btn-action-start {
     background-color: #1E60EC;
     color: #FFFFFF;

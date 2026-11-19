@@ -37,7 +37,7 @@ if (session()->get('user_id')) {
             <li class="nav-item">
                 <a href="<?= base_url('/spt') ?>" class="nav-link <?= ($currentSegment === 'spt') ? 'active' : '' ?>">
                     <i class="bi bi-file-earmark-text"></i>
-                    <span>Surat Perintah Tugas (SPT)</span>
+                    <span><?= ($role === 'Arsiparis') ? 'Tugas Alih Media' : 'Surat Perintah Tugas (SPT)' ?></span>
                 </a>
             </li>
             <li class="nav-item">
@@ -95,7 +95,7 @@ if (session()->get('user_id')) {
             <li class="nav-item">
                 <a href="<?= base_url('/spt') ?>" class="nav-link <?= ($currentSegment === 'spt') ? 'active' : '' ?>">
                     <i class="bi bi-file-earmark-text"></i>
-                    <span>Surat Perintah Tugas (SPT)</span>
+                    <span><?= ($role === 'Arsiparis') ? 'Tugas Alih Media' : 'Surat Perintah Tugas (SPT)' ?></span>
                 </a>
             </li>
             <li class="nav-item">

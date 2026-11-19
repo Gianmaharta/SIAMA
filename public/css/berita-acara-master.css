@@ -607,13 +607,14 @@
     white-space: nowrap;
     height: 42px;
     border: none;
+    box-shadow: 0 2px 6px rgba(30, 96, 236, 0.25);
 }
 
 .ba-btn-save:hover {
     background-color: #1752CE;
     color: #FFFFFF;
     transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(30, 96, 236, 0.25);
+    box-shadow: 0 4px 14px rgba(30, 96, 236, 0.35);
 }
 
 .ba-btn-cancel {

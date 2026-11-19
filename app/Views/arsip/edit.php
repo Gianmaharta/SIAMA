@@ -335,14 +335,14 @@ Edit Arsip - SIAMA
     </div>
 
     <!-- 5. Tombol Aksi Simpan & Batal -->
-    <div class="d-flex align-items-center gap-2 mt-4 mb-5">
+    <div class="d-flex align-items-center justify-content-end gap-2 mt-4 mb-5">
+        <a href="<?= base_url('/arsip') ?>" class="btn arsip-btn-cancel" id="btnBatalArsip">
+            Batal
+        </a>
         <button type="submit" class="btn arsip-btn-save" id="btnSimpanArsip">
             <i class="bi bi-floppy"></i>
             <span>Simpan Perubahan</span>
         </button>
-        <a href="<?= base_url('/arsip') ?>" class="btn arsip-btn-cancel" id="btnBatalArsip">
-            Batal
-        </a>
     </div>
 </form>
 

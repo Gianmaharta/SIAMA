@@ -387,6 +387,28 @@
     min-width: 140px;
 }
 
+.spt-table .col-tanggal-penugasan {
+    min-width: 160px;
+}
+
+.spt-table .col-jumlah-arsip {
+    min-width: 110px;
+    text-align: center;
+}
+
+.spt-table .col-status-pekerjaan {
+    min-width: 140px;
+    text-align: center;
+}
+
+.spt-row-highlight-new {
+    background-color: #F8FAFE !important;
+}
+
+.spt-row-highlight-new:hover {
+    background-color: #EFF6FF !important;
+}
+
 .spt-table .col-aksi {
     min-width: 180px;
     text-align: center;
@@ -398,7 +420,9 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 8px;
+    row-gap: 8px;
+    flex-wrap: wrap;
 }
 
 .spt-action-btn {
@@ -924,7 +948,7 @@
     font-weight: 600;
     padding: 9px 24px;
     border-radius: 8px;
-    border: none;
+    border: 1px solid #1E60EC;
     box-shadow: 0 1px 3px rgba(30, 96, 236, 0.3);
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     cursor: pointer;
@@ -932,12 +956,14 @@
 
 .spt-btn-modal-submit:hover {
     background-color: #1752CE;
+    border-color: #1752CE;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(30, 96, 236, 0.35);
 }
 
 .spt-btn-modal-submit:active {
     transform: translateY(0);
+    background-color: #1E60EC;
 }
 
 .spt-btn-modal-cancel {

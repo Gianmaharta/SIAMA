@@ -31,35 +31,52 @@ class Spt extends BaseController
         $id_opd  = $session->get('id_opd');
         $user_id = $session->get('user_id');
 
-        // Jika Pimpinan atau Admin OPD atau Kabid -> Tampilkan semua SPT di OPD tersebut
-        if (in_array($nama_role, ['Pimpinan', 'Admin_OPD', 'Kepala_Bidang'])) {
+        // Jika Pimpinan atau Admin OPD atau Kabid -> Tampilkan semua SPT di OPD tersebut (Terbaru paling atas)
+        if (in_array($nama_role, ['Pimpinan', 'Kepala_Dinas', 'Kepala Dinas', 'Admin_OPD', 'Administrator OPD', 'Kepala_Bidang', 'Kepala Bidang', 'Kabid'])) {
             $data['spt_list'] = $this->sptModel->getSptByOpd($id_opd);
         } 
-        // Jika Arsiparis -> Tampilkan hanya SPT miliknya
+        // Jika Arsiparis -> Tampilkan hanya penugasan SPT miliknya (Terbaru paling atas)
         elseif ($nama_role === 'Arsiparis') {
             $data['spt_list'] = $this->sptModel->getSptByPelaksana($user_id);
         }
-        // Jika Admin Pemkab -> Bisa lihat semua (opsional, asumsikan bisa lihat semua)
+        // Jika Admin Pemkab -> Bisa lihat semua data secara global
         else {
-            $data['spt_list'] = $this->sptModel->orderBy('tanggal_spt', 'DESC')->findAll();
+            $data['spt_list'] = $this->sptModel->getAllSptWithArsipCount();
         }
 
-        // Hitung Statistik Informasi SPT
+        // Hitung Statistik Informasi SPT & Tetapkan Status Pekerjaan Dinamis
         $totalSpt = count($data['spt_list'] ?? []);
-        $belumDitugaskan = 0;
-        $ditugaskan = 0;
+        $belumDitugaskan = 0; // atau Belum Dimulai untuk Arsiparis
+        $ditugaskan = 0;      // atau Sedang Diproses untuk Arsiparis
         $selesai = 0;
 
-        foreach ($data['spt_list'] as $item) {
-            $status = strtolower(trim($item['status_penugasan'] ?? ''));
-            if ($status === 'selesai') {
-                $selesai++;
-            } elseif (in_array($status, ['ditugaskan', 'proses', 'dalam proses'])) {
-                $ditugaskan++;
+        foreach ($data['spt_list'] as &$item) {
+            $countArsip = (int)($item['jumlah_arsip'] ?? 0);
+            $assignStatus = strtolower(trim($item['assignment_status'] ?? ''));
+            $sptStatusPenugasan = strtolower(trim($item['status_penugasan'] ?? ''));
+
+            if ($nama_role === 'Arsiparis') {
+                if ($assignStatus === 'selesai' || $sptStatusPenugasan === 'selesai') {
+                    $item['status_pekerjaan'] = 'Selesai';
+                    $selesai++;
+                } elseif ($assignStatus === 'proses' || $countArsip > 0) {
+                    $item['status_pekerjaan'] = 'Sedang Diproses';
+                    $ditugaskan++;
+                } else {
+                    $item['status_pekerjaan'] = 'Belum Dimulai';
+                    $belumDitugaskan++;
+                }
             } else {
-                $belumDitugaskan++;
+                if ($sptStatusPenugasan === 'selesai') {
+                    $selesai++;
+                } elseif (in_array($sptStatusPenugasan, ['ditugaskan', 'proses', 'dalam proses'])) {
+                    $ditugaskan++;
+                } else {
+                    $belumDitugaskan++;
+                }
             }
         }
+        unset($item);
 
         $data['totalSpt'] = $totalSpt;
         $data['belumDitugaskan'] = $belumDitugaskan;
@@ -139,8 +156,11 @@ class Spt extends BaseController
             $fileSpt->move($uploadDir, $fileName);
         }
         
+        $id_spt = function_exists('generate_uuidv4') ? generate_uuidv4() : vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex(random_bytes(16)), 4));
+
         // Data Utama SPT
         $sptData = [
+            'id_spt'           => $id_spt,
             'nomor_spt'        => trim((string)$this->request->getPost('nomor_spt')),
             'tanggal_spt'      => $this->request->getPost('tanggal_spt'),
             'perihal'          => trim((string)$this->request->getPost('perihal')),
@@ -150,15 +170,15 @@ class Spt extends BaseController
             'status_penugasan' => 'belum_ditugaskan',
             'id_opd'           => $session->get('id_opd'),
             'id_pimpinan'      => $session->get('user_id'), // Yang menerbitkan
-            'file_spt'         => $fileName
+            'file_spt'         => $fileName,
+            'created_at'       => date('Y-m-d H:i:s'),
+            'updated_at'       => date('Y-m-d H:i:s')
         ];
 
         // Validasi dan Insert SPT
         if (!$this->sptModel->insert($sptData)) {
             return redirect()->back()->withInput()->with('error', 'Gagal menyimpan data SPT. Periksa kembali inputan Anda.');
         }
-
-        $id_spt = $this->sptModel->getInsertID();
 
         log_activity('SPT', 'CREATE', 'Menerbitkan Surat Perintah Tugas baru: ' . $sptData['nomor_spt']);
 
@@ -326,10 +346,13 @@ class Spt extends BaseController
 
         // Simpan ke spt_assignments
         $assignmentData = [
-            'id_spt' => $id_spt,
-            'id_user' => $id_user,
-            'assigned_by' => $session->get('user_id'),
-            'status' => 'pending'
+            'id_assignment' => function_exists('generate_uuidv4') ? generate_uuidv4() : vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex(random_bytes(16)), 4)),
+            'id_spt'        => $id_spt,
+            'id_user'       => $id_user,
+            'assigned_by'   => $session->get('user_id'),
+            'status'        => 'pending',
+            'created_at'    => date('Y-m-d H:i:s'),
+            'updated_at'    => date('Y-m-d H:i:s')
         ];
 
         if (!$this->sptAssignmentModel->insert($assignmentData)) {
@@ -385,5 +408,28 @@ class Spt extends BaseController
 
         // Redirect ke halaman buat arsip dengan param spt_id
         return redirect()->to('/arsip/create?id_spt=' . $id_spt);
+    }
+
+    /**
+     * Menyajikan file dokumen fisik SPT secara aman.
+     * Digunakan untuk unduhan dan pratinjau berkas SPT.
+     *
+     * @param string $filename Nama berkas SPT
+     * @return \CodeIgniter\HTTP\ResponseInterface
+     */
+    public function serveFile(string $filename)
+    {
+        $safeFilename = basename($filename);
+        $filePath = FCPATH . 'uploads/spt/' . $safeFilename;
+
+        if (!file_exists($filePath) || !is_file($filePath)) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Berkas SPT {$safeFilename} tidak ditemukan pada server.");
+        }
+
+        return $this->response
+            ->setHeader('Content-Type', 'application/pdf')
+            ->setHeader('Content-Disposition', 'inline; filename="' . $safeFilename . '"')
+            ->setHeader('Content-Length', (string) filesize($filePath))
+            ->setBody(file_get_contents($filePath));
     }
 }

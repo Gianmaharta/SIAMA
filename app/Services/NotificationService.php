@@ -722,4 +722,108 @@ class NotificationService
 
         return $sentIds;
     }
+
+    /**
+     * Skenario Khusus: Notifikasi Penilaian Arsip untuk Admin Pemkab
+     * Dikirim ketika arsip telah selesai dialihmediakan dan mendapatkan pengesahan.
+     *
+     * @param string $id_arsip ID Arsip yang disahkan
+     * @param string|null $pengesah_user_id ID Pimpinan / Kepala Bidang yang mengesahkan
+     * @param string|null $tanggalPengesahan Tanggal pengesahan dokumen
+     * @return array ID notifikasi yang berhasil dikirim
+     */
+    public function notifyArsipDisahkanForPenilaian(string $id_arsip, ?string $pengesah_user_id = null, ?string $tanggalPengesahan = null): array
+    {
+        $arsip = $this->arsipModel->getArsipWithRelations($id_arsip);
+        if (!$arsip) {
+            return [];
+        }
+
+        // Ketentuan: Jangan mengirim notifikasi ketika arsip masih dalam tahap pengerjaan, verifikasi, revisi, atau belum disahkan
+        $statusVerif = strtolower(trim((string)($arsip['status_verifikasi'] ?? '')));
+        if (!in_array($statusVerif, ['selesai', 'disetujui', 'terverifikasi', 'disahkan'], true)) {
+            return [];
+        }
+
+        // Ambil Nama OPD
+        $namaOpd = !empty($arsip['nama_opd']) ? $arsip['nama_opd'] : '-';
+        if ($namaOpd === '-' && !empty($arsip['id_opd'])) {
+            $opdRow = $this->db->table('opd')->where('id_opd', $arsip['id_opd'])->get()->getRowArray();
+            if ($opdRow && !empty($opdRow['nama_opd'])) {
+                $namaOpd = $opdRow['nama_opd'];
+            }
+        }
+
+        // Ambil Nama Arsiparis pembuat/pengunggah
+        $namaArsiparis = !empty($arsip['nama_arsiparis']) ? $arsip['nama_arsiparis'] : null;
+        if (empty($namaArsiparis)) {
+            $uploaderId = $arsip['id_user_upload'] ?? $arsip['created_by'] ?? null;
+            if (!empty($uploaderId)) {
+                $uploader = $this->userModel->find($uploaderId);
+                $namaArsiparis = $uploader['nama'] ?? '-';
+            } else {
+                $namaArsiparis = '-';
+            }
+        }
+
+        $nomorArsip = !empty($arsip['nomor_arsip']) ? $arsip['nomor_arsip'] : '-';
+        $namaArsip  = !empty($arsip['nama_arsip']) ? $arsip['nama_arsip'] : '-';
+
+        $rawTgl = $tanggalPengesahan ?: date('Y-m-d');
+        $tglTimestamp = strtotime($rawTgl);
+        $tglFormatted = $tglTimestamp ? date('d/m/Y', $tglTimestamp) : $rawTgl;
+
+        $title = 'Arsip Menunggu Penilaian';
+        $message = "Terdapat arsip yang telah selesai dialihmediakan dan disahkan. Silakan lakukan penilaian arsip.\n"
+            . "• OPD: {$namaOpd}\n"
+            . "• Nomor Arsip: {$nomorArsip}\n"
+            . "• Nama Arsip: {$namaArsip}\n"
+            . "• Tanggal Pengesahan: {$tglFormatted}\n"
+            . "• Arsiparis: {$namaArsiparis}";
+
+        $url = base_url('/penilaian/form/' . $id_arsip);
+
+        // Cari seluruh akun Admin Pemkab yang berwenang dan aktif
+        $adminPemkabs = $this->db->table('users u')
+            ->join('user_roles ur', 'u.id_user = ur.id_user')
+            ->join('roles r', 'ur.id_role = r.id_role')
+            ->whereIn('r.nama_role', ['Admin_Pemkab', 'Admin Pemkab', 'Administrator Pemkab'])
+            ->where('u.is_active', 1)
+            ->select('u.id_user')
+            ->get()
+            ->getResultArray();
+
+        $sentIds = [];
+        $uniqueAdminIds = array_unique(array_column($adminPemkabs, 'id_user'));
+
+        foreach ($uniqueAdminIds as $adminId) {
+            // Cegah duplikasi notifikasi penilaian untuk arsip yang sama
+            $alreadyNotified = $this->db->table('notifications')
+                ->where('id_user', $adminId)
+                ->where('type', 'penilaian')
+                ->where('reference_id', $id_arsip)
+                ->countAllResults();
+
+            if ($alreadyNotified > 0) {
+                continue;
+            }
+
+            $sent = $this->sendToUser(
+                $adminId,
+                $title,
+                $message,
+                'penilaian',
+                $id_arsip,
+                'arsip',
+                $url,
+                $pengesah_user_id
+            );
+
+            if ($sent) {
+                $sentIds[] = $sent;
+            }
+        }
+
+        return $sentIds;
+    }
 }

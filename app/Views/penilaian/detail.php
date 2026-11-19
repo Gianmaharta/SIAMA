@@ -140,12 +140,23 @@ Detail Penilaian Arsip - SIAMA
                     <th>Berkas Digital</th>
                     <td class="table-colon">:</td>
                     <td>
-                        <?php if (!empty($arsip['file_arsip'])) : ?>
-                            <a href="<?= base_url('uploads/arsip/' . $arsip['file_arsip']) ?>" target="_blank" class="text-primary text-decoration-none fw-semibold">
+                        <?php 
+                        $hasMediaFile = !empty($has_file_alih_media);
+                        $mediaUrl = $file_url ?? null;
+                        if (!$hasMediaFile && !empty($arsip['file_arsip'])) {
+                            $checkPath = FCPATH . 'uploads/arsip/' . $arsip['file_arsip'];
+                            if (is_file($checkPath) && file_exists($checkPath)) {
+                                $hasMediaFile = true;
+                                $mediaUrl = base_url('uploads/arsip/' . $arsip['file_arsip']) . '?v=' . filemtime($checkPath);
+                            }
+                        }
+                        ?>
+                        <?php if ($hasMediaFile && !empty($mediaUrl)) : ?>
+                            <a href="<?= $mediaUrl ?>" target="_blank" class="text-primary text-decoration-none fw-semibold">
                                 <i class="bi bi-box-arrow-up-right me-1"></i> Lihat Dokumen Digital
                             </a>
                         <?php else : ?>
-                            <span class="text-muted">Tidak ada berkas</span>
+                            <span class="text-muted fst-italic">Dokumen hasil alih media belum tersedia.</span>
                         <?php endif; ?>
                     </td>
                 </tr>

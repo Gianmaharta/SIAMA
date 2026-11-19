@@ -151,13 +151,13 @@ Manajemen Akun - SIAMA
         <table class="table user-table align-middle" id="userTable">
             <thead>
                 <tr>
-                    <th scope="col" class="col-no">No</th>
-                    <th scope="col" class="col-nama">Nama</th>
-                    <th scope="col" class="col-email">Email</th>
-                    <th scope="col" class="col-role">Role</th>
-                    <th scope="col" class="col-opd">OPD</th>
-                    <th scope="col" class="col-status">Status</th>
-                    <th scope="col" class="col-aksi">Aksi</th>
+                    <th scope="col" class="col-no text-center">No</th>
+                    <th scope="col" class="col-nama text-center">Nama</th>
+                    <th scope="col" class="col-email text-center">Email</th>
+                    <th scope="col" class="col-role text-center">Role</th>
+                    <th scope="col" class="col-opd text-center">OPD</th>
+                    <th scope="col" class="col-status text-center">Status</th>
+                    <th scope="col" class="col-aksi text-center">Aksi</th>
                 </tr>
             </thead>
             <tbody id="userTableBody">
@@ -880,7 +880,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td class="col-email">${safeEmail}</td>
                     <td class="col-role">${roleBadge}</td>
                     <td class="col-opd">${safeOpd}</td>
-                    <td class="col-status">${statusHtml}</td>
+                    <td class="col-status text-center">${statusHtml}</td>
                     <td class="col-aksi">${actionHtml}</td>
                 </tr>
             `;

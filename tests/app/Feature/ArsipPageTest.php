@@ -323,5 +323,106 @@ class ArsipPageTest extends CIUnitTestCase
         $result->assertSee('Klasifikasi Arsip');
         $this->assertStringNotContainsString('Tingkat Perkembangan', $body);
     }
+
+    public function testNewestArsipAppearsFirstInOrder()
+    {
+        $db = \Config\Database::connect();
+        $arsipModel = new \App\Models\ArsipModel();
+        $bidang = $db->table('bidang')->get(1)->getRowArray();
+        $idOpd = $bidang['id_opd'] ?? 'OPD-001';
+
+        // Buat arsip pertama (lama)
+        $idOld = 'arsip-old-' . time();
+        $nomorOld = 'ARSIP/TEST/001/' . time();
+        $db->table('arsip')->insert([
+            'id_arsip'          => $idOld,
+            'id_opd'            => $idOpd,
+            'nomor_arsip'       => $nomorOld,
+            'nama_arsip'        => 'Arsip Lama 001',
+            'created_at'        => date('Y-m-d H:i:s', strtotime('-10 minutes')),
+            'status_verifikasi' => 'Selesai',
+        ]);
+
+        // Buat arsip kedua (baru)
+        $idNew = 'arsip-new-' . (time() + 1);
+        $nomorNew = 'ARSIP/TEST/002/' . time();
+        $db->table('arsip')->insert([
+            'id_arsip'          => $idNew,
+            'id_opd'            => $idOpd,
+            'nomor_arsip'       => $nomorNew,
+            'nama_arsip'        => 'Arsip Baru 002',
+            'created_at'        => date('Y-m-d H:i:s'),
+            'status_verifikasi' => 'Menunggu',
+        ]);
+
+        // Ambil daftar arsip dari model
+        $list = $arsipModel->getArsipWithRelations(null, $idOpd);
+        $this->assertNotEmpty($list);
+
+        // Cari index idNew dan idOld
+        $indexNew = -1;
+        $indexOld = -1;
+        foreach ($list as $idx => $row) {
+            if ($row['id_arsip'] === $idNew) {
+                $indexNew = $idx;
+            }
+            if ($row['id_arsip'] === $idOld) {
+                $indexOld = $idx;
+            }
+        }
+
+        $this->assertNotEquals(-1, $indexNew);
+        $this->assertNotEquals(-1, $indexOld);
+        $this->assertLessThan($indexOld, $indexNew, "Arsip baru harus berada pada urutan sebelum arsip lama (index lebih kecil).");
+
+        // Bersihkan data uji
+        $db->table('arsip')->whereIn('id_arsip', [$idOld, $idNew])->delete();
+    }
+
+    public function testServeFileReturnsFileWithCorrectHeaders(): void
+    {
+        $testFile = 'test_serve_dummy.pdf';
+        $fullPath = FCPATH . 'uploads/arsip/' . $testFile;
+        file_put_contents($fullPath, '%PDF-1.4 dummy content');
+
+        try {
+            $result = $this->withSession($this->sessArsiparis())->get('uploads/arsip/' . $testFile);
+            $result->assertStatus(200);
+            $result->assertHeader('Content-Type', 'application/pdf');
+            $this->assertStringContainsString('inline; filename="test_serve_dummy.pdf"', $result->response()->getHeaderLine('Content-Disposition'));
+        } finally {
+            if (file_exists($fullPath)) {
+                unlink($fullPath);
+            }
+        }
+    }
+
+    public function testServeFileThrows404WhenNotFound(): void
+    {
+        $this->expectException(\CodeIgniter\Exceptions\PageNotFoundException::class);
+        $this->withSession($this->sessArsiparis())->get('uploads/arsip/non_existent_file_xyz.pdf');
+    }
+
+    public function testDetailArsipDisplaysNotAvailableMessageWhenNoFile(): void
+    {
+        $db = \Config\Database::connect('tests');
+        $idArsip = 'arsip-test-no-file-' . time();
+        $db->table('arsip')->insert([
+            'id_arsip'          => $idArsip,
+            'id_opd'            => '9974e50e-9512-4044-999d-7eb4061cd6b2',
+            'nomor_arsip'       => 'ARSIP/NOFILE/' . time(),
+            'nama_arsip'        => 'Arsip Tanpa File',
+            'file_arsip'        => null,
+            'status_verifikasi' => 'Draft',
+            'id_user_upload'    => '08167f77-3106-4010-b801-b0716a2809d8',
+            'created_at'        => date('Y-m-d H:i:s'),
+        ]);
+
+        $result = $this->withSession($this->sessArsiparis())->get('arsip/detail/' . $idArsip);
+        $result->assertStatus(200);
+        $result->assertSee('Dokumen hasil alih media belum tersedia.');
+
+        $db->table('arsip')->where('id_arsip', $idArsip)->delete();
+    }
 }
 

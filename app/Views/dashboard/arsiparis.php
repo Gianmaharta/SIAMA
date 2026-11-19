@@ -119,7 +119,7 @@ $statusData = $status_arsip_arsiparis ?? [
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <div class="d-inline-flex align-items-center gap-1.5 flex-wrap justify-content-center">
+                                    <div class="d-inline-flex align-items-center gap-2 flex-wrap justify-content-center table-action-group" style="gap: 8px; row-gap: 8px;">
                                         <a href="<?= base_url('/arsip/create?id_spt=' . $spt['id_spt']) ?>" class="btn-action-start" title="Mulai unggah berkas alih media untuk SPT ini">
                                             <i class="bi bi-folder-plus"></i> Mulai Alih Media
                                         </a>
@@ -295,7 +295,7 @@ $statusData = $status_arsip_arsiparis ?? [
                                     ?>
                                 </td>
                                 <td class="text-center">
-                                    <div class="d-inline-flex align-items-center gap-1">
+                                    <div class="d-inline-flex align-items-center gap-2 flex-wrap justify-content-center" style="gap: 8px; row-gap: 8px;">
                                         <a href="<?= base_url('/arsip/detail/' . $rowArsip['id_arsip']) ?>" class="btn-action-detail" title="Lihat Rincian Arsip">
                                             <i class="bi bi-eye"></i> Detail
                                         </a>

@@ -141,4 +141,5 @@ public/uploads/spt/*.pdf
 tests/Feature/
 tests/_support/SiamaTestCase.php
 tests/unit/PriorityCalculationTest.php
+backups/
 

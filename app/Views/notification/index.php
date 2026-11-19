@@ -51,22 +51,22 @@ Pusat Notifikasi - SIAMA
     <a href="<?= base_url('/notification?filter=all') ?>" class="notif-filter-btn <?= $currentFilter === 'all' ? 'active' : '' ?>">
         <i class="bi bi-collection"></i>
         <span>Semua</span>
-        <span class="filter-count"><?= $totalAll ?></span>
+        <span class="filter-count" id="filterCountAll"><?= $totalAll ?></span>
     </a>
     <a href="<?= base_url('/notification?filter=unread') ?>" class="notif-filter-btn <?= $currentFilter === 'unread' ? 'active' : '' ?>">
         <i class="bi bi-envelope-exclamation"></i>
         <span>Belum Dibaca</span>
-        <span class="filter-count"><?= $totalUnread ?></span>
+        <span class="filter-count" id="filterCountUnread"><?= $totalUnread ?></span>
     </a>
     <a href="<?= base_url('/notification?filter=read') ?>" class="notif-filter-btn <?= $currentFilter === 'read' ? 'active' : '' ?>">
         <i class="bi bi-envelope-check"></i>
         <span>Sudah Dibaca</span>
-        <span class="filter-count"><?= $totalRead ?></span>
+        <span class="filter-count" id="filterCountRead"><?= $totalRead ?></span>
     </a>
 </div>
 
 <!-- Daftar Kartu Notifikasi -->
-<div class="notif-list-container">
+<div class="notif-list-container" id="notifListContainer" data-current-filter="<?= esc($currentFilter) ?>">
     <?php if (empty($notifications)) : ?>
         <div class="card border-0 shadow-sm rounded-4 text-center py-5 px-3">
             <div class="card-body">
@@ -119,7 +119,7 @@ Pusat Notifikasi - SIAMA
                         </div>
                     </div>
 
-                    <p class="notif-card-desc"><?= esc($notif['message']) ?></p>
+                    <p class="notif-card-desc" style="white-space: pre-line;"><?= esc($notif['message']) ?></p>
 
                     <!-- Info Pengirim & Referensi Dokumen -->
                     <?php if (!empty($notif['sender_nama']) || !empty($notif['reference_type'])) : ?>
@@ -199,11 +199,11 @@ Pusat Notifikasi - SIAMA
                         <div class="notif-card-meta">
                             <span>
                                 <i class="bi bi-calendar3 me-1"></i>
-                                <?= !empty($notif['created_at']) ? date('d M Y, H:i', strtotime($notif['created_at'])) . ' WITA' : '-' ?>
+                                <span class="notif-full-date"><?= !empty($notif['formatted_date']) ? esc($notif['formatted_date']) : (!empty($notif['created_at']) ? date('d M Y, H:i', strtotime($notif['created_at'])) . ' WITA' : '-') ?></span>
                             </span>
                             <span>
                                 <i class="bi bi-clock-history me-1"></i>
-                                <?= esc($notif['time_ago']) ?>
+                                <span class="notif-time-ago" data-timestamp="<?= esc($notif['created_at']) ?>"><?= esc($notif['time_ago']) ?></span>
                             </span>
                         </div>
 

@@ -13,7 +13,10 @@ class SptModel extends BaseModel
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     
-    protected $useTimestamps    = false;
+    protected $useTimestamps    = true;
+    protected $dateFormat       = 'datetime';
+    protected $createdField     = 'created_at';
+    protected $updatedField     = 'updated_at';
     protected $beforeInsert     = ['generateUuid'];
     protected $beforeUpdate     = [];
 
@@ -30,7 +33,9 @@ class SptModel extends BaseModel
         'id_pimpinan',
         'file_spt',
         'created_by',
-        'updated_by'
+        'updated_by',
+        'created_at',
+        'updated_at'
     ];
 
     // Validasi
@@ -75,19 +80,37 @@ class SptModel extends BaseModel
         return $this->where('id_opd', $id_opd)->countAllResults();
     }
 
-    // Mendapatkan daftar SPT berdasarkan OPD
+    // Mendapatkan daftar SPT berdasarkan OPD (Terbaru di urutan paling atas)
     public function getSptByOpd($id_opd)
     {
-        return $this->where('id_opd', $id_opd)->findAll();
+        return $this->select('spt.*, (SELECT COUNT(a.id_arsip) FROM arsip a WHERE a.id_spt = spt.id_spt) as jumlah_arsip')
+                    ->where('spt.id_opd', $id_opd)
+                    ->orderBy('COALESCE(spt.created_at, CONCAT(spt.tanggal_spt, " 00:00:00"))', 'DESC', false)
+                    ->orderBy('spt.tanggal_spt', 'DESC')
+                    ->orderBy('spt.id_spt', 'DESC')
+                    ->findAll();
     }
 
+    // Mendapatkan daftar SPT penugasan Arsiparis (Tugas terbaru di urutan paling atas)
     public function getSptByPelaksana($user_id)
     {
-        return $this->select('spt.*, spt_assignments.status as assignment_status')
+        return $this->select('spt.*, spt_assignments.id_assignment, spt_assignments.status as assignment_status, spt_assignments.created_at as tanggal_penugasan, spt_assignments.assigned_by, (SELECT COUNT(a.id_arsip) FROM arsip a WHERE a.id_spt = spt.id_spt) as jumlah_arsip, u_kabid.nama as nama_kabid')
                     ->join('spt_assignments', 'spt_assignments.id_spt = spt.id_spt')
+                    ->join('users u_kabid', 'u_kabid.id_user = spt_assignments.assigned_by', 'left')
                     ->where('spt_assignments.id_user', $user_id)
-                    ->where('spt_assignments.status !=', 'selesai')
-                    ->where('spt.status', 'Aktif')
+                    ->orderBy('COALESCE(spt_assignments.created_at, spt.created_at, CONCAT(spt.tanggal_spt, " 00:00:00"))', 'DESC', false)
+                    ->orderBy('spt.tanggal_spt', 'DESC')
+                    ->orderBy('spt_assignments.id_assignment', 'DESC')
+                    ->findAll();
+    }
+
+    // Mendapatkan semua data SPT global dengan jumlah arsip (Urutan terbaru)
+    public function getAllSptWithArsipCount()
+    {
+        return $this->select('spt.*, (SELECT COUNT(a.id_arsip) FROM arsip a WHERE a.id_spt = spt.id_spt) as jumlah_arsip')
+                    ->orderBy('COALESCE(spt.created_at, CONCAT(spt.tanggal_spt, " 00:00:00"))', 'DESC', false)
+                    ->orderBy('spt.tanggal_spt', 'DESC')
+                    ->orderBy('spt.id_spt', 'DESC')
                     ->findAll();
     }
 
