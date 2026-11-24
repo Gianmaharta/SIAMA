@@ -36,7 +36,79 @@ class Bidang extends BaseController
             $data['id_opd_locked'] = null;
         }
 
+        if ($this->wantsJson()) {
+            return $this->response->setJSON([
+                'status'  => 'success',
+                'total'   => count($data['bidangs']),
+                'data'    => $data['bidangs'],
+            ]);
+        }
+
         return view('bidang/index', $data);
+    }
+
+    /**
+     * Endpoint Server-Side DataTables untuk Master Bidang (GET /bidang/datatable)
+     */
+    public function datatable()
+    {
+        $session   = session();
+        $nama_role = $session->get('nama_role');
+        $id_opd    = $session->get('id_opd');
+
+        $draw   = (int) ($this->request->getGet('draw') ?? 1);
+        $length = max(1, min(100, (int) ($this->request->getGet('length') ?: $this->request->getGet('per_page') ?: 10)));
+        $start  = $this->request->getGet('start') !== null
+            ? max(0, (int) $this->request->getGet('start'))
+            : (max(1, (int) ($this->request->getGet('page') ?: 1)) - 1) * $length;
+
+        $searchParam = $this->request->getGet('search');
+        $search = is_array($searchParam)
+            ? trim((string) ($searchParam['value'] ?? ''))
+            : trim((string) ($searchParam ?? ''));
+
+        $sortMap = [
+            'id_bidang'   => 'bidang.id_bidang',
+            'nama_opd'    => 'opd.nama_opd',
+            'nama_bidang' => 'bidang.nama_bidang',
+        ];
+        $sortBy  = (string) ($this->request->getGet('sort_by') ?: 'nama_opd');
+        $sortCol = $sortMap[$sortBy] ?? 'opd.nama_opd';
+        $sortDir = strtoupper((string) ($this->request->getGet('sort_dir') ?: 'ASC')) === 'DESC' ? 'DESC' : 'ASC';
+
+        $db = \Config\Database::connect();
+        $baseBuilder = $db->table('bidang')
+            ->select('bidang.*, opd.nama_opd')
+            ->join('opd', 'opd.id_opd = bidang.id_opd', 'left');
+
+        if ($nama_role === 'Admin_OPD' && !empty($id_opd)) {
+            $baseBuilder->where('bidang.id_opd', $id_opd);
+        }
+
+        $recordsTotal = (int) (clone $baseBuilder)->countAllResults();
+
+        if ($search !== '') {
+            $baseBuilder->groupStart()
+                ->like('bidang.id_bidang', $search)
+                ->orLike('opd.nama_opd', $search)
+                ->orLike('bidang.nama_bidang', $search)
+                ->groupEnd();
+        }
+
+        $recordsFiltered = (int) (clone $baseBuilder)->countAllResults();
+        $rows = $baseBuilder->orderBy($sortCol, $sortDir)
+            ->orderBy('bidang.nama_bidang', 'ASC')
+            ->limit($length, $start)
+            ->get()
+            ->getResultArray();
+
+        return $this->response->setJSON([
+            'status'          => 'success',
+            'draw'            => $draw,
+            'recordsTotal'    => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data'            => $rows,
+        ]);
     }
 
     public function create()

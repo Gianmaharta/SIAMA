@@ -528,49 +528,57 @@ document.addEventListener('DOMContentLoaded', function() {
         return text.toString().replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 
-    /**
-     * Filter data berdasarkan teks pencarian dan pilihan status
-     */
-    function applyFilters() {
-        const query = searchInput.value.trim().toLowerCase();
-        const statusVal = statusFilter.value;
+    let searchTimeout = null;
+    let totalFiltered = 0;
 
-        // Toggle tombol clear search
-        if (query.length > 0) {
-            clearSearchBtn.classList.remove('d-none');
-        } else {
-            clearSearchBtn.classList.add('d-none');
+    /**
+     * Ambil data dari Server-Side DataTables (/opd/datatable)
+     */
+    async function fetchOpdPage() {
+        const query = searchInput ? searchInput.value.trim() : '';
+        const statusVal = statusFilter ? statusFilter.value : 'all';
+        const perPageVal = perPageSelect ? perPageSelect.value : '10';
+        const effectivePerPage = perPageVal === 'all' ? 500 : (parseInt(perPageVal, 10) || 10);
+        const startIdx = (currentPage - 1) * effectivePerPage;
+
+        if (clearSearchBtn) {
+            clearSearchBtn.classList.toggle('d-none', query.length === 0);
         }
 
-        filteredData = rawData.filter(item => {
-            // Pencarian nama, kode, atau id
-            const matchQuery = !query || 
-                (item.nama_opd && item.nama_opd.toLowerCase().includes(query)) ||
-                (item.kode_opd && item.kode_opd.toLowerCase().includes(query)) ||
-                (item.id_opd && item.id_opd.toLowerCase().includes(query));
-
-            // Filter status
-            let matchStatus = true;
-            if (statusVal === '1') {
-                matchStatus = parseInt(item.is_active) === 1;
-            } else if (statusVal === '0') {
-                matchStatus = parseInt(item.is_active) === 0;
-            }
-
-            return matchQuery && matchStatus;
+        const params = new URLSearchParams({
+            start: String(startIdx),
+            length: String(effectivePerPage),
+            search: query,
+            is_active: statusVal
         });
 
-        currentPage = 1; // Reset ke halaman pertama saat filter berubah
-        renderTable();
+        try {
+            const res = await fetch('<?= base_url('opd/datatable') ?>?' + params.toString(), {
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            if (!res.ok) return;
+            const json = await res.json();
+            totalFiltered = Number(json.recordsFiltered ?? 0);
+            renderRows(json.data || [], startIdx, effectivePerPage, perPageVal);
+        } catch (err) {
+            console.error('Gagal memuat data OPD:', err);
+        }
+    }
+
+    function applyFilters() {
+        currentPage = 1;
+        fetchOpdPage();
+    }
+
+    function renderTable() {
+        fetchOpdPage();
     }
 
     /**
      * Render Baris Tabel dan Navigasi Pagination
      */
-    function renderTable() {
-        const totalItems = filteredData.length;
-        const perPageVal = perPageSelect ? perPageSelect.value : '10';
-        const effectivePerPage = perPageVal === 'all' ? Math.max(totalItems, 1) : parseInt(perPageVal);
+    function renderRows(pageItems, startIndex, effectivePerPage, perPageVal) {
+        const totalItems = totalFiltered;
         const totalPages = Math.ceil(totalItems / effectivePerPage) || 1;
 
         if (currentPage > totalPages) {
@@ -578,7 +586,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Tampilkan / Sembunyikan Empty State
-        if (totalItems === 0) {
+        if (totalItems === 0 || pageItems.length === 0) {
             tableBody.innerHTML = '';
             emptyState.classList.remove('d-none');
             paginationInfo.textContent = 'Menampilkan 0 data';
@@ -588,10 +596,7 @@ document.addEventListener('DOMContentLoaded', function() {
             emptyState.classList.add('d-none');
         }
 
-        // Slice data untuk halaman aktif
-        const startIndex = (currentPage - 1) * effectivePerPage;
-        const endIndex = Math.min(startIndex + effectivePerPage, totalItems);
-        const pageItems = filteredData.slice(startIndex, endIndex);
+        const endIndex = Math.min(startIndex + pageItems.length, totalItems);
 
         // Render Baris Data
         let htmlRows = '';
@@ -748,9 +753,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // EVENT LISTENERS
     // ==============================================================
 
-    // 1. Pencarian Real-Time
+    // 1. Pencarian Real-Time (Debounce 250ms ke Server)
     if (searchInput) {
-        searchInput.addEventListener('input', applyFilters);
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(applyFilters, 250);
+        });
     }
 
     // 2. Clear Pencarian

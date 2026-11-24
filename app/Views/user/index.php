@@ -673,49 +673,59 @@ document.addEventListener('DOMContentLoaded', function() {
         return text.toString().replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 
-    /**
-     * Filter data pengguna berdasarkan teks pencarian dan pilihan OPD
-     */
-    function applyFilters() {
-        const query = searchInput.value.trim().toLowerCase();
-        const selectedOpd = opdFilter ? opdFilter.value : 'all';
+    let searchTimeout = null;
+    let totalFiltered = 0;
 
-        // Tampilkan/sembunyikan tombol clear search
-        if (query.length > 0) {
-            clearSearchBtn.classList.remove('d-none');
-        } else {
-            clearSearchBtn.classList.add('d-none');
+    /**
+     * Ambil data pengguna dari Server-Side DataTables (/users/datatable)
+     */
+    async function fetchUsersPage() {
+        const query = searchInput ? searchInput.value.trim() : '';
+        const selectedOpd = opdFilter ? opdFilter.value : 'all';
+        const perPageVal = perPageSelect ? perPageSelect.value : '10';
+        const effectivePerPage = perPageVal === 'all' ? 100 : (parseInt(perPageVal, 10) || 10);
+        const startIdx = (currentPage - 1) * effectivePerPage;
+
+        if (clearSearchBtn) {
+            clearSearchBtn.classList.toggle('d-none', query.length === 0);
         }
 
-        filteredData = rawData.filter(item => {
-            // Pencarian Nama, Email, OPD, Bidang, atau Role
-            const matchQuery = !query || 
-                (item.nama && item.nama.toLowerCase().includes(query)) ||
-                (item.email && item.email.toLowerCase().includes(query)) ||
-                (item.nama_opd && item.nama_opd.toLowerCase().includes(query)) ||
-                (item.nama_bidang && item.nama_bidang.toLowerCase().includes(query)) ||
-                (item.nama_role && item.nama_role.toLowerCase().includes(query));
-
-            // Filter OPD
-            let matchOpd = true;
-            if (selectedOpd !== 'all') {
-                matchOpd = item.id_opd === selectedOpd;
-            }
-
-            return matchQuery && matchOpd;
+        const params = new URLSearchParams({
+            start: String(startIdx),
+            length: String(effectivePerPage),
+            search: query
         });
+        if (selectedOpd && selectedOpd !== 'all') {
+            params.set('id_opd', selectedOpd);
+        }
 
+        try {
+            const res = await fetch('<?= base_url('users/datatable') ?>?' + params.toString(), {
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            if (!res.ok) return;
+            const json = await res.json();
+            totalFiltered = Number(json.recordsFiltered ?? 0);
+            renderRows(json.data || [], startIdx, effectivePerPage, perPageVal);
+        } catch (err) {
+            console.error('Gagal memuat data pengguna:', err);
+        }
+    }
+
+    function applyFilters() {
         currentPage = 1;
-        renderTable();
+        fetchUsersPage();
+    }
+
+    function renderTable() {
+        fetchUsersPage();
     }
 
     /**
      * Render Baris Tabel dan Navigasi Pagination
      */
-    function renderTable() {
-        const totalItems = filteredData.length;
-        const perPageVal = perPageSelect ? perPageSelect.value : '10';
-        const effectivePerPage = perPageVal === 'all' ? Math.max(totalItems, 1) : (parseInt(perPageVal, 10) || 10);
+    function renderRows(pageItems, startIndex, effectivePerPage, perPageVal) {
+        const totalItems = totalFiltered;
         const totalPages = Math.ceil(totalItems / effectivePerPage) || 1;
 
         if (currentPage > totalPages) {
@@ -723,7 +733,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Tampilkan / Sembunyikan Empty State
-        if (totalItems === 0) {
+        if (totalItems === 0 || pageItems.length === 0) {
             tableBody.innerHTML = '';
             emptyState.classList.remove('d-none');
             paginationInfo.textContent = 'Menampilkan 0 data';
@@ -733,10 +743,7 @@ document.addEventListener('DOMContentLoaded', function() {
             emptyState.classList.add('d-none');
         }
 
-        // Slice data untuk halaman aktif
-        const startIndex = (currentPage - 1) * effectivePerPage;
-        const endIndex = Math.min(startIndex + effectivePerPage, totalItems);
-        const pageItems = filteredData.slice(startIndex, endIndex);
+        const endIndex = Math.min(startIndex + pageItems.length, totalItems);
 
         // Render Baris Data
         let htmlRows = '';
@@ -1012,9 +1019,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // EVENT LISTENERS
     // ==============================================================
 
-    // 1. Pencarian Real-Time
+    // 1. Pencarian Real-Time (Debounce 250ms ke Server)
     if (searchInput) {
-        searchInput.addEventListener('input', applyFilters);
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(applyFilters, 250);
+        });
     }
 
     // 2. Clear Pencarian

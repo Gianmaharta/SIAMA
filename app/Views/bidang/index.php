@@ -460,50 +460,52 @@ document.addEventListener('DOMContentLoaded', function() {
         return text.toString().replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 
-    /**
-     * Filter data berdasarkan teks pencarian (ID, Nama OPD, Nama Bidang)
-     */
-    function applyFilters() {
-        const query = searchInput.value.trim().toLowerCase();
+    let searchTimeout = null;
+    let totalFiltered = 0;
 
-        // Tampilkan/sembunyikan tombol clear search
-        if (query.length > 0) {
-            clearSearchBtn.classList.remove('d-none');
-        } else {
-            clearSearchBtn.classList.add('d-none');
+    /**
+     * Ambil data dari Server-Side DataTables (/bidang/datatable)
+     */
+    async function fetchBidangPage() {
+        const query = searchInput ? searchInput.value.trim() : '';
+        const startIdx = (currentPage - 1) * perPage;
+
+        if (clearSearchBtn) {
+            clearSearchBtn.classList.toggle('d-none', query.length === 0);
         }
 
-        filteredData = rawData.filter(item => {
-            if (!query) return true;
-            const matchId = item.id_bidang && item.id_bidang.toLowerCase().includes(query);
-            const matchOpd = item.nama_opd && item.nama_opd.toLowerCase().includes(query);
-            const matchBidang = item.nama_bidang && item.nama_bidang.toLowerCase().includes(query);
-            return matchId || matchOpd || matchBidang;
+        const params = new URLSearchParams({
+            start: String(startIdx),
+            length: String(perPage),
+            search: query,
+            sort_by: currentSort.key || 'nama_opd',
+            sort_dir: (currentSort.direction || 'asc').toUpperCase()
         });
 
-        // Terapkan sorting jika ada kolom yang diurutkan
-        if (currentSort.key) {
-            applySort();
+        try {
+            const res = await fetch('<?= base_url('bidang/datatable') ?>?' + params.toString(), {
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            if (!res.ok) return;
+            const json = await res.json();
+            totalFiltered = Number(json.recordsFiltered ?? 0);
+            renderRows(json.data || [], startIdx);
+        } catch (err) {
+            console.error('Gagal memuat data Bidang:', err);
         }
-
-        currentPage = 1;
-        renderTable();
     }
 
-    /**
-     * Urutkan data berdasarkan currentSort
-     */
+    function applyFilters() {
+        currentPage = 1;
+        fetchBidangPage();
+    }
+
     function applySort() {
-        if (!currentSort.key) return;
+        currentPage = 1;
+    }
 
-        filteredData.sort((a, b) => {
-            const valA = (a[currentSort.key] || '').toString().toLowerCase();
-            const valB = (b[currentSort.key] || '').toString().toLowerCase();
-
-            if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
-            if (valA > valB) return currentSort.direction === 'asc' ? 1 : -1;
-            return 0;
-        });
+    function renderTable() {
+        fetchBidangPage();
     }
 
     /**
@@ -533,8 +535,8 @@ document.addEventListener('DOMContentLoaded', function() {
     /**
      * Render Baris Tabel dan Navigasi Pagination
      */
-    function renderTable() {
-        const totalItems = filteredData.length;
+    function renderRows(pageItems, startIndex) {
+        const totalItems = totalFiltered;
         const totalPages = Math.ceil(totalItems / perPage) || 1;
 
         if (currentPage > totalPages) {
@@ -542,7 +544,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Tampilkan / Sembunyikan Empty State
-        if (totalItems === 0) {
+        if (totalItems === 0 || pageItems.length === 0) {
             tableBody.innerHTML = '';
             emptyState.classList.remove('d-none');
             paginationInfo.textContent = 'Menampilkan 0 data';
@@ -552,10 +554,7 @@ document.addEventListener('DOMContentLoaded', function() {
             emptyState.classList.add('d-none');
         }
 
-        // Slice data untuk halaman aktif
-        const startIndex = (currentPage - 1) * perPage;
-        const endIndex = Math.min(startIndex + perPage, totalItems);
-        const pageItems = filteredData.slice(startIndex, endIndex);
+        const endIndex = Math.min(startIndex + pageItems.length, totalItems);
 
         // Render Baris Data
         let htmlRows = '';
@@ -709,9 +708,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // EVENT LISTENERS
     // ==============================================================
 
-    // 1. Pencarian Real-Time
+    // 1. Pencarian Real-Time (Debounce 250ms ke Server)
     if (searchInput) {
-        searchInput.addEventListener('input', applyFilters);
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(applyFilters, 250);
+        });
     }
 
     // 2. Clear Pencarian

@@ -283,6 +283,23 @@ class SwaggerExtraDocs
     #[OA\Get(path: '/opd', summary: 'Daftar Master OPD', tags: ['Master OPD'], security: [['sessionAuth' => []]], responses: [new OA\Response(response: 200, description: 'Halaman daftar OPD')])]
     public function opdIndex(): void {}
 
+    #[OA\Get(
+        path: '/opd/datatable',
+        operationId: 'opdDatatable',
+        summary: 'Server-Side DataTables Master OPD (JSON)',
+        tags: ['Master OPD'],
+        security: [['sessionAuth' => []]],
+        parameters: [
+            new OA\Parameter(name: 'draw', in: 'query', schema: new OA\Schema(type: 'integer', default: 1)),
+            new OA\Parameter(name: 'start', in: 'query', schema: new OA\Schema(type: 'integer', default: 0)),
+            new OA\Parameter(name: 'length', in: 'query', schema: new OA\Schema(type: 'integer', default: 10)),
+            new OA\Parameter(name: 'search', in: 'query', schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'is_active', in: 'query', schema: new OA\Schema(type: 'string', enum: ['all', '1', '0'])),
+        ],
+        responses: [new OA\Response(response: 200, description: 'Payload DataTables Master OPD JSON')]
+    )]
+    public function opdDatatable(): void {}
+
     #[OA\Get(path: '/opd/create', summary: 'Form Tambah OPD', tags: ['Master OPD'], security: [['sessionAuth' => []]], responses: [new OA\Response(response: 200, description: 'Halaman tambah OPD')])]
     public function opdCreate(): void {}
 
@@ -300,6 +317,24 @@ class SwaggerExtraDocs
 
     #[OA\Get(path: '/bidang', summary: 'Daftar Master Bidang', tags: ['Master Bidang'], security: [['sessionAuth' => []]], responses: [new OA\Response(response: 200, description: 'Halaman daftar Bidang')])]
     public function bidangIndex(): void {}
+
+    #[OA\Get(
+        path: '/bidang/datatable',
+        operationId: 'bidangDatatable',
+        summary: 'Server-Side DataTables Master Bidang (JSON)',
+        tags: ['Master Bidang'],
+        security: [['sessionAuth' => []]],
+        parameters: [
+            new OA\Parameter(name: 'draw', in: 'query', schema: new OA\Schema(type: 'integer', default: 1)),
+            new OA\Parameter(name: 'start', in: 'query', schema: new OA\Schema(type: 'integer', default: 0)),
+            new OA\Parameter(name: 'length', in: 'query', schema: new OA\Schema(type: 'integer', default: 10)),
+            new OA\Parameter(name: 'search', in: 'query', schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'sort_by', in: 'query', schema: new OA\Schema(type: 'string', enum: ['id_bidang', 'nama_opd', 'nama_bidang'])),
+            new OA\Parameter(name: 'sort_dir', in: 'query', schema: new OA\Schema(type: 'string', enum: ['ASC', 'DESC'])),
+        ],
+        responses: [new OA\Response(response: 200, description: 'Payload DataTables Master Bidang JSON')]
+    )]
+    public function bidangDatatable(): void {}
 
     #[OA\Get(path: '/bidang/create', summary: 'Form Tambah Bidang', tags: ['Master Bidang'], security: [['sessionAuth' => []]], responses: [new OA\Response(response: 200, description: 'Halaman tambah Bidang')])]
     public function bidangCreate(): void {}

@@ -31,7 +31,67 @@ class Opd extends BaseController
             'inactiveOpd' => $inactiveOpd,
             'nextKodeOpd' => $nextKodeOpd,
         ];
+
+        if ($this->wantsJson()) {
+            return $this->response->setJSON([
+                'status'       => 'success',
+                'total_opd'    => $totalOpd,
+                'active_opd'   => $activeOpd,
+                'inactive_opd' => $inactiveOpd,
+                'data'         => $opds,
+            ]);
+        }
+
         return view('opd/index', $data);
+    }
+
+    /**
+     * Endpoint Server-Side DataTables untuk Master OPD (GET /opd/datatable)
+     */
+    public function datatable()
+    {
+        $draw   = (int) ($this->request->getGet('draw') ?? 1);
+        $lengthParam = $this->request->getGet('length') ?: $this->request->getGet('per_page') ?: 10;
+        $length = ($lengthParam === 'all') ? 500 : max(1, min(500, (int) $lengthParam));
+        $start  = $this->request->getGet('start') !== null
+            ? max(0, (int) $this->request->getGet('start'))
+            : (max(1, (int) ($this->request->getGet('page') ?: 1)) - 1) * $length;
+
+        $searchParam = $this->request->getGet('search');
+        $search = is_array($searchParam)
+            ? trim((string) ($searchParam['value'] ?? ''))
+            : trim((string) ($searchParam ?? ''));
+
+        $statusFilter = trim((string) ($this->request->getGet('is_active') ?? 'all'));
+
+        $db = \Config\Database::connect();
+        $recordsTotal = (int) $db->table('opd')->countAllResults();
+
+        $builder = $db->table('opd');
+        if ($search !== '') {
+            $builder->groupStart()
+                ->like('nama_opd', $search)
+                ->orLike('kode_opd', $search)
+                ->orLike('id_opd', $search)
+                ->groupEnd();
+        }
+        if ($statusFilter === '1' || $statusFilter === '0') {
+            $builder->where('is_active', (int) $statusFilter);
+        }
+
+        $recordsFiltered = (int) (clone $builder)->countAllResults();
+        $rows = $builder->orderBy('kode_opd', 'ASC')
+            ->limit($length, $start)
+            ->get()
+            ->getResultArray();
+
+        return $this->response->setJSON([
+            'status'          => 'success',
+            'draw'            => $draw,
+            'recordsTotal'    => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data'            => $rows,
+        ]);
     }
 
     public function create()
