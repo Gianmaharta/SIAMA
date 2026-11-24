@@ -15,12 +15,6 @@ Terbitkan SPT Baru - SIAMA
     </div>
 </div>
 
-<?php if (session()->getFlashdata('error')) : ?>
-    <div style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 15px;">
-        <?= session()->getFlashdata('error') ?>
-    </div>
-<?php endif; ?>
-
 <form action="<?= base_url('/spt/store') ?>" method="POST" enctype="multipart/form-data">
     <?= csrf_field() ?>
 

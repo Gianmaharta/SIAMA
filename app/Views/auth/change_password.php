@@ -13,23 +13,6 @@ Ganti Password Default - SIAMA
     <div class="row justify-content-center">
         <div class="col-12 col-md-11 col-lg-8 col-xl-7" style="max-width: 660px;">
 
-            <!-- Flash Message Feedback -->
-            <?php if (session()->getFlashdata('error')) : ?>
-                <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 mb-3 rounded-3 border-0 shadow-sm" role="alert">
-                    <i class="bi bi-exclamation-circle-fill fs-5 text-danger"></i>
-                    <div class="small fw-medium"><?= session()->getFlashdata('error') ?></div>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
-                </div>
-            <?php endif; ?>
-
-            <?php if (session()->getFlashdata('success')) : ?>
-                <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 mb-3 rounded-3 border-0 shadow-sm" role="alert">
-                    <i class="bi bi-check-circle-fill fs-5 text-success"></i>
-                    <div class="small fw-medium"><?= session()->getFlashdata('success') ?></div>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
-                </div>
-            <?php endif; ?>
-
             <!-- Kotak Informasi Peringatan Keamanan Wajib -->
             <div class="alert border-0 rounded-3 p-3 mb-4 d-flex align-items-start gap-3 shadow-sm" style="background-color: #FFFBEB; border: 1px solid #FEF3C7 !important;">
                 <div class="d-flex align-items-center justify-content-center flex-shrink-0 mt-0.5" style="color: #D97706; font-size: 20px;">

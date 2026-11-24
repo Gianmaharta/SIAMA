@@ -63,8 +63,8 @@ Pengelolaan Arsip - SIAMA
                 </select>
             </div>
 
-            <!-- Tombol Utama + Tambah Arsip (CTA Utama) -->
-            <?php if (in_array($user_role ?? session()->get('nama_role'), ['Arsiparis', 'Admin_Pemkab'])) : ?>
+            <?php if (($user_role ?? session()->get('nama_role')) === 'Arsiparis') : ?>
+                <!-- Tombol Utama + Tambah Arsip (CTA Utama) - Khusus Role Arsiparis -->
                 <a href="<?= base_url('/arsip/create') ?>" class="btn arsip-btn-add btn-toolbar-primary" id="btnTambahArsip" title="Tambah Arsip Baru">
                     <i class="bi bi-plus-lg"></i>
                     <span>Tambah Arsip</span>
@@ -119,7 +119,7 @@ Pengelolaan Arsip - SIAMA
         <h5 class="arsip-empty-title" id="emptyTitle">Belum ada arsip</h5>
         <p class="arsip-empty-desc" id="emptyDesc">Belum ada arsip yang tersedia untuk dikelola.</p>
         <div class="d-flex align-items-center justify-content-center gap-2 mt-3" id="emptyActions">
-            <?php if (in_array($user_role ?? session()->get('nama_role'), ['Arsiparis', 'Admin_Pemkab'])) : ?>
+            <?php if (($user_role ?? session()->get('nama_role')) === 'Arsiparis') : ?>
                 <a href="<?= base_url('/arsip/create') ?>" class="btn arsip-btn-add btn-toolbar-primary" id="emptyBtnTambahArsip">
                     <i class="bi bi-plus-lg"></i>
                     <span>Tambah Arsip</span>

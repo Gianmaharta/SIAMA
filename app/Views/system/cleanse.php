@@ -154,7 +154,11 @@ Reset & Data Cleansing - SIAMA
                         <li><strong>Transaksi Aman:</strong> Operasi database dijalankan dalam transaksi dan dapat dibatalkan jika terjadi error.</li>
                     </ul>
 
-                    <form action="<?= base_url('/system-cleanse/execute') ?>" method="post" onsubmit="return confirm('PERINGATAN: Anda akan menghapus seluruh data SPT, Arsip, Berita Acara, Log Aktivitas, dan Notifikasi secara permanen setelah backup dibuat.\n\nKetik OK untuk melanjutkan proses reset data?')">
+                    <form action="<?= base_url('/system-cleanse/execute') ?>" method="post" 
+                          data-swal-confirm="PERINGATAN KEAMANAN: Seluruh data operasional (SPT, Penugasan, Berita Acara, Pengesahan, Log Aktivitas, dan Notifikasi) akan dibersihkan secara permanen setelah cadangan otomatis disimpan. Apakah Anda yakin ingin melanjutkan?"
+                          data-swal-title="Reset Seluruh Data Operasional?"
+                          data-swal-danger="true"
+                          data-swal-btn="Ya, Reset Sekarang">
                         <?= csrf_field() ?>
                         <div class="d-grid">
                             <button type="submit" class="btn btn-danger btn-lg py-3 fw-bold rounded-3 shadow-sm d-flex align-items-center justify-content-center gap-2">

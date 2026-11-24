@@ -559,23 +559,6 @@ Detail Berita Acara - SIAMA
     </div>
 </div>
 
-<!-- Feedback Flash Messages -->
-<?php if (session()->getFlashdata('success')) : ?>
-    <div class="alert alert-success alert-dismissible fade show d-flex align-items-center mb-4 rounded-3 border-0 shadow-sm" role="alert">
-        <i class="bi bi-check-circle-fill me-2 fs-5 text-success"></i>
-        <div class="small fw-medium"><?= session()->getFlashdata('success') ?></div>
-        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Tutup"></button>
-    </div>
-<?php endif; ?>
-
-<?php if (session()->getFlashdata('error')) : ?>
-    <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-4 rounded-3 border-0 shadow-sm" role="alert">
-        <i class="bi bi-exclamation-circle-fill me-2 fs-5 text-danger"></i>
-        <div class="small fw-medium"><?= session()->getFlashdata('error') ?></div>
-        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Tutup"></button>
-    </div>
-<?php endif; ?>
-
 <?php
     // Inisialisasi data dengan fallback nilai default sesuai referensi prompt
     $nomorBa    = !empty($ba['nomor_ba']) ? $ba['nomor_ba'] : '018/BA/BPKPD/2026';

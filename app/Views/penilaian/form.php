@@ -27,27 +27,6 @@ if ($currentSkor > 100) $currentSkor = 100;
     </div>
 </div>
 
-<!-- Notifikasi Flash Error / Success -->
-<?php if (session()->getFlashdata('error')) : ?>
-    <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-4" role="alert">
-        <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
-        <div>
-            <?= session()->getFlashdata('error') ?>
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
-    </div>
-<?php endif; ?>
-
-<?php if (session()->getFlashdata('success')) : ?>
-    <div class="alert alert-success alert-dismissible fade show d-flex align-items-center mb-4" role="alert">
-        <i class="bi bi-check-circle-fill me-2 fs-5"></i>
-        <div>
-            <?= session()->getFlashdata('success') ?>
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
-    </div>
-<?php endif; ?>
-
 <div class="row g-4 align-items-stretch">
     <?php
     $isMediaReady = !empty($has_file_alih_media);

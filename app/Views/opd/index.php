@@ -421,35 +421,6 @@ Master Data OPD - SIAMA
     </div>
 </div>
 
-<!-- ============================================================== -->
-<!-- MODAL: KONFIRMASI HAPUS OPD                                     -->
-<!-- ============================================================== -->
-<div class="modal fade" id="modalHapusOpd" tabindex="-1" aria-labelledby="modalHapusOpdLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-sm" style="max-width: 420px;">
-        <div class="modal-content opd-modal text-center p-2">
-            <div class="modal-body opd-modal-body pt-4 pb-2">
-                <div class="empty-icon-wrap bg-danger-subtle text-danger mb-3" style="width: 60px; height: 60px; font-size: 26px;">
-                    <i class="bi bi-exclamation-triangle-fill"></i>
-                </div>
-                <h5 class="opd-modal-title mb-2">Hapus Data OPD?</h5>
-                <p class="text-secondary small mb-3" id="deleteOpdMessage">
-                    Apakah Anda yakin ingin menghapus data OPD ini? Tindakan ini tidak dapat dibatalkan.
-                </p>
-                <div class="p-2 mb-3 bg-light rounded-2 text-start border small text-break" id="deleteOpdDetailBox">
-                    <strong class="d-block text-dark" id="deleteOpdName">Nama OPD</strong>
-                    <span class="text-muted" id="deleteOpdCode">OPD-000</span>
-                </div>
-            </div>
-            <div class="modal-footer opd-modal-footer justify-content-center bg-transparent border-0 pt-0 pb-3 gap-2">
-                <button type="button" class="btn btn-light border px-3" data-bs-dismiss="modal">Batal</button>
-                <a href="#" id="btnConfirmDelete" class="btn btn-danger px-4 fw-medium">
-                    <i class="bi bi-trash me-1"></i> Hapus OPD
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Toast Notifikasi Copy ID -->
 <div class="opd-toast-container">
     <div id="copyToast" class="opd-toast" role="alert" aria-live="assertive" aria-atomic="true">
@@ -490,11 +461,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const editNamaInput = document.getElementById('edit_nama_opd');
     const editKuotaInput = document.getElementById('edit_kuota_storage_mb');
     const editActiveSelect = document.getElementById('edit_is_active');
-
-    // Elemen Modal Hapus
-    const deleteOpdName = document.getElementById('deleteOpdName');
-    const deleteOpdCode = document.getElementById('deleteOpdCode');
-    const btnConfirmDelete = document.getElementById('btnConfirmDelete');
 
     // Toast
     const copyToast = document.getElementById('copyToast');
@@ -646,8 +612,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             <button 
                                 type="button" 
                                 class="opd-action-btn btn-action-delete btn-delete-opd" 
-                                data-bs-toggle="modal"
-                                data-bs-target="#modalHapusOpd"
                                 data-id="${safeId}"
                                 data-kode="${safeKode}"
                                 data-nama="${safeNama}"
@@ -847,36 +811,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (editActiveSelect) editActiveSelect.value = active;
     }
 
-    // Helper fungsi mengisi modal Hapus
-    function populateDeleteModal(btn) {
-        if (!btn) return;
-        const id = btn.getAttribute('data-id');
-        const kode = btn.getAttribute('data-kode');
-        const nama = btn.getAttribute('data-nama');
-
-        if (deleteOpdName) deleteOpdName.textContent = nama;
-        if (deleteOpdCode) deleteOpdCode.textContent = kode;
-        if (btnConfirmDelete) btnConfirmDelete.href = baseDeleteUrl + '/' + id;
-    }
-
-    // 7. Event show.bs.modal untuk Modal Edit
+        // 7. Event show.bs.modal untuk Modal Edit
     const modalEditEl = document.getElementById('modalEditOpd');
     if (modalEditEl) {
         modalEditEl.addEventListener('show.bs.modal', function(event) {
             const button = event.relatedTarget;
             if (button && button.classList.contains('btn-edit-opd')) {
                 populateEditForm(button);
-            }
-        });
-    }
-
-    // 8. Event show.bs.modal untuk Modal Hapus
-    const modalHapusEl = document.getElementById('modalHapusOpd');
-    if (modalHapusEl) {
-        modalHapusEl.addEventListener('show.bs.modal', function(event) {
-            const button = event.relatedTarget;
-            if (button && button.classList.contains('btn-delete-opd')) {
-                populateDeleteModal(button);
             }
         });
     }
@@ -888,15 +829,6 @@ document.addEventListener('DOMContentLoaded', function() {
             populateEditForm(editBtn);
             if (modalEditEl) {
                 const modal = bootstrap.Modal.getOrCreateInstance(modalEditEl);
-                modal.show();
-            }
-        }
-
-        const deleteBtn = e.target.closest('.btn-delete-opd');
-        if (deleteBtn) {
-            populateDeleteModal(deleteBtn);
-            if (modalHapusEl) {
-                const modal = bootstrap.Modal.getOrCreateInstance(modalHapusEl);
                 modal.show();
             }
         }
@@ -977,7 +909,11 @@ document.addEventListener('DOMContentLoaded', function() {
             } else if (!hiddenNamaInput.value) {
                 e.preventDefault();
                 if (btnDropdownNama) btnDropdownNama.focus();
-                alert('Silakan pilih Nama OPD terlebih dahulu.');
+                if (window.SiamaSwal) {
+                    SiamaSwal.warning('Validasi Form', 'Silakan pilih Nama OPD terlebih dahulu.');
+                } else {
+                    alert('Silakan pilih Nama OPD terlebih dahulu.');
+                }
             }
         });
     }
@@ -1001,7 +937,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Pindahkan modals ke <body> agar terhindar dari stacking context .app-layout yang fixed
-    ['modalTambahOpd', 'modalEditOpd', 'modalHapusOpd'].forEach(function(modalId) {
+    ['modalTambahOpd', 'modalEditOpd'].forEach(function(modalId) {
         const m = document.getElementById(modalId);
         if (m && m.parentElement !== document.body) {
             document.body.appendChild(m);

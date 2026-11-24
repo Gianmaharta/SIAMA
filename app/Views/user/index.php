@@ -473,39 +473,6 @@ Manajemen Akun - SIAMA
     </div>
 </div>
 
-<!-- ============================================================== -->
-<!-- MODAL: KONFIRMASI HAPUS PENGGUNA                                -->
-<!-- ============================================================== -->
-<div class="modal fade" id="modalHapusUser" tabindex="-1" aria-labelledby="modalHapusUserLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-sm" style="max-width: 430px;">
-        <div class="modal-content user-modal text-center p-2">
-            <div class="modal-body user-modal-body pt-4 pb-2">
-                <div class="empty-icon-wrap bg-danger-subtle text-danger mb-3" style="width: 60px; height: 60px; font-size: 26px;">
-                    <i class="bi bi-exclamation-triangle-fill"></i>
-                </div>
-                <h5 class="user-modal-title justify-content-center mb-2">Hapus Akun Pengguna?</h5>
-                <p class="text-secondary small mb-3">
-                    Apakah Anda yakin ingin menghapus akun pengguna ini? Tindakan ini tidak dapat dibatalkan.
-                </p>
-                <div class="p-3 mb-3 bg-light rounded-3 text-start border small text-break">
-                    <div class="text-muted small mb-1">Nama Pengguna:</div>
-                    <strong class="d-block text-dark fs-6 mb-2" id="deleteUserName">Nama Pengguna</strong>
-                    <div class="text-muted small mb-1">Email:</div>
-                    <div class="text-secondary mb-2" id="deleteUserEmail">email@domain.com</div>
-                    <div class="text-muted small mb-1">Organisasi Perangkat Daerah:</div>
-                    <span class="text-secondary fw-medium" id="deleteUserOpd">Nama OPD</span>
-                </div>
-            </div>
-            <div class="modal-footer user-modal-footer justify-content-center bg-transparent border-0 pt-0 pb-3 gap-2">
-                <button type="button" class="btn btn-light border px-3" data-bs-dismiss="modal">Batal</button>
-                <a href="#" id="btnConfirmDeleteUser" class="btn btn-danger px-4 fw-medium">
-                    <i class="bi bi-trash me-1"></i> Hapus
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
 <?php 
 $currentRoleSession = session()->get('nama_role');
 // Fitur "Masuk Sebagai" (Switch User) KHUSUS untuk Super_Admin asli (bukan Admin_Pemkab atau Admin_OPD)
@@ -651,12 +618,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const editOpdInput = document.getElementById('edit_id_opd');
     const editBidangInput = document.getElementById('edit_id_bidang');
     const editActiveInput = document.getElementById('edit_is_active');
-
-    // Elemen Modal Hapus
-    const deleteUserName = document.getElementById('deleteUserName');
-    const deleteUserEmail = document.getElementById('deleteUserEmail');
-    const deleteUserOpd = document.getElementById('deleteUserOpd');
-    const btnConfirmDeleteUser = document.getElementById('btnConfirmDeleteUser');
 
     /**
      * Escape string HTML untuk keamanan
@@ -1136,20 +1097,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Helper: Isi Modal Hapus
-    function populateDeleteModal(btn) {
-        if (!btn) return;
-        const id = btn.getAttribute('data-id');
-        const nama = btn.getAttribute('data-nama');
-        const email = btn.getAttribute('data-email');
-        const opd = btn.getAttribute('data-opd');
-
-        if (deleteUserName) deleteUserName.textContent = nama;
-        if (deleteUserEmail) deleteUserEmail.textContent = email;
-        if (deleteUserOpd) deleteUserOpd.textContent = opd;
-        if (btnConfirmDeleteUser) btnConfirmDeleteUser.href = baseDeleteUrl + '/' + id;
-    }
-
     // Helper: Isi Modal Switch User
     function populateSwitchModal(btn) {
         if (!btn) return;
@@ -1249,18 +1196,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 7. Event Modal Hapus (show.bs.modal & delegation)
-    const modalHapusEl = document.getElementById('modalHapusUser');
-    if (modalHapusEl) {
-        modalHapusEl.addEventListener('show.bs.modal', function(event) {
-            const button = event.relatedTarget;
-            if (button && button.classList.contains('btn-delete-user')) {
-                populateDeleteModal(button);
-            }
-        });
-    }
-
-    // 8. Event Modal Switch User (show.bs.modal & delegation)
+    // 7. Event Modal Switch User (show.bs.modal & delegation)
     const modalSwitchEl = document.getElementById('modalSwitchUser');
     if (modalSwitchEl) {
         modalSwitchEl.addEventListener('show.bs.modal', function(event) {
@@ -1287,15 +1223,6 @@ document.addEventListener('DOMContentLoaded', function() {
             populateEditModal(editBtn);
             if (modalEditEl) {
                 const modal = bootstrap.Modal.getOrCreateInstance(modalEditEl);
-                modal.show();
-            }
-        }
-
-        const deleteBtn = e.target.closest('.btn-delete-user');
-        if (deleteBtn) {
-            populateDeleteModal(deleteBtn);
-            if (modalHapusEl) {
-                const modal = bootstrap.Modal.getOrCreateInstance(modalHapusEl);
                 modal.show();
             }
         }
@@ -1412,7 +1339,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Pindahkan modals ke <body> agar terhindar dari stacking context
-    ['modalTambahUser', 'modalEditUser', 'modalHapusUser', 'modalSwitchUser'].forEach(function(modalId) {
+    ['modalTambahUser', 'modalEditUser', 'modalSwitchUser'].forEach(function(modalId) {
         const m = document.getElementById(modalId);
         if (m && m.parentElement !== document.body) {
             document.body.appendChild(m);

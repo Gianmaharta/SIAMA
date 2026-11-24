@@ -1,0 +1,249 @@
+:root {
+    --swal-primary: #1E60EC;
+    --swal-primary-hover: #154EC2;
+    --swal-primary-light: #EFF6FF;
+    --swal-dark: #0B1528;
+    --swal-text: #475569;
+    --swal-danger: #DC2626;
+    --swal-danger-hover: #B91C1C;
+    --swal-success: #10B981;
+    --swal-warning: #F59E0B;
+    --swal-border: #E2E8F0;
+    --swal-bg-muted: #F8FAFC;
+}
+
+/* Container Backdrop */
+.siama-swal-container {
+    z-index: 2050 !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+    background: rgba(11, 21, 40, 0.45) !important;
+}
+
+/* Modal Popup Card */
+.swal2-popup,
+.siama-swal-popup {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    border-radius: 28px !important;
+    box-shadow: 0 20px 45px rgba(11, 21, 40, 0.16) !important;
+    padding: 30px 26px 26px !important;
+    background: #FFFFFF !important;
+    border: 1px solid #EEF2F6 !important;
+    width: 100% !important;
+    max-width: 440px !important;
+}
+
+/* Popup Header & Title */
+.siama-swal-header {
+    padding: 0 !important;
+}
+
+.siama-swal-title {
+    font-family: 'Poppins', sans-serif !important;
+    color: var(--swal-dark) !important;
+    font-size: 18.5px !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.2px !important;
+    margin-top: 10px !important;
+    margin-bottom: 8px !important;
+    padding: 0 !important;
+}
+
+/* Popup Body Content */
+.siama-swal-html {
+    font-family: 'Poppins', sans-serif !important;
+    color: var(--swal-text) !important;
+    font-size: 13.5px !important;
+    line-height: 1.6 !important;
+    margin: 0 !important;
+    padding: 0 6px !important;
+}
+
+/* Icons */
+.swal2-icon.siama-swal-icon {
+    margin: 4px auto 10px !important;
+    transform: scale(0.92);
+}
+
+.swal2-icon.swal2-success {
+    border-color: #10B981 !important;
+    color: #10B981 !important;
+}
+.swal2-icon.swal2-success [class^='swal2-success-line'] {
+    background-color: #10B981 !important;
+}
+.swal2-icon.swal2-success .swal2-success-ring {
+    border: .25em solid rgba(16, 185, 129, 0.25) !important;
+}
+
+.swal2-icon.swal2-error {
+    border-color: #EF4444 !important;
+    color: #EF4444 !important;
+}
+.swal2-icon.swal2-error [class^='swal2-x-mark-line'] {
+    background-color: #EF4444 !important;
+}
+
+.swal2-icon.swal2-warning {
+    border-color: #F59E0B !important;
+    color: #F59E0B !important;
+}
+
+.swal2-icon.swal2-info {
+    border-color: #1E60EC !important;
+    color: #1E60EC !important;
+}
+
+/* Action Buttons Container */
+.swal2-actions,
+.siama-swal-actions {
+    margin-top: 26px !important;
+    gap: 16px !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+/* Deny button dinonaktifkan sepenuhnya: hanya ada 2 tombol (Batal & Hapus/Konfirmasi) */
+.swal2-actions .swal2-deny,
+.swal2-deny,
+.siama-swal-btn-deny {
+    display: none !important;
+}
+
+/* Buttons Styling */
+.swal2-actions button.swal2-confirm,
+.swal2-actions button.swal2-cancel,
+.siama-swal-actions .siama-swal-btn:not(.siama-swal-btn-deny),
+.siama-swal-btn:not(.siama-swal-btn-deny) {
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    border-radius: 14px !important;
+    padding: 11px 24px !important;
+    margin: 0 8px !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    transition: all 0.2s ease !important;
+    border: none !important;
+    min-width: 115px !important;
+    text-decoration: none !important;
+    outline: none !important;
+}
+
+/* Explicit separation between adjacent action buttons */
+.swal2-actions button + button,
+.swal2-actions > button + button,
+.siama-swal-actions button + button {
+    margin-left: 16px !important;
+}
+
+.swal2-actions .swal2-cancel,
+.swal2-actions .siama-swal-btn-cancel,
+.siama-swal-btn-cancel {
+    margin-right: 8px !important;
+    margin-left: 8px !important;
+}
+
+.swal2-actions .swal2-confirm,
+.swal2-actions .siama-swal-btn-danger,
+.swal2-actions .siama-swal-btn-primary,
+.siama-swal-btn-danger,
+.siama-swal-btn-primary {
+    margin-left: 8px !important;
+    margin-right: 8px !important;
+}
+
+.siama-swal-btn:focus {
+    box-shadow: 0 0 0 3px rgba(30, 96, 236, 0.25) !important;
+}
+
+/* Primary / Confirm Button */
+.siama-swal-btn-primary {
+    background-color: var(--swal-primary) !important;
+    color: #FFFFFF !important;
+    border: 1px solid var(--swal-primary) !important;
+}
+.siama-swal-btn-primary:hover {
+    background-color: var(--swal-primary-hover) !important;
+    border-color: var(--swal-primary-hover) !important;
+    transform: translateY(-1px);
+}
+.siama-swal-btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Danger Button (Khusus Hapus / Tindakan Kritis) */
+.siama-swal-btn-danger {
+    background-color: var(--swal-danger) !important;
+    color: #FFFFFF !important;
+    border: 1px solid var(--swal-danger) !important;
+}
+.siama-swal-btn-danger:hover {
+    background-color: var(--swal-danger-hover) !important;
+    border-color: var(--swal-danger-hover) !important;
+    transform: translateY(-1px);
+}
+.siama-swal-btn-danger:active {
+    transform: translateY(0);
+}
+
+/* Cancel Button */
+.siama-swal-btn-cancel {
+    background-color: var(--swal-bg-muted) !important;
+    color: var(--swal-text) !important;
+    border: 1px solid var(--swal-border) !important;
+}
+.siama-swal-btn-cancel:hover {
+    background-color: #F1F5F9 !important;
+    color: #1E293B !important;
+    border-color: #CBD5E1 !important;
+    transform: translateY(-1px);
+}
+.siama-swal-btn-cancel:active {
+    transform: translateY(0);
+}
+
+/* Deny Button (Dinonaktifkan) */
+.siama-swal-btn-deny {
+    display: none !important;
+}
+
+/* Timer Progress Bar */
+.siama-swal-progress-bar {
+    background: rgba(30, 96, 236, 0.5) !important;
+    height: 3px !important;
+}
+
+/* Detail Box inside SweetAlert */
+.siama-swal-detail-box {
+    background-color: #F8FAFC !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 18px !important;
+    padding: 14px 18px !important;
+    text-align: left !important;
+    font-size: 13px !important;
+    margin-top: 14px !important;
+    word-break: break-word !important;
+}
+.siama-swal-detail-title {
+    font-size: 11.5px !important;
+    color: #64748B !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    margin-bottom: 4px !important;
+}
+.siama-swal-detail-value {
+    color: #0F172A !important;
+    font-weight: 600 !important;
+    font-size: 13.5px !important;
+}
+.siama-swal-detail-sub {
+    color: #64748B !important;
+    font-size: 12px !important;
+}

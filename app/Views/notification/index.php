@@ -141,7 +141,7 @@ Pusat Notifikasi - SIAMA
                                         <i class="bi bi-box-arrow-right me-1"></i> Pindahkan ke Inaktif
                                     </button>
                                 </form>
-                                <form action="<?= base_url('/notification/action/' . $notif['id_notification']) ?>" method="post" class="d-inline" onsubmit="return confirm('Yakin ingin menetapkan arsip ini sebagai Musnah? File fisik tetap dipertahankan.')">
+                                <form action="<?= base_url('/notification/action/' . $notif['id_notification']) ?>" method="post" class="d-inline" data-swal-confirm="Yakin ingin menetapkan arsip ini sebagai Musnah? File fisik tetap dipertahankan." data-swal-danger="true" data-swal-title="Apakah Anda yakin?" data-swal-btn="Ya, Musnahkan">
                                     <?= csrf_field() ?>
                                     <input type="hidden" name="action" value="musnahkan">
                                     <button type="submit" class="btn btn-sm btn-danger px-3 py-1 fw-medium" style="font-size: 12px; border-radius: 6px;">
@@ -154,7 +154,7 @@ Pusat Notifikasi - SIAMA
                         <div class="notif-jra-actions mb-3">
                             <strong class="d-block small text-dark mb-2"><i class="bi bi-clock-history me-1"></i> Tindakan Akhir Retensi Inaktif:</strong>
                             <div class="d-flex flex-wrap gap-2">
-                                <form action="<?= base_url('/notification/action/' . $notif['id_notification']) ?>" method="post" class="d-inline" onsubmit="return confirm('Yakin ingin menetapkan arsip ini sebagai Musnah? File fisik tetap dipertahankan.')">
+                                <form action="<?= base_url('/notification/action/' . $notif['id_notification']) ?>" method="post" class="d-inline" data-swal-confirm="Yakin ingin menetapkan arsip ini sebagai Musnah? File fisik tetap dipertahankan." data-swal-danger="true" data-swal-title="Apakah Anda yakin?" data-swal-btn="Ya, Musnahkan">
                                     <?= csrf_field() ?>
                                     <input type="hidden" name="action" value="musnahkan">
                                     <button type="submit" class="btn btn-sm btn-danger px-3 py-1 fw-medium" style="font-size: 12px; border-radius: 6px;">

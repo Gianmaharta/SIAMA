@@ -347,37 +347,6 @@ Master Data Bidang - SIAMA
     </div>
 </div>
 
-<!-- ============================================================== -->
-<!-- MODAL: KONFIRMASI HAPUS BIDANG                                  -->
-<!-- ============================================================== -->
-<div class="modal fade" id="modalHapusBidang" tabindex="-1" aria-labelledby="modalHapusBidangLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-sm" style="max-width: 430px;">
-        <div class="modal-content bidang-modal text-center p-2">
-            <div class="modal-body bidang-modal-body pt-4 pb-2">
-                <div class="empty-icon-wrap bg-danger-subtle text-danger mb-3" style="width: 60px; height: 60px; font-size: 26px;">
-                    <i class="bi bi-exclamation-triangle-fill"></i>
-                </div>
-                <h5 class="bidang-modal-title justify-content-center mb-2">Hapus Data Bidang?</h5>
-                <p class="text-secondary small mb-3">
-                    Apakah Anda yakin ingin menghapus data bidang ini? Tindakan ini tidak dapat dibatalkan.
-                </p>
-                <div class="p-3 mb-3 bg-light rounded-3 text-start border small text-break">
-                    <div class="text-muted small mb-1">Nama Bidang:</div>
-                    <strong class="d-block text-dark fs-6 mb-2" id="deleteBidangName">Nama Bidang</strong>
-                    <div class="text-muted small mb-1">Organisasi Perangkat Daerah:</div>
-                    <span class="text-secondary fw-medium" id="deleteOpdName">Nama OPD</span>
-                </div>
-            </div>
-            <div class="modal-footer bidang-modal-footer justify-content-center bg-transparent border-0 pt-0 pb-3 gap-2">
-                <button type="button" class="btn btn-light border px-3" data-bs-dismiss="modal">Batal</button>
-                <a href="#" id="btnConfirmDeleteBidang" class="btn btn-danger px-4 fw-medium">
-                    <i class="bi bi-trash me-1"></i> Hapus Bidang
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Toast Notifikasi Copy ID -->
 <div class="bidang-toast-container">
     <div id="copyToast" class="bidang-toast" role="alert" aria-live="assertive" aria-atomic="true">
@@ -422,11 +391,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const editOpdInput = document.getElementById('edit_id_opd');
     const labelSelectedEditOpd = document.getElementById('labelSelectedEditOpd');
     const editLockedOpdName = document.getElementById('edit_locked_opd_name');
-
-    // Elemen Modal Hapus
-    const deleteBidangName = document.getElementById('deleteBidangName');
-    const deleteOpdName = document.getElementById('deleteOpdName');
-    const btnConfirmDeleteBidang = document.getElementById('btnConfirmDeleteBidang');
 
     // Toast
     const copyToast = document.getElementById('copyToast');
@@ -596,8 +560,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             <button 
                                 type="button" 
                                 class="bidang-action-btn btn-action-delete btn-delete-bidang" 
-                                data-bs-toggle="modal"
-                                data-bs-target="#modalHapusBidang"
                                 data-id="${safeId}"
                                 data-opd-name="${safeOpd}"
                                 data-bidang="${safeBidang}"
@@ -810,17 +772,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Helper: Isi Modal Hapus
-    function populateDeleteModal(btn) {
-        if (!btn) return;
-        const id = btn.getAttribute('data-id');
-        const opdName = btn.getAttribute('data-opd-name');
-        const bidang = btn.getAttribute('data-bidang');
-
-        if (deleteBidangName) deleteBidangName.textContent = bidang;
-        if (deleteOpdName) deleteOpdName.textContent = opdName;
-        if (btnConfirmDeleteBidang) btnConfirmDeleteBidang.href = baseDeleteUrl + '/' + id;
-    }
 
     // 7. Event Modal Edit (show.bs.modal & delegation)
     const modalEditEl = document.getElementById('modalEditBidang');
@@ -833,16 +784,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 8. Event Modal Hapus (show.bs.modal & delegation)
-    const modalHapusEl = document.getElementById('modalHapusBidang');
-    if (modalHapusEl) {
-        modalHapusEl.addEventListener('show.bs.modal', function(event) {
-            const button = event.relatedTarget;
-            if (button && button.classList.contains('btn-delete-bidang')) {
-                populateDeleteModal(button);
-            }
-        });
-    }
 
     // Delegasi klik fallback
     document.addEventListener('click', function(e) {
@@ -855,14 +796,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        const deleteBtn = e.target.closest('.btn-delete-bidang');
-        if (deleteBtn) {
-            populateDeleteModal(deleteBtn);
-            if (modalHapusEl) {
-                const modal = bootstrap.Modal.getOrCreateInstance(modalHapusEl);
-                modal.show();
-            }
-        }
     });
 
     // 9. Dropdown OPD di Modal Tambah Data
@@ -964,7 +897,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Pindahkan modals ke <body> agar terhindar dari stacking context .app-layout yang fixed
-    ['modalTambahBidang', 'modalEditBidang', 'modalHapusBidang'].forEach(function(modalId) {
+    ['modalTambahBidang', 'modalEditBidang'].forEach(function(modalId) {
         const m = document.getElementById(modalId);
         if (m && m.parentElement !== document.body) {
             document.body.appendChild(m);

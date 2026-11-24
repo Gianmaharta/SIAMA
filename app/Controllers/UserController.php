@@ -336,14 +336,14 @@ class UserController extends BaseController
         if ($this->wantsJson()) {
             return $this->response->setJSON([
                 'status'             => 'success',
-                'message'            => 'Akun berhasil dibuat.',
+                'message'            => 'Akun pengguna baru berhasil dibuat.',
                 'user_id'            => $userId,
                 'password_mode'      => $passwordOption,
                 'generated_password' => $plainPassword,
             ]);
         }
 
-        $redirect = redirect()->to('/users')->with('success', 'Akun berhasil dibuat dengan password awal: ' . $plainPassword);
+        $redirect = redirect()->to('/users')->with('success', 'Akun pengguna baru berhasil dibuat.');
         if ($passwordOption === 'random') {
             $redirect->with('generated_password', $plainPassword)
                      ->with('generated_user_name', $userData['nama'])
@@ -636,14 +636,14 @@ class UserController extends BaseController
         if ($this->wantsJson()) {
             return $this->response->setJSON([
                 'status'       => 'success',
-                'message'      => 'Password berhasil di-reset.',
+                'message'      => 'Password pengguna berhasil di-reset.',
                 'user_id'      => $id,
                 'mode'         => $mode,
                 'new_password' => $newPlainPassword,
             ]);
         }
 
-        $redirect = redirect()->back()->with('success', 'Password berhasil di-reset ke: ' . $newPlainPassword . '. Pengguna wajib mengganti password saat login.');
+        $redirect = redirect()->back()->with('success', 'Password pengguna berhasil di-reset. Pengguna wajib mengganti password saat login.');
         if ($mode === 'random') {
             $redirect->with('generated_password', $newPlainPassword)
                      ->with('generated_user_name', $user['nama'])
