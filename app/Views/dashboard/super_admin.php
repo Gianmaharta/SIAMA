@@ -326,9 +326,8 @@ $pwModeLabel = ($pwMode === 'random') ? 'Password Random Otomatis' : 'Password D
                                         <?= esc($qu['nama_opd'] ?? 'Tingkat Pemkab') ?>
                                     </td>
                                     <td class="text-end">
-                                        <a href="<?= base_url('/users/switch/' . $qu['id_user']) ?>" class="btn btn-sm btn-primary px-2.5 py-1 rounded-2 fw-medium d-inline-flex align-items-center gap-1" style="background-color: #1E60EC; border-color: #1E60EC; font-size: 12px;" title="Masuk Sebagai <?= esc($qu['nama']) ?>">
-                                            <i class="bi bi-box-arrow-in-right"></i>
-                                            <span>Switch</span>
+                                        <a href="<?= base_url('/users/switch/' . $qu['id_user']) ?>" class="btn btn-sm btn-primary rounded-2 d-inline-flex align-items-center justify-content-center" style="background-color: #1E60EC; border-color: #1E60EC; width: 32px; height: 32px; padding: 0;" data-bs-toggle="tooltip" title="Masuk Sebagai <?= esc($qu['nama']) ?>" aria-label="Masuk Sebagai <?= esc($qu['nama']) ?>">
+                                            <i class="bi bi-box-arrow-in-right fs-6"></i>
                                         </a>
                                     </td>
                                 </tr>
@@ -470,41 +469,64 @@ document.addEventListener('DOMContentLoaded', function() {
     const trendCanvas = document.getElementById('saTrendChart');
     if (trendCanvas) {
         new Chart(trendCanvas.getContext('2d'), {
-            type: 'bar',
+            type: 'line',
             data: {
                 labels: trendData.labels,
                 datasets: [
                     {
                         label: 'Transaksi Sistem (Activity Log)',
                         data: trendData.activity,
-                        backgroundColor: 'rgba(30, 96, 236, 0.82)',
-                        borderRadius: 6,
-                        barPercentage: 0.65
+                        borderColor: '#1E60EC',
+                        backgroundColor: 'rgba(30, 96, 236, 0.12)',
+                        borderWidth: 2.5,
+                        pointBackgroundColor: '#1E60EC',
+                        pointBorderColor: '#FFFFFF',
+                        pointBorderWidth: 1.5,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        tension: 0.35,
+                        fill: true
                     },
                     {
                         label: 'Login Sukses',
                         data: trendData.login_ok,
-                        backgroundColor: 'rgba(16, 185, 129, 0.82)',
-                        borderRadius: 6,
-                        barPercentage: 0.65
+                        borderColor: '#10B981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                        borderWidth: 2.5,
+                        pointBackgroundColor: '#10B981',
+                        pointBorderColor: '#FFFFFF',
+                        pointBorderWidth: 1.5,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        tension: 0.35,
+                        fill: true
                     },
                     {
                         label: 'Gagal Login',
                         data: trendData.login_failed,
-                        backgroundColor: 'rgba(239, 68, 68, 0.85)',
-                        borderRadius: 6,
-                        barPercentage: 0.65
+                        borderColor: '#EF4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.10)',
+                        borderWidth: 2.5,
+                        pointBackgroundColor: '#EF4444',
+                        pointBorderColor: '#FFFFFF',
+                        pointBorderWidth: 1.5,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        tension: 0.35,
+                        fill: true
                     }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
                 plugins: {
-                    legend: { position: 'top', labels: { boxWidth: 12, font: { family: 'Poppins', size: 12 } } }
+                    legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 10, font: { family: 'Poppins', size: 12 } } }
                 },
                 scales: {
-                    y: { beginAtZero: true, ticks: { precision: 0 } }
+                    y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: '#F2F4F7' } },
+                    x: { grid: { display: false } }
                 }
             }
         });

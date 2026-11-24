@@ -10,27 +10,6 @@ Penilaian Arsip - SIAMA
 
 <?= $this->section('content') ?>
 
-<!-- Flash Messages (Notifikasi Sukses / Gagal) -->
-<?php if (session()->getFlashdata('success')) : ?>
-    <div class="alert alert-success alert-dismissible fade show d-flex align-items-center mb-4" role="alert">
-        <i class="bi bi-check-circle-fill me-2 fs-5"></i>
-        <div>
-            <?= session()->getFlashdata('success') ?>
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
-    </div>
-<?php endif; ?>
-
-<?php if (session()->getFlashdata('error')) : ?>
-    <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-4" role="alert">
-        <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
-        <div>
-            <?= session()->getFlashdata('error') ?>
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
-    </div>
-<?php endif; ?>
-
 <!-- Header Halaman -->
 <div class="penilaian-page-header">
     <h1 class="penilaian-page-title">Penilaian Arsip</h1>

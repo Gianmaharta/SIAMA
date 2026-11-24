@@ -6,28 +6,6 @@ Dashboard - SIAMA
 
 <?= $this->section('content') ?>
 
-<!-- Flash Message: Error -->
-<?php if (session()->getFlashdata('error')) : ?>
-    <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 mb-4 rounded-3 border-0 shadow-sm" role="alert">
-        <i class="bi bi-exclamation-circle-fill fs-5 text-danger"></i>
-        <div class="fw-medium small">
-            <?= session()->getFlashdata('error') ?>
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-<?php endif; ?>
-
-<!-- Flash Message: Success -->
-<?php if (session()->getFlashdata('success')) : ?>
-    <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 mb-4 rounded-3 border-0 shadow-sm" role="alert">
-        <i class="bi bi-check-circle-fill fs-5 text-success"></i>
-        <div class="fw-medium small">
-            <?= session()->getFlashdata('success') ?>
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-<?php endif; ?>
-
 <?php if (in_array($nama_role, ['Super_Admin', 'Super Admin'], true)) : ?>
     <?= $this->include('dashboard/super_admin') ?>
 <?php elseif (in_array($nama_role, ['Admin_OPD', 'Administrator OPD'])) : ?>
