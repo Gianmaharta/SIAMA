@@ -424,5 +424,42 @@ class ArsipPageTest extends CIUnitTestCase
 
         $db->table('arsip')->where('id_arsip', $idArsip)->delete();
     }
+
+    protected function sessAdminPemkab(): array
+    {
+        return [
+            'user_id'             => 'admin-pemkab-test-id',
+            'email'               => 'admin.pemkab@siama.test',
+            'nama_lengkap'        => 'Admin Pemkab Test',
+            'nama_role'           => 'Admin_Pemkab',
+            'id_role'             => '1',
+            'id_opd'              => null,
+            'id_bidang'           => null,
+            'isLoggedIn'          => true,
+            'is_default_password' => 0,
+        ];
+    }
+
+    public function testAdminPemkabDoesNotSeeTambahArsipButton(): void
+    {
+        $result = $this->withSession($this->sessAdminPemkab())
+                       ->get('/arsip');
+
+        $result->assertOK();
+        $body = $result->getBody();
+
+        // Admin Pemkab dapat mengakses halaman pengelolaan arsip
+        $result->assertSee('Pengelolaan Arsip');
+        $result->assertSee('Cari nomor, nama arsip, atau bidang...');
+
+        // Tombol Tambah Arsip TIDAK boleh ditampilkan untuk Admin Pemkab
+        $this->assertStringNotContainsString('id="btnTambahArsip"', $body);
+        $this->assertStringNotContainsString('id="emptyBtnTambahArsip"', $body);
+        $this->assertStringNotContainsString('Tambah Arsip', $body);
+
+        // Akses langsung ke /arsip/create oleh Admin Pemkab diblokir oleh route role filter
+        $createAttempt = $this->withSession($this->sessAdminPemkab())->get('/arsip/create');
+        $createAttempt->assertRedirect();
+    }
 }
 

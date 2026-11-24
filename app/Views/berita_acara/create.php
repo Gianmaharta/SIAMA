@@ -33,15 +33,6 @@ Buat Berita Acara - SIAMA
     </div>
 </div>
 
-<!-- Feedback Flash Messages -->
-<?php if (session()->getFlashdata('error')) : ?>
-    <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center mb-4 rounded-3 border-0 shadow-sm" role="alert">
-        <i class="bi bi-exclamation-circle-fill me-2 fs-5 text-danger"></i>
-        <div class="small fw-medium"><?= session()->getFlashdata('error') ?></div>
-        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Tutup"></button>
-    </div>
-<?php endif; ?>
-
 <!-- Form Tambah Berita Acara -->
 <form action="<?= base_url('/berita-acara/store') ?>" method="post" id="formBuatBA" class="needs-validation" novalidate>
     <?= csrf_field() ?>

@@ -10,27 +10,6 @@ Master Jadwal Retensi Arsip (JRA) - SIAMA
 
 <?= $this->section('content') ?>
 
-<!-- Flash Message Feedback -->
-<?php if (session()->getFlashdata('success')) : ?>
-    <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 mb-4 rounded-3 border-0 shadow-sm" role="alert">
-        <i class="bi bi-check-circle-fill fs-5 text-success"></i>
-        <div class="fw-medium small">
-            <?= session()->getFlashdata('success') ?>
-        </div>
-        <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Tutup"></button>
-    </div>
-<?php endif; ?>
-
-<?php if (session()->getFlashdata('error')) : ?>
-    <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 mb-4 rounded-3 border-0 shadow-sm" role="alert">
-        <i class="bi bi-exclamation-circle-fill fs-5 text-danger"></i>
-        <div class="fw-medium small">
-            <?= session()->getFlashdata('error') ?>
-        </div>
-        <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Tutup"></button>
-    </div>
-<?php endif; ?>
-
 <?php
 // Fallback data contoh jika tabel database masih kosong agar visual halaman sesuai mockup
 if (empty($jra_list)) {
@@ -248,8 +227,6 @@ $totalData = count($jra_list);
                                         type="button" 
                                         class="jra-action-btn btn-action-delete" 
                                         title="Hapus JRA"
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#modalHapusJra"
                                         data-id="<?= esc($row['id_jra']) ?>"
                                         data-kode="<?= esc($kodeText) ?>"
                                         data-keterangan="<?= esc($keterangan) ?>"
@@ -620,46 +597,6 @@ $totalData = count($jra_list);
     </div>
 </div>
 
-<!-- ============================================================== -->
-<!-- MODAL: KONFIRMASI HAPUS JRA                                    -->
-<!-- ============================================================== -->
-<div class="modal fade" id="modalHapusJra" tabindex="-1" aria-labelledby="modalHapusJraLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered jra-modal-dialog">
-        <div class="modal-content jra-modal-content text-center p-3 p-sm-4 position-relative">
-            <div class="modal-body p-0 pt-2 pb-2">
-                <button type="button" class="btn-close position-absolute top-0 end-0 m-3 shadow-none" data-bs-dismiss="modal" aria-label="Tutup"></button>
-                
-                <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 58px; height: 58px; background-color: #FEE2E2; color: #DC2626; font-size: 24px;">
-                    <i class="bi bi-trash3-fill"></i>
-                </div>
-                
-                <h5 class="fw-bold mb-2 text-dark" id="modalHapusJraLabel" style="font-size: 18px;">Hapus Data JRA?</h5>
-                
-                <p class="text-secondary small mb-3 px-2">
-                    Apakah Anda yakin ingin menghapus data jadwal retensi arsip ini? Tindakan ini tidak dapat dibatalkan.
-                </p>
-
-                <div class="p-3 mb-3 bg-light rounded-3 text-start border small">
-                    <div class="text-muted small mb-1">Kode Klasifikasi:</div>
-                    <strong class="d-block text-dark mb-2" id="deleteJraKode">000.9.1 - Teletest</strong>
-                    <div class="text-muted small mb-1">Keterangan Retensi:</div>
-                    <span class="text-dark fw-medium" id="deleteJraKeterangan">Musnah</span>
-                </div>
-
-                <div class="d-flex align-items-center justify-content-center gap-2 pt-1">
-                    <button type="button" class="btn btn-light border px-4 py-2 rounded-3 text-secondary fw-medium flex-fill" data-bs-dismiss="modal" style="font-size: 13.5px;">
-                        Batal
-                    </button>
-                    <a href="#" id="btnConfirmDeleteJra" class="btn btn-danger px-4 py-2 rounded-3 fw-medium flex-fill d-inline-flex align-items-center justify-content-center gap-2" style="font-size: 13.5px; background-color: #DC2626; border-color: #DC2626;">
-                        <i class="bi bi-trash"></i>
-                        <span>Ya, Hapus</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
@@ -834,38 +771,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Modal Konfirmasi Hapus Data
-    const modalHapusJra = document.getElementById('modalHapusJra');
-    if (modalHapusJra) {
-        modalHapusJra.addEventListener('show.bs.modal', function(event) {
-            const button = event.relatedTarget;
-            if (!button || button.disabled) {
-                event.preventDefault();
-                return;
-            }
-
-            const keterangan = (button.getAttribute('data-keterangan') || '').toLowerCase();
-            if (keterangan.includes('musnah')) {
-                event.preventDefault();
-                return;
-            }
-
-            const id = button.getAttribute('data-id');
-            const kode = button.getAttribute('data-kode');
-            const ketVal = button.getAttribute('data-keterangan');
-
-            const deleteKodeEl = document.getElementById('deleteJraKode');
-            const deleteKetEl = document.getElementById('deleteJraKeterangan');
-            const btnConfirm = document.getElementById('btnConfirmDeleteJra');
-
-            if (deleteKodeEl) deleteKodeEl.textContent = kode || '-';
-            if (deleteKetEl) deleteKetEl.textContent = ketVal || '-';
-            if (btnConfirm) {
-                btnConfirm.href = '<?= rtrim(base_url('/jra/delete'), '/') ?>/' + id;
-            }
-        });
-    }
-
     // Sortable Headers
     let sortDirection = {};
     document.querySelectorAll('.sortable-th').forEach(th => {
@@ -910,7 +815,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Pindahkan modals ke <body> agar terhindar dari stacking context .app-layout yang fixed
-    ['modalTambahJra', 'modalEditJra', 'modalHapusJra'].forEach(function(modalId) {
+    ['modalTambahJra', 'modalEditJra'].forEach(function(modalId) {
         const m = document.getElementById(modalId);
         if (m && m.parentElement !== document.body) {
             document.body.appendChild(m);

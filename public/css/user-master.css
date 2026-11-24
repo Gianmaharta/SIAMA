@@ -712,7 +712,7 @@
 
 .modal-content.user-modal {
     border: none;
-    border-radius: 14px;
+    border-radius: 24px;
     box-shadow: 0 16px 36px rgba(11, 21, 40, 0.16);
     max-height: calc(100vh - 3rem);
     display: flex;
@@ -731,8 +731,10 @@
 .modal-header.user-modal-header {
     background: #FFFFFF;
     border-bottom: 1px solid var(--user-border);
-    padding: 14px 20px;
+    padding: 16px 22px;
     flex-shrink: 0;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
 }
 
 .modal-title.user-modal-title {
@@ -773,13 +775,15 @@
 
 .modal-footer.user-modal-footer {
     border-top: 1px solid var(--user-border);
-    padding: 12px 20px;
+    padding: 14px 22px;
     background: #F8FAFC;
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 8px;
+    gap: 12px;
     flex-shrink: 0;
+    border-bottom-left-radius: 24px;
+    border-bottom-right-radius: 24px;
 }
 
 .user-form-label {
@@ -791,10 +795,10 @@
 }
 
 .user-form-control {
-    height: 38px;
-    border-radius: 8px;
+    height: 40px;
+    border-radius: 12px;
     border: 1px solid var(--user-border);
-    padding: 7px 12px;
+    padding: 8px 14px;
     font-size: 13px;
     color: var(--user-text-main);
     background-color: #FFFFFF;
@@ -828,7 +832,7 @@ select.user-form-control,
     background-repeat: no-repeat;
     background-position: right 14px center;
     background-size: 11px 8px;
-    padding: 7px 36px 7px 12px;
+    padding: 8px 36px 8px 14px;
     cursor: pointer;
     line-height: normal;
 }
@@ -853,14 +857,14 @@ select.user-form-control option,
 }
 
 .user-btn-cancel {
-    height: 38px;
+    height: 40px;
     background: #FFFFFF;
     color: var(--user-text-muted);
     border: 1px solid var(--user-border);
-    border-radius: 8px;
+    border-radius: 12px;
     font-weight: 500;
     font-size: 13px;
-    padding: 0 16px;
+    padding: 0 18px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -875,8 +879,8 @@ select.user-form-control option,
 }
 
 .user-modal .user-btn-add {
-    height: 38px;
-    border-radius: 8px;
+    height: 40px;
+    border-radius: 12px;
     font-size: 13px;
 }
 

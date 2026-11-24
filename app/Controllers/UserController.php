@@ -172,7 +172,7 @@ class UserController extends BaseController
             log_message('error', 'Gagal mengirim notifikasi pembuatan user: ' . $e->getMessage());
         }
 
-        return redirect()->to('/users')->with('success', 'Akun berhasil dibuat dengan password default: Admin123!');
+        return redirect()->to('/users')->with('success', 'Akun pengguna baru berhasil dibuat.');
     }
 
     public function edit($id)
@@ -358,7 +358,7 @@ class UserController extends BaseController
             log_message('error', 'Gagal mengirim notifikasi reset user: ' . $e->getMessage());
         }
 
-        return redirect()->back()->with('success', 'Password berhasil di-reset ke default (Admin123!). Pengguna akan diminta untuk mengganti password saat login.');
+        return redirect()->back()->with('success', 'Password pengguna berhasil di-reset ke default. Pengguna akan diminta untuk mengganti password saat login.');
     }
 
     // =========================================================================

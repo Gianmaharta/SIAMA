@@ -21,14 +21,6 @@ Edit Pengguna - SIAMA
     </div>
 </div>
 
-<?php if (session()->getFlashdata('error')) : ?>
-    <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 mb-4 rounded-3 border-0 shadow-sm" role="alert">
-        <i class="bi bi-exclamation-circle-fill fs-5 text-danger"></i>
-        <div class="fw-medium small"><?= session()->getFlashdata('error') ?></div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
-    </div>
-<?php endif; ?>
-
 <div class="row">
     <div class="col-12 col-lg-8 col-xl-7">
         <div class="user-table-card p-4">
@@ -107,7 +99,11 @@ Edit Pengguna - SIAMA
                 </div>
 
                 <div class="d-flex align-items-center justify-content-between pt-2 border-top">
-                    <a href="<?= base_url('/users/reset-password/' . $user['id_user']) ?>" class="btn btn-outline-warning btn-sm" onclick="return confirm('Reset password pengguna ini ke default (Admin123!)?')">
+                    <a href="<?= base_url('/users/reset-password/' . $user['id_user']) ?>" 
+                       class="btn btn-outline-warning btn-sm"
+                       data-swal-confirm="Password akun pengguna ini akan di-reset kembali ke password default (Admin123!). Pengguna wajib mengganti password saat login berikutnya. Lanjutkan?"
+                       data-swal-title="Reset Password Pengguna?"
+                       data-swal-btn="Ya, Reset Password">
                         <i class="bi bi-key me-1"></i> Reset Password ke Default
                     </a>
                     <div class="d-flex gap-2">

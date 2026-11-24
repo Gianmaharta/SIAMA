@@ -21,17 +21,6 @@ Tambah Arsip - SIAMA
     </div>
 </div>
 
-<!-- Feedback Error Alerts -->
-<?php if (session()->getFlashdata('error')) : ?>
-    <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 mb-4 rounded-3 border-0 shadow-sm" role="alert">
-        <i class="bi bi-exclamation-circle-fill fs-5 text-danger"></i>
-        <div class="fw-medium small">
-            <?= session()->getFlashdata('error') ?>
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
-    </div>
-<?php endif; ?>
-
 <!-- Feedback Info jika terhubung dengan SPT -->
 <?php if (!empty($spt_terpilih)) : ?>
     <div class="alert alert-info alert-dismissible fade show d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4 rounded-3 border-0 shadow-sm" role="alert">

@@ -10,28 +10,6 @@ Pengelolaan Arsip - SIAMA
 
 <?= $this->section('content') ?>
 
-<!-- Flash Message: Success -->
-<?php if (session()->getFlashdata('success')) : ?>
-    <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 mb-4 rounded-3 border-0 shadow-sm" role="alert">
-        <i class="bi bi-check-circle-fill fs-5 text-success"></i>
-        <div class="fw-medium small">
-            <?= session()->getFlashdata('success') ?>
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
-    </div>
-<?php endif; ?>
-
-<!-- Flash Message: Error -->
-<?php if (session()->getFlashdata('error')) : ?>
-    <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 mb-4 rounded-3 border-0 shadow-sm" role="alert">
-        <i class="bi bi-exclamation-circle-fill fs-5 text-danger"></i>
-        <div class="fw-medium small">
-            <?= session()->getFlashdata('error') ?>
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
-    </div>
-<?php endif; ?>
-
 <!-- Header Halaman -->
 <div class="arsip-page-header mb-4">
     <h1 class="arsip-page-title mb-1">Pengelolaan Arsip</h1>
@@ -85,8 +63,8 @@ Pengelolaan Arsip - SIAMA
                 </select>
             </div>
 
-            <!-- Tombol Utama + Tambah Arsip (CTA Utama) -->
-            <?php if (in_array($user_role ?? session()->get('nama_role'), ['Arsiparis', 'Admin_Pemkab'])) : ?>
+            <?php if (($user_role ?? session()->get('nama_role')) === 'Arsiparis') : ?>
+                <!-- Tombol Utama + Tambah Arsip (CTA Utama) - Khusus Role Arsiparis -->
                 <a href="<?= base_url('/arsip/create') ?>" class="btn arsip-btn-add btn-toolbar-primary" id="btnTambahArsip" title="Tambah Arsip Baru">
                     <i class="bi bi-plus-lg"></i>
                     <span>Tambah Arsip</span>
@@ -141,7 +119,7 @@ Pengelolaan Arsip - SIAMA
         <h5 class="arsip-empty-title" id="emptyTitle">Belum ada arsip</h5>
         <p class="arsip-empty-desc" id="emptyDesc">Belum ada arsip yang tersedia untuk dikelola.</p>
         <div class="d-flex align-items-center justify-content-center gap-2 mt-3" id="emptyActions">
-            <?php if (in_array($user_role ?? session()->get('nama_role'), ['Arsiparis', 'Admin_Pemkab'])) : ?>
+            <?php if (($user_role ?? session()->get('nama_role')) === 'Arsiparis') : ?>
                 <a href="<?= base_url('/arsip/create') ?>" class="btn arsip-btn-add btn-toolbar-primary" id="emptyBtnTambahArsip">
                     <i class="bi bi-plus-lg"></i>
                     <span>Tambah Arsip</span>

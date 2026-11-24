@@ -228,14 +228,22 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!file) return;
 
         if (!file.name.toLowerCase().endsWith('.pdf') && file.type !== 'application/pdf') {
-            alert('Format file tidak didukung! Harap unggah file berformat PDF.');
+            if (window.SiamaSwal) {
+                SiamaSwal.warning('Format Berkas Tidak Sesuai', 'Format file tidak didukung! Harap unggah file berformat PDF.');
+            } else {
+                alert('Format file tidak didukung! Harap unggah file berformat PDF.');
+            }
             fileInput.value = '';
             return;
         }
 
         // Cek ukuran max 5MB
         if (file.size > 5 * 1024 * 1024) {
-            alert('Ukuran file melebihi 5MB! Harap unggah file yang lebih kecil.');
+            if (window.SiamaSwal) {
+                SiamaSwal.warning('Ukuran Berkas Melebihi Batas', 'Ukuran file melebihi 5MB! Harap unggah file yang lebih kecil.');
+            } else {
+                alert('Ukuran file melebihi 5MB! Harap unggah file yang lebih kecil.');
+            }
             fileInput.value = '';
             return;
         }

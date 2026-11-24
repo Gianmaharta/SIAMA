@@ -21,9 +21,19 @@
     <!-- Custom Dashboard CSS -->
     <link rel="stylesheet" href="<?= base_url('css/dashboard.css?v=' . (file_exists(FCPATH . 'css/dashboard.css') ? filemtime(FCPATH . 'css/dashboard.css') : time())) ?>">
     <link rel="stylesheet" href="<?= base_url('css/notification-master.css?v=' . (file_exists(FCPATH . 'css/notification-master.css') ? filemtime(FCPATH . 'css/notification-master.css') : time())) ?>">
+    <link rel="stylesheet" href="<?= base_url('css/siama-swal.css?v=' . (file_exists(FCPATH . 'css/siama-swal.css') ? filemtime(FCPATH . 'css/siama-swal.css') : time())) ?>">
     <?= $this->renderSection('styles') ?>
 </head>
 <body>
+    <!-- Carrier Flashdata Terpusat untuk SweetAlert2 -->
+    <div id="siama-flash-data" class="d-none"
+        data-success="<?= esc(session()->getFlashdata('success') ?? '') ?>"
+        data-error="<?= esc(session()->getFlashdata('error') ?? '') ?>"
+        data-warning="<?= esc(session()->getFlashdata('warning') ?? '') ?>"
+        data-info="<?= esc(session()->getFlashdata('info') ?? '') ?>"
+        data-errors="<?= esc(is_array(session()->getFlashdata('errors')) ? implode('<br>', session()->getFlashdata('errors')) : (session()->getFlashdata('errors') ?? '')) ?>"
+    ></div>
+
     <div class="app-layout">
         <!-- Sidebar Kiri -->
         <?= $this->include('layouts/sidebar') ?>
@@ -128,6 +138,9 @@
     </script>
     <!-- Notification System Dynamic Handler -->
     <script src="<?= base_url('js/notification.js') ?>"></script>
+    <!-- SweetAlert2 Library & SIAMA Centralized Notification Handler -->
+    <script src="<?= base_url('js/sweetalert2.all.min.js') ?>"></script>
+    <script src="<?= base_url('js/siama-swal.js?v=' . (file_exists(FCPATH . 'js/siama-swal.js') ? filemtime(FCPATH . 'js/siama-swal.js') : time())) ?>"></script>
     <?= $this->renderSection('scripts') ?>
 </body>
 </html>

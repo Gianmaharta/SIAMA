@@ -17,8 +17,17 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="<?= base_url('css/login.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('css/siama-swal.css?v=' . (file_exists(FCPATH . 'css/siama-swal.css') ? filemtime(FCPATH . 'css/siama-swal.css') : time())) ?>">
 </head>
 <body>
+    <!-- Carrier Flashdata Terpusat untuk SweetAlert2 -->
+    <div id="siama-flash-data" class="d-none"
+        data-success="<?= esc(session()->getFlashdata('success') ?? '') ?>"
+        data-error="<?= esc(session()->getFlashdata('error') ?? '') ?>"
+        data-warning="<?= esc(session()->getFlashdata('warning') ?? '') ?>"
+        data-info="<?= esc(session()->getFlashdata('info') ?? '') ?>"
+    ></div>
+
     <div class="login-wrapper d-flex flex-column justify-content-between align-items-center min-vh-100 position-relative">
         <div class="overlay"></div>
 
@@ -28,24 +37,6 @@
                     <h1 class="login-title fw-bold">LOGIN</h1>
                     <p class="login-subtitle mb-0">Sistem Informasi Alih Media (SIAMA)</p>
                 </div>
-
-                <?php if (session()->getFlashdata('error')) : ?>
-                    <div class="alert alert-danger d-flex align-items-center gap-2 py-2 px-3 mb-4 rounded-3 border-0" role="alert">
-                        <i class="bi bi-exclamation-circle-fill flex-shrink-0"></i>
-                        <div class="small fw-medium">
-                            <?= session()->getFlashdata('error') ?>
-                        </div>
-                    </div>
-                <?php endif; ?>
-
-                <?php if (session()->getFlashdata('success')) : ?>
-                    <div class="alert alert-success d-flex align-items-center gap-2 py-2 px-3 mb-4 rounded-3 border-0" role="alert">
-                        <i class="bi bi-check-circle-fill flex-shrink-0"></i>
-                        <div class="small fw-medium">
-                            <?= session()->getFlashdata('success') ?>
-                        </div>
-                    </div>
-                <?php endif; ?>
 
                 <form action="<?= base_url('/login/process') ?>" method="POST" class="login-form">
                     <?= csrf_field() ?>
@@ -107,6 +98,9 @@
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- SweetAlert2 Library & SIAMA Centralized Notification Handler -->
+    <script src="<?= base_url('js/sweetalert2.all.min.js') ?>"></script>
+    <script src="<?= base_url('js/siama-swal.js?v=' . (file_exists(FCPATH . 'js/siama-swal.js') ? filemtime(FCPATH . 'js/siama-swal.js') : time())) ?>"></script>
     <script>
         function togglePassword() {
             var pwd = document.getElementById("password");
