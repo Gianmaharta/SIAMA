@@ -3,8 +3,12 @@
 use CodeIgniter\Router\RouteCollection;
 
 /** @var RouteCollection $routes */
-$routes->get('/', function() {
-    return redirect()->to('/login');
+$routes->get('/', 'Landing::index');
+
+// --- Pengaturan Website (Khusus Super_Admin) ---
+$routes->group('settings', ['filter' => ['auth', 'role:Super_Admin']], static function ($routes) {
+    $routes->get('/', 'WebsiteSettings::index');
+    $routes->post('update', 'WebsiteSettings::update');
 });
 
 // --- Rute Otentikasi ---
@@ -42,8 +46,8 @@ $routes->group('approval', ['filter' => ['auth', 'role:Pimpinan,Kepala_Bidang']]
 $routes->get('swagger', 'Swagger::index');
 $routes->get('swagger/json', 'Swagger::json');
 
-// --- Master OPD (Khusus Admin_Pemkab) ---
-$routes->group('opd', ['filter' => ['auth', 'role:Admin_Pemkab']], static function ($routes) {
+// --- Master OPD (Super_Admin & Admin_Pemkab) ---
+$routes->group('opd', ['filter' => ['auth', 'role:Super_Admin,Admin_Pemkab']], static function ($routes) {
     $routes->get('/', 'Opd::index');
     $routes->get('create', 'Opd::create');
     $routes->post('store', 'Opd::store');
@@ -52,8 +56,8 @@ $routes->group('opd', ['filter' => ['auth', 'role:Admin_Pemkab']], static functi
     $routes->match(['get', 'post'], 'delete/(:segment)', 'Opd::delete/$1');
 });
 
-// --- Master Bidang (Admin_Pemkab & Admin_OPD) ---
-$routes->group('bidang', ['filter' => ['auth', 'role:Admin_Pemkab,Admin_OPD']], static function ($routes) {
+// --- Master Bidang (Super_Admin, Admin_Pemkab & Admin_OPD) ---
+$routes->group('bidang', ['filter' => ['auth', 'role:Super_Admin,Admin_Pemkab,Admin_OPD']], static function ($routes) {
     $routes->get('/', 'Bidang::index');
     $routes->get('create', 'Bidang::create');
     $routes->post('store', 'Bidang::store');
@@ -65,21 +69,22 @@ $routes->group('bidang', ['filter' => ['auth', 'role:Admin_Pemkab,Admin_OPD']], 
 // --- Modul Master Kode Klasifikasi ---
 $routes->group('kode-klasifikasi', ['filter' => 'auth'], static function ($routes) {
     $routes->get('/', 'KodeKlasifikasi::index');
-    $routes->get('create', 'KodeKlasifikasi::create', ['filter' => 'role:Admin_Pemkab']);
-    $routes->post('store', 'KodeKlasifikasi::store', ['filter' => 'role:Admin_Pemkab']);
-    $routes->get('edit/(:segment)', 'KodeKlasifikasi::edit/$1', ['filter' => 'role:Admin_Pemkab']);
-    $routes->post('update/(:segment)', 'KodeKlasifikasi::update/$1', ['filter' => 'role:Admin_Pemkab']);
-    $routes->get('delete/(:segment)', 'KodeKlasifikasi::delete/$1', ['filter' => 'role:Admin_Pemkab']);
+    $routes->get('create', 'KodeKlasifikasi::create', ['filter' => 'role:Super_Admin,Admin_Pemkab']);
+    $routes->post('store', 'KodeKlasifikasi::store', ['filter' => 'role:Super_Admin,Admin_Pemkab']);
+    $routes->get('edit/(:segment)', 'KodeKlasifikasi::edit/$1', ['filter' => 'role:Super_Admin,Admin_Pemkab']);
+    $routes->post('update/(:segment)', 'KodeKlasifikasi::update/$1', ['filter' => 'role:Super_Admin,Admin_Pemkab']);
+    $routes->get('delete/(:segment)', 'KodeKlasifikasi::delete/$1', ['filter' => 'role:Super_Admin,Admin_Pemkab']);
 });
 
 // --- Modul Master JRA ---
 $routes->group('jra', ['filter' => 'auth'], static function ($routes) {
-    $routes->get('/', 'Jra::index', ['filter' => 'role:Admin_Pemkab,Admin_OPD,Administrator OPD']);
-    $routes->get('create', 'Jra::create', ['filter' => 'role:Admin_Pemkab,Admin_OPD,Administrator OPD']);
-    $routes->post('store', 'Jra::store', ['filter' => 'role:Admin_Pemkab,Admin_OPD,Administrator OPD']);
-    $routes->get('edit/(:segment)', 'Jra::edit/$1', ['filter' => 'role:Admin_Pemkab,Admin_OPD,Administrator OPD']);
-    $routes->post('update/(:segment)', 'Jra::update/$1', ['filter' => 'role:Admin_Pemkab,Admin_OPD,Administrator OPD']);
-    $routes->match(['get', 'post'], 'delete/(:segment)', 'Jra::delete/$1', ['filter' => 'role:Admin_Pemkab,Admin_OPD,Administrator OPD']);
+    $routes->get('/', 'Jra::index', ['filter' => 'role:Super_Admin,Admin_Pemkab,Admin_OPD,Administrator OPD']);
+    $routes->get('datatable', 'Jra::datatable', ['filter' => 'role:Super_Admin,Admin_Pemkab,Admin_OPD,Administrator OPD']);
+    $routes->get('create', 'Jra::create', ['filter' => 'role:Super_Admin,Admin_Pemkab,Admin_OPD,Administrator OPD']);
+    $routes->post('store', 'Jra::store', ['filter' => 'role:Super_Admin,Admin_Pemkab,Admin_OPD,Administrator OPD']);
+    $routes->get('edit/(:segment)', 'Jra::edit/$1', ['filter' => 'role:Super_Admin,Admin_Pemkab,Admin_OPD,Administrator OPD']);
+    $routes->post('update/(:segment)', 'Jra::update/$1', ['filter' => 'role:Super_Admin,Admin_Pemkab,Admin_OPD,Administrator OPD']);
+    $routes->match(['get', 'post'], 'delete/(:segment)', 'Jra::delete/$1', ['filter' => 'role:Super_Admin,Admin_Pemkab,Admin_OPD,Administrator OPD']);
     // API untuk dropdown (Bisa diakses oleh Arsiparis saat create arsip)
     $routes->get('get_by_klasifikasi/(:segment)', 'Jra::get_by_klasifikasi/$1');
 });
@@ -141,6 +146,7 @@ $routes->group('spt', ['filter' => 'auth'], static function ($routes) {
 $routes->group('arsip', ['filter' => 'auth'], static function ($routes) {
     // Semua role yang sudah login dapat melihat daftar & detail arsip (filter role di Controller)
     $routes->get('/', 'Arsip::index');
+    $routes->get('datatable', 'Arsip::datatable');
     $routes->get('detail/(:segment)', 'Arsip::detail/$1');
 
     // Hanya Arsiparis (role: Arsiparis) yang boleh membuat, mengubah, dan menghapus arsip
@@ -151,7 +157,7 @@ $routes->group('arsip', ['filter' => 'auth'], static function ($routes) {
     $routes->get('delete/(:segment)', 'Arsip::delete/$1', ['filter' => 'role:Arsiparis']);
 
     // Khusus Kepala Bidang: Verifikasi Arsip
-    $routes->post('verify/(:segment)', 'Arsip::verify/$1', ['filter' => 'role:Kepala_Bidang,Admin_Pemkab']);
+    $routes->post('verify/(:segment)', 'Arsip::verify/$1', ['filter' => 'role:Kepala_Bidang,Admin_Pemkab,Super_Admin']);
 });
 
 // --- Rute Akses / Streaming File Unggahan ---
@@ -159,30 +165,35 @@ $routes->get('uploads/arsip/(:any)', 'Arsip::serveFile/$1');
 $routes->get('uploads/spt/(:any)', 'Spt::serveFile/$1');
 
 // --- Modul Manajemen Pengguna ---
-$routes->group('users', ['filter' => ['auth', 'role:Admin_Pemkab,Admin_OPD']], static function ($routes) {
+$routes->group('users', ['filter' => ['auth', 'role:Super_Admin,Admin_Pemkab,Admin_OPD']], static function ($routes) {
     $routes->get('/', 'UserController::index');
+    $routes->get('datatable', 'UserController::datatable');
     $routes->get('create', 'UserController::create');
     $routes->post('store', 'UserController::store');
     $routes->get('edit/(:segment)', 'UserController::edit/$1');
     $routes->post('update/(:segment)', 'UserController::update/$1');
-    $routes->get('reset-password/(:segment)', 'UserController::resetPassword/$1');
+    $routes->match(['get', 'post'], 'reset-password/(:segment)', 'UserController::resetPassword/$1');
+    $routes->post('toggle-status/(:segment)', 'UserController::toggleStatus/$1');
     $routes->match(['get', 'post'], 'delete/(:segment)', 'UserController::delete/$1');
 });
 
-// --- Switch Role / User Impersonation (Khusus Admin Pemkab) ---
+// --- Switch Role / User Impersonation (Khusus Super Admin) ---
 $routes->get('users/switch/(:segment)', 'UserController::switchUser/$1', ['filter' => 'auth']);
 $routes->get('users/switch-back', 'UserController::switchBack', ['filter' => 'auth']);
 
-// --- Modul Audit Log (Khusus Admin_Pemkab) ---
-$routes->group('audit-log', ['filter' => ['auth', 'role:Admin_Pemkab']], static function ($routes) {
+// --- Modul Audit Log (Super_Admin & Admin_Pemkab) ---
+$routes->group('audit-log', ['filter' => ['auth', 'role:Super_Admin,Admin_Pemkab']], static function ($routes) {
     $routes->get('access', 'AuditLog::accessLog');
+    $routes->get('access/datatable', 'AuditLog::accessDatatable');
     $routes->get('access/export', 'AuditLog::exportAccessCsv');
     $routes->get('activity', 'AuditLog::activityLog');
+    $routes->get('activity/chart-data', 'AuditLog::activityChartData');
+    $routes->get('activity/datatable', 'AuditLog::activityDatatable');
     $routes->get('activity/export', 'AuditLog::exportActivityCsv');
 });
 
-// --- Reset Data / Data Cleansing (Khusus Admin_Pemkab) ---
-$routes->group('system-cleanse', ['filter' => ['auth', 'role:Admin_Pemkab']], static function ($routes) {
+// --- Reset Data / Data Cleansing (Super_Admin & Admin_Pemkab) ---
+$routes->group('system-cleanse', ['filter' => ['auth', 'role:Super_Admin,Admin_Pemkab']], static function ($routes) {
     $routes->get('/', 'SystemMaintenance::index');
     $routes->post('execute', 'SystemMaintenance::execute');
 });

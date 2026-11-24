@@ -56,6 +56,7 @@ class SwitchRoleTest extends CIUnitTestCase
         $db = $this->db();
 
         // Buat role
+        $db->table('roles')->insert(['id_role' => 'r-super',     'nama_role' => 'Super_Admin']);
         $db->table('roles')->insert(['id_role' => 'r-admin',     'nama_role' => 'Admin_Pemkab']);
         $db->table('roles')->insert(['id_role' => 'r-opd',       'nama_role' => 'Admin_OPD']);
         $db->table('roles')->insert(['id_role' => 'r-arsiparis',  'nama_role' => 'Arsiparis']);
@@ -64,6 +65,14 @@ class SwitchRoleTest extends CIUnitTestCase
 
         // Buat OPD
         $db->table('opd')->insert(['id_opd' => 'opd-test', 'nama_opd' => 'Dinas Pertanian, Ketahanan Pangan dan Perikanan']);
+
+        // Buat user Super Admin
+        $db->table('users')->insert([
+            'id_user' => 'super-admin-1', 'nama' => 'Super Admin Test',
+            'email' => 'super@switch.test', 'password' => password_hash('Test123!', PASSWORD_DEFAULT),
+            'id_opd' => null, 'is_active' => 1, 'is_default_password' => 0,
+        ]);
+        $db->table('user_roles')->insert(['id_user' => 'super-admin-1', 'id_role' => 'r-super']);
 
         // Buat user Admin Pemkab
         $db->table('users')->insert([
@@ -106,6 +115,7 @@ class SwitchRoleTest extends CIUnitTestCase
         $db->table('user_roles')->insert(['id_user' => 'pimpinan-1', 'id_role' => 'r-pimpinan']);
 
         return [
+            'super_id'    => 'super-admin-1',
             'admin_id'    => 'admin-pemkab-1',
             'target_id'   => 'admin-opd-1',
             'arsiparis_id'=> 'arsiparis-1',
@@ -125,12 +135,12 @@ class SwitchRoleTest extends CIUnitTestCase
         $db->query('SET FOREIGN_KEY_CHECKS=1');
     }
 
-    public function testSwitchUserSebagaiAdminPemkab(): void
+    public function testSwitchUserSebagaiSuperAdmin(): void
     {
         $ids = $this->setupTestData();
 
-        // Login sebagai Admin Pemkab
-        $result = $this->withSession($this->sess($ids['admin_id'], 'admin@switch.test', 'Admin Pemkab Test', 'Admin_Pemkab'))
+        // Login sebagai Super Admin
+        $result = $this->withSession($this->sess($ids['super_id'], 'super@switch.test', 'Super Admin Test', 'Super_Admin'))
             ->get('/users/switch/' . $ids['target_id']);
 
         // Harus redirect ke dashboard
@@ -140,21 +150,21 @@ class SwitchRoleTest extends CIUnitTestCase
         $this->assertEquals('admin-opd-1', session()->get('user_id'));
         $this->assertEquals('Admin_OPD', session()->get('nama_role'));
 
-        // Session admin asli harus tersimpan
-        $this->assertEquals('admin-pemkab-1', session()->get('original_admin_id'));
+        // Session Super Admin asli harus tersimpan
+        $this->assertEquals('super-admin-1', session()->get('original_admin_id'));
     }
 
-    public function testSwitchBackKeAdminPemkab(): void
+    public function testSwitchBackKeSuperAdmin(): void
     {
         $ids = $this->setupTestData();
 
         // Simulasi sudah dalam mode impersonation
         $switchedSession = $this->sess($ids['target_id'], 'opd@switch.test', 'Admin OPD Target', 'Admin_OPD', 'opd-test');
-        $switchedSession['original_admin_id']    = $ids['admin_id'];
-        $switchedSession['original_admin_email']  = 'admin@switch.test';
-        $switchedSession['original_admin_nama']   = 'Admin Pemkab Test';
-        $switchedSession['original_admin_role']   = 'Admin_Pemkab';
-        $switchedSession['original_admin_id_role'] = 'r-admin';
+        $switchedSession['original_admin_id']    = $ids['super_id'];
+        $switchedSession['original_admin_email']  = 'super@switch.test';
+        $switchedSession['original_admin_nama']   = 'Super Admin Test';
+        $switchedSession['original_admin_role']   = 'Super_Admin';
+        $switchedSession['original_admin_id_role'] = 'r-super';
         $switchedSession['original_admin_id_opd']  = null;
         $switchedSession['original_admin_id_bidang'] = null;
 
@@ -163,28 +173,32 @@ class SwitchRoleTest extends CIUnitTestCase
         // Harus redirect ke dashboard
         $result->assertRedirect();
 
-        // Session harus kembali ke Admin Pemkab asli
-        $this->assertEquals('admin-pemkab-1', session()->get('user_id'));
-        $this->assertEquals('Admin_Pemkab', session()->get('nama_role'));
+        // Session harus kembali ke Super Admin asli
+        $this->assertEquals('super-admin-1', session()->get('user_id'));
+        $this->assertEquals('Super_Admin', session()->get('nama_role'));
 
         // Data impersonation harus terhapus
         $this->assertNull(session()->get('original_admin_id'));
     }
 
-    public function testNonAdminTidakBisaSwitch(): void
+    public function testNonSuperAdminTidakBisaSwitch(): void
     {
         $ids = $this->setupTestData();
 
-        // Login sebagai Admin OPD (bukan Admin Pemkab)
-        $result = $this->withSession($this->sess($ids['target_id'], 'opd@switch.test', 'Admin OPD', 'Admin_OPD', 'opd-test'))
-            ->get('/users/switch/' . $ids['admin_id']);
+        // Login sebagai Admin Pemkab (bukan Super Admin) -> tidak boleh switch
+        $resultPemkab = $this->withSession($this->sess($ids['admin_id'], 'admin@switch.test', 'Admin Pemkab', 'Admin_Pemkab'))
+            ->get('/users/switch/' . $ids['target_id']);
+        $resultPemkab->assertRedirectTo('/dashboard');
+        $this->assertEquals('Akses Ditolak. Fitur Masuk Sebagai hanya dapat digunakan oleh Super Admin.', session()->getFlashdata('error'));
 
-        // Harus redirect ke dashboard dengan error
-        $result->assertRedirectTo('/dashboard');
-        $this->assertEquals('Akses Ditolak. Fitur Masuk Sebagai hanya dapat digunakan oleh Admin Pemkab.', session()->getFlashdata('error'));
+        // Login sebagai Admin OPD -> tidak boleh switch
+        $resultOpd = $this->withSession($this->sess($ids['target_id'], 'opd@switch.test', 'Admin OPD', 'Admin_OPD', 'opd-test'))
+            ->get('/users/switch/' . $ids['admin_id']);
+        $resultOpd->assertRedirectTo('/dashboard');
+        $this->assertEquals('Akses Ditolak. Fitur Masuk Sebagai hanya dapat digunakan oleh Super Admin.', session()->getFlashdata('error'));
     }
 
-    public function testAdminOpdCannotSeeSwitchModalOrButton(): void
+    public function testAdminOpdAndAdminPemkabCannotSeeSwitchModalOrButton(): void
     {
         $ids = $this->setupTestData();
 
@@ -199,17 +213,24 @@ class SwitchRoleTest extends CIUnitTestCase
         $this->assertStringNotContainsString('id="modalSwitchUser"', $body);
         $this->assertStringNotContainsString('id="btnConfirmSwitchUser"', $body);
         $this->assertStringNotContainsString('Masuk Sebagai Pengguna?', $body);
-
-        // Flag isCanSwitch harus false
         $this->assertStringContainsString('const isCanSwitch = false;', $body);
+
+        // Login sebagai Admin Pemkab -> tidak boleh melihat Super Admin & tidak boleh switch
+        $resPemkab = $this->withSession($this->sess($ids['admin_id'], 'admin@switch.test', 'Admin Pemkab', 'Admin_Pemkab'))
+            ->get('/users');
+        $resPemkab->assertOK();
+        $bodyPemkab = $resPemkab->getBody();
+        $this->assertStringNotContainsString('id="modalSwitchUser"', $bodyPemkab);
+        $this->assertStringContainsString('const isCanSwitch = false;', $bodyPemkab);
+        $this->assertStringNotContainsString('super@switch.test', $bodyPemkab);
     }
 
     public function testImpersonatingAdminOpdCannotSeeSwitchModalOrButton(): void
     {
         $ids = $this->setupTestData();
 
-        // Admin Pemkab switch ke Admin OPD
-        $this->withSession($this->sess($ids['admin_id'], 'admin@switch.test', 'Admin Pemkab Test', 'Admin_Pemkab'))
+        // Super Admin switch ke Admin OPD
+        $this->withSession($this->sess($ids['super_id'], 'super@switch.test', 'Super Admin Test', 'Super_Admin'))
             ->get('/users/switch/' . $ids['target_id']);
 
         $switchedSession = session()->get();
@@ -230,14 +251,14 @@ class SwitchRoleTest extends CIUnitTestCase
         // Jika mencoba switch lagi saat sudah dalam penyamaran, harus ditolak
         $switchAgain = $this->withSession($switchedSession)->get('/users/switch/' . $ids['arsiparis_id']);
         $switchAgain->assertRedirectTo('/dashboard');
-        $this->assertEquals('Akses Ditolak. Fitur Masuk Sebagai hanya dapat digunakan oleh Admin Pemkab.', session()->getFlashdata('error'));
+        $this->assertEquals('Akses Ditolak. Fitur Masuk Sebagai hanya dapat digunakan oleh Super Admin.', session()->getFlashdata('error'));
     }
 
     public function testModalSwitchUserRendersCorrectly(): void
     {
         $ids = $this->setupTestData();
 
-        $result = $this->withSession($this->sess($ids['admin_id'], 'admin@switch.test', 'Admin Pemkab Test', 'Admin_Pemkab'))
+        $result = $this->withSession($this->sess($ids['super_id'], 'super@switch.test', 'Super Admin Test', 'Super_Admin'))
             ->get('/users');
 
         $result->assertOK();
@@ -257,8 +278,8 @@ class SwitchRoleTest extends CIUnitTestCase
     {
         $ids = $this->setupTestData();
 
-        // 1. Admin Pemkab switch ke Arsiparis
-        $switchRes = $this->withSession($this->sess($ids['admin_id'], 'admin@switch.test', 'Admin Pemkab Test', 'Admin_Pemkab'))
+        // 1. Super Admin switch ke Arsiparis
+        $switchRes = $this->withSession($this->sess($ids['super_id'], 'super@switch.test', 'Super Admin Test', 'Super_Admin'))
             ->get('/users/switch/' . $ids['arsiparis_id']);
         $switchRes->assertRedirectTo('/dashboard');
 
@@ -272,7 +293,7 @@ class SwitchRoleTest extends CIUnitTestCase
         $dashRes->assertDontSee('Ni Luh Ayu (Arsiparis) (Arsiparis)');
         $dashRes->assertDontSee('Mode Penyamaran Aktif');
         $dashRes->assertSee('Dinas Pertanian, Ketahanan Pangan dan Perikanan.');
-        $dashRes->assertSee('Kembali ke Akun Admin Pemkab');
+        $dashRes->assertSee('Kembali ke Akun Super Admin');
 
         // Sidebar harus mengikuti role Arsiparis
         $dashRes->assertSee('sidebar-menu-pimpinan');
@@ -301,7 +322,7 @@ class SwitchRoleTest extends CIUnitTestCase
         $ids = $this->setupTestData();
 
         // Switch ke Kepala Bidang
-        $this->withSession($this->sess($ids['admin_id'], 'admin@switch.test', 'Admin Pemkab Test', 'Admin_Pemkab'))
+        $this->withSession($this->sess($ids['super_id'], 'super@switch.test', 'Super Admin Test', 'Super_Admin'))
             ->get('/users/switch/' . $ids['kabid_id']);
 
         $sessionData = session()->get();
@@ -312,7 +333,7 @@ class SwitchRoleTest extends CIUnitTestCase
 
         // Banner
         $dashRes->assertSee('Sedang Masuk sebagai Ketut Sujana (Kepala Bidang)');
-        $dashRes->assertSee('Kembali ke Akun Admin Pemkab');
+        $dashRes->assertSee('Kembali ke Akun Super Admin');
 
         // Sidebar Kepala Bidang
         $dashRes->assertSee('sidebar-menu-pimpinan');
@@ -335,7 +356,7 @@ class SwitchRoleTest extends CIUnitTestCase
         $ids = $this->setupTestData();
 
         // Switch ke Pimpinan
-        $this->withSession($this->sess($ids['admin_id'], 'admin@switch.test', 'Admin Pemkab Test', 'Admin_Pemkab'))
+        $this->withSession($this->sess($ids['super_id'], 'super@switch.test', 'Super Admin Test', 'Super_Admin'))
             ->get('/users/switch/' . $ids['pimpinan_id']);
 
         $sessionData = session()->get();
@@ -346,7 +367,7 @@ class SwitchRoleTest extends CIUnitTestCase
 
         // Banner
         $dashRes->assertSee('Sedang Masuk sebagai I Made Pimpinan (Kepala Dinas)');
-        $dashRes->assertSee('Kembali ke Akun Admin Pemkab');
+        $dashRes->assertSee('Kembali ke Akun Super Admin');
 
         // Sidebar Pimpinan
         $dashRes->assertSee('sidebar-menu-pimpinan');
@@ -369,7 +390,7 @@ class SwitchRoleTest extends CIUnitTestCase
         $ids = $this->setupTestData();
 
         // Switch ke Admin OPD
-        $this->withSession($this->sess($ids['admin_id'], 'admin@switch.test', 'Admin Pemkab Test', 'Admin_Pemkab'))
+        $this->withSession($this->sess($ids['super_id'], 'super@switch.test', 'Super Admin Test', 'Super_Admin'))
             ->get('/users/switch/' . $ids['target_id']);
 
         $sessionData = session()->get();
@@ -380,7 +401,7 @@ class SwitchRoleTest extends CIUnitTestCase
 
         // Banner
         $dashRes->assertSee('Sedang Masuk sebagai Admin OPD Target (Admin OPD)');
-        $dashRes->assertSee('Kembali ke Akun Admin Pemkab');
+        $dashRes->assertSee('Kembali ke Akun Super Admin');
 
         // Sidebar Admin OPD
         $dashRes->assertSee('Manajemen Akun');
@@ -401,47 +422,52 @@ class SwitchRoleTest extends CIUnitTestCase
         $penilaianDirect->assertRedirectTo('/dashboard');
     }
 
-    public function testSwitchBackRestoresAdminPemkabSessionAndSidebar(): void
+    public function testSwitchBackRestoresSuperAdminSessionAndSidebar(): void
     {
         $ids = $this->setupTestData();
 
         // 1. Simulasikan sedang impersonate Arsiparis
-        $this->withSession($this->sess($ids['admin_id'], 'admin@switch.test', 'Admin Pemkab Test', 'Admin_Pemkab'))
+        $this->withSession($this->sess($ids['super_id'], 'super@switch.test', 'Super Admin Test', 'Super_Admin'))
             ->get('/users/switch/' . $ids['arsiparis_id']);
 
         $impersonatedSession = session()->get();
         $this->assertTrue(isset($impersonatedSession['original_admin_id']));
 
-        // 2. Klik tombol kembali ke Admin Pemkab
+        // 2. Klik tombol kembali ke Super Admin
         $backRes = $this->withSession($impersonatedSession)->get('/users/switch-back');
         $backRes->assertRedirectTo('/dashboard');
 
-        // 3. Verifikasi session kembali ke Admin Pemkab asli
+        // 3. Verifikasi session kembali ke Super Admin asli
         $adminSession = session()->get();
-        $this->assertEquals('admin-pemkab-1', $adminSession['user_id']);
-        $this->assertEquals('Admin_Pemkab', $adminSession['nama_role']);
+        $this->assertEquals('super-admin-1', $adminSession['user_id']);
+        $this->assertEquals('Super_Admin', $adminSession['nama_role']);
         $this->assertFalse(isset($adminSession['original_admin_id']));
 
-        // 4. Akses Dashboard sebagai Admin Pemkab asli
+        // 4. Akses Dashboard sebagai Super Admin asli
         $dashRes = $this->withSession($adminSession)->get('/dashboard');
         $dashRes->assertOK();
 
         // Banner penyamaran TIDAK boleh ada lagi
         $dashRes->assertDontSee('Sedang Masuk sebagai');
-        $dashRes->assertDontSee('Kembali ke Akun Admin Pemkab');
+        $dashRes->assertDontSee('Kembali ke Akun Super Admin');
 
-        // Seluruh menu Admin Pemkab harus tampil lengkap kembali
+        // Seluruh menu Super Admin harus tampil lengkap kembali (tanpa Modul Kearsipan yang dikhususkan untuk Admin Pemkab)
         $dashRes->assertSee('Master OPD');
         $dashRes->assertSee('Master Bidang');
         $dashRes->assertSee('Master JRA');
         $dashRes->assertSee('Manajemen Akun');
-        $dashRes->assertSee('Penilaian Arsip');
         $dashRes->assertSee('Access Log');
         $dashRes->assertSee('Activity Log');
+        $dashRes->assertSee('Pengaturan Website');
+        $dashRes->assertDontSee('MODUL KEARSIPAN');
 
-        // Admin Pemkab asli bisa mengakses /opd dengan sukses (Status 200)
+        // Super Admin asli bisa mengakses /opd dan /settings dengan sukses (Status 200)
         $opdRes = $this->withSession($adminSession)->get('/opd');
         $opdRes->assertOK();
+
+        $settingsRes = $this->withSession($adminSession)->get('/settings');
+        $settingsRes->assertOK();
+        $settingsRes->assertSee('Pengaturan Website');
     }
 
     public function testAdminPemkabCanPerformFullCrudOnMasterJra(): void

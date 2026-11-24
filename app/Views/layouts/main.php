@@ -68,8 +68,57 @@
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        <?php if (session()->getFlashdata('generated_password')) : ?>
+            Swal.fire({
+                icon: 'success',
+                title: 'Password Random Berhasil Dibuat',
+                html: `
+                    <div class="text-start small p-3 rounded-3 bg-light border mb-2">
+                        <div class="text-muted mb-1">Pengguna:</div>
+                        <div class="fw-bold text-dark mb-2"><?= esc(session()->getFlashdata('generated_user_name') ?? '-') ?> (<?= esc(session()->getFlashdata('generated_user_email') ?? '-') ?>)</div>
+                        <div class="text-muted mb-1">Password Sementara (Wajib Ganti Saat Login):</div>
+                        <div class="d-flex align-items-center justify-content-between gap-2 p-2 bg-white rounded border">
+                            <code class="fs-5 fw-bold text-primary" id="swalGeneratedPw"><?= esc(session()->getFlashdata('generated_password')) ?></code>
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="navigator.clipboard.writeText(document.getElementById('swalGeneratedPw').textContent); this.innerHTML='<i class=\'bi bi-check2\'></i> Tersalin';">
+                                <i class="bi bi-clipboard"></i> Salin
+                            </button>
+                        </div>
+                    </div>
+                `,
+                confirmButtonText: 'Selesai',
+                confirmButtonColor: '#1E60EC'
+            });
+        <?php elseif (session()->getFlashdata('success')) : ?>
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: <?= json_encode(strip_tags((string) session()->getFlashdata('success'))) ?>,
+                    timer: 2600,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end',
+                    timerProgressBar: true
+                });
+            }
+        <?php elseif (session()->getFlashdata('error')) : ?>
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Perhatian',
+                    text: <?= json_encode(strip_tags((string) session()->getFlashdata('error'))) ?>,
+                    timer: 3800,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end',
+                    timerProgressBar: true
+                });
+            }
+        <?php endif; ?>
         const toggleBtn = document.getElementById('sidebarToggleBtn');
         const closeBtn = document.getElementById('sidebarCloseBtn');
         const sidebar = document.getElementById('appSidebar');

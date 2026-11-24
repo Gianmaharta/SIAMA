@@ -32,10 +32,35 @@ Manajemen Akun - SIAMA
     </div>
 <?php endif; ?>
 
-<!-- Header Halaman -->
-<div class="user-page-header">
-    <h1 class="user-page-title">Manajemen Akun</h1>
-    <p class="user-page-subtitle">Kelola data Organisasi Perangkat Daerah (OPD) di Kabupaten Buleleng.</p>
+<!-- Header Halaman (Dibedakan sesuai Role Super Admin vs Admin Pemkab vs Admin OPD) -->
+<?php $loginRoleHeader = session()->get('nama_role'); ?>
+<div class="user-page-header d-flex flex-wrap align-items-center justify-content-between gap-3">
+    <div>
+        <?php if ($loginRoleHeader === 'Super_Admin') : ?>
+            <div class="d-inline-flex align-items-center gap-1.5 px-2.5 py-1 rounded-pill mb-2" style="background-color: #F3E8FF; color: #7C3AED; font-size: 11.5px; font-weight: 600;">
+                <i class="bi bi-shield-fill-check"></i>
+                <span>Super Admin &bull; Akses Hierarki Tertinggi &amp; Switch User</span>
+            </div>
+            <h1 class="user-page-title">Manajemen Akun &amp; Impersonation</h1>
+            <p class="user-page-subtitle">Kendali penuh seluruh akun sistem lintas level (termasuk Admin Pemkab) beserta fitur Masuk Sebagai (Switch User).</p>
+        <?php elseif ($loginRoleHeader === 'Admin_Pemkab') : ?>
+            <div class="d-inline-flex align-items-center gap-1.5 px-2.5 py-1 rounded-pill mb-2" style="background-color: #EFF6FF; color: #1E60EC; font-size: 11.5px; font-weight: 600;">
+                <i class="bi bi-building-gear"></i>
+                <span>Admin Pemkab &bull; Manajemen Akun Perangkat Daerah</span>
+            </div>
+            <h1 class="user-page-title">Manajemen Akun Perangkat Daerah</h1>
+            <p class="user-page-subtitle">Kelola akun pengguna tingkat Kabupaten dan OPD (Admin OPD, Pimpinan, Kepala Bidang, dan Arsiparis).</p>
+        <?php else : ?>
+            <h1 class="user-page-title">Manajemen Akun Internal OPD</h1>
+            <p class="user-page-subtitle">Kelola akun Kepala Bidang, Pimpinan, dan Arsiparis di lingkungan Perangkat Daerah Anda.</p>
+        <?php endif; ?>
+    </div>
+    <?php if ($loginRoleHeader === 'Super_Admin') : ?>
+        <a href="<?= base_url('/settings') ?>" class="btn btn-outline-primary btn-sm px-3 py-2 rounded-3 fw-medium d-inline-flex align-items-center gap-2">
+            <i class="bi bi-key-fill"></i>
+            <span>Atur Password Default (<?= esc($defaultPassword ?? 'Admin123!') ?>)</span>
+        </a>
+    <?php endif; ?>
 </div>
 
 <!-- Tiga Kartu Statistik Pengguna -->
@@ -242,10 +267,10 @@ Manajemen Akun - SIAMA
                             Role Pengguna <span class="text-danger">*</span>
                         </label>
                         <select name="id_role" id="create_id_role" class="user-form-control user-form-select" required>
-                            <option value="">-- Pilih Role Pengguna --</option>
+                            <option value="" data-role-name="">-- Pilih Role Pengguna --</option>
                             <?php if (!empty($roles)) : ?>
                                 <?php foreach ($roles as $r) : ?>
-                                    <option value="<?= esc($r['id_role']) ?>"><?= esc($r['nama_role']) ?></option>
+                                    <option value="<?= esc($r['id_role']) ?>" data-role-name="<?= esc($r['nama_role']) ?>"><?= esc(str_replace('_', ' ', $r['nama_role'])) ?></option>
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </select>
@@ -302,10 +327,27 @@ Manajemen Akun - SIAMA
                         </select>
                     </div>
 
-                    <!-- Info Password Default -->
-                    <div class="p-2 px-3 bg-light rounded-2 border d-flex align-items-center gap-2 small text-muted">
-                        <i class="bi bi-info-circle text-primary"></i>
-                        <span>Password akun baru akan disetel otomatis ke: <strong class="text-dark font-monospace">Admin123!</strong></span>
+                    <!-- Opsi Mekanisme Password Akun Baru -->
+                    <?php
+                    $defaultPwVal = $defaultPassword ?? 'Admin123!';
+                    $pwModeDefault = $passwordMode ?? 'default';
+                    ?>
+                    <div class="mb-3">
+                        <label class="user-form-label">Mekanisme Password Awal <span class="text-danger">*</span></label>
+                        <div class="d-flex flex-column gap-2 p-2.5 px-3 bg-light rounded-3 border">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="password_option" id="pw_opt_default" value="default" <?= $pwModeDefault !== 'random' ? 'checked' : '' ?>>
+                                <label class="form-check-label small text-dark" for="pw_opt_default">
+                                    Gunakan Password Default Pengaturan Website (<code class="fw-bold text-primary"><?= esc($defaultPwVal) ?></code>)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="password_option" id="pw_opt_random" value="random" <?= $pwModeDefault === 'random' ? 'checked' : '' ?>>
+                                <label class="form-check-label small text-dark" for="pw_opt_random">
+                                    Generate Password Random Otomatis <span class="text-muted">(Ditampilkan & bisa di-copy setelah disimpan)</span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer user-modal-footer">
@@ -373,10 +415,10 @@ Manajemen Akun - SIAMA
                             Role Pengguna <span class="text-danger">*</span>
                         </label>
                         <select name="id_role" id="edit_id_role" class="user-form-control user-form-select" required>
-                            <option value="">-- Pilih Role --</option>
+                            <option value="" data-role-name="">-- Pilih Role --</option>
                             <?php if (!empty($roles)) : ?>
                                 <?php foreach ($roles as $r) : ?>
-                                    <option value="<?= esc($r['id_role']) ?>"><?= esc($r['nama_role']) ?></option>
+                                    <option value="<?= esc($r['id_role']) ?>" data-role-name="<?= esc($r['nama_role']) ?>"><?= esc(str_replace('_', ' ', $r['nama_role'])) ?></option>
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </select>
@@ -488,9 +530,8 @@ Manajemen Akun - SIAMA
 
 <?php 
 $currentRoleSession = session()->get('nama_role');
-// Fitur "Masuk Sebagai" HANYA boleh ada jika akun sedang aktif sebagai Admin Pemkab asli
-// Admin OPD (maupun Admin Pemkab yang sedang masuk sebagai Admin OPD) tidak memiliki wewenang ini
-$isCanSwitchRole = in_array($currentRoleSession, ['Admin_Pemkab', 'Admin Pemkab']) && !session()->has('original_admin_id');
+// Fitur "Masuk Sebagai" (Switch User) KHUSUS untuk Super_Admin asli (bukan Admin_Pemkab atau Admin_OPD)
+$isCanSwitchRole = in_array($currentRoleSession, ['Super_Admin', 'Super Admin'], true) && !session()->has('original_admin_id');
 ?>
 <?php if ($isCanSwitchRole) : ?>
 <!-- ============================================================== -->
@@ -751,54 +792,57 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const roleBadge = `<span class="user-role-badge ${roleBadgeClass}">${safeRole}</span>`;
 
-            // Status Indicator
-            let statusHtml = '';
-            if (isActive) {
-                statusHtml = `
-                    <div class="user-status-wrap">
-                        <span class="user-status-badge status-aktif">
-                            <span class="status-dot dot-aktif"></span>
-                            Aktif
-                        </span>
-                        <span class="user-status-sub">(Akun dari Pemkab)</span>
-                    </div>
-                `;
-            } else {
-                statusHtml = `
-                    <div class="user-status-wrap">
-                        <span class="user-status-badge status-nonaktif">
-                            <span class="status-dot dot-nonaktif"></span>
-                            Tidak Aktif
-                        </span>
-                    </div>
-                `;
-            }
+            // Cek perlindungan akun (Diri sendiri atau Super Admin)
+            const isSuperAdminTarget = cleanRole === 'super_admin';
+            const isProtected = isSelf || isSuperAdminTarget;
 
-            // Aksi Buttons: Switch User, Edit, and Hapus (with icon + text)
-            let actionHtml = `<div class="user-action-group">`;
+            // Status Indicator + Interactive Toggle Switch (Catatan #8)
+            const toggleDisabledAttr = isProtected ? 'disabled title="Status akun ini tidak dapat dinonaktifkan"' : `title="Klik untuk ${isActive ? 'menonaktifkan' : 'mengaktifkan'} akun ${safeNama}"`;
+            const statusHtml = `
+                <div class="d-inline-flex align-items-center justify-content-center gap-2">
+                    <div class="form-check form-switch m-0 d-flex align-items-center">
+                        <input 
+                            class="form-check-input user-status-toggle" 
+                            type="checkbox" 
+                            role="switch"
+                            style="cursor: ${isProtected ? 'not-allowed' : 'pointer'}; width: 36px; height: 19px;"
+                            data-id="${safeId}"
+                            data-nama="${safeNama}"
+                            ${isActive ? 'checked' : ''}
+                            ${toggleDisabledAttr}
+                        >
+                    </div>
+                    <span class="user-status-badge ${isActive ? 'status-aktif' : 'status-nonaktif'}" id="statusBadge_${safeId}">
+                        <span class="status-dot ${isActive ? 'dot-aktif' : 'dot-nonaktif'}"></span>
+                        <span class="status-label-text">${isActive ? 'Aktif' : 'Nonaktif'}</span>
+                    </span>
+                </div>
+            `;
 
-            // Tombol Switch User / Masuk Sebagai (Khusus Admin Pemkab)
+            // Aksi Buttons: Ikon Saja dengan Tooltip (Catatan #7 & #1)
+            let actionHtml = `<div class="user-action-group justify-content-center">`;
+
+            // 1. Tombol Switch User / Masuk Sebagai (Khusus Super_Admin)
             if (isCanSwitch) {
                 if (isSelf) {
                     actionHtml += `
                         <button 
                             type="button" 
-                            class="user-action-btn btn-action-switch current-user" 
+                            class="user-action-btn btn-action-switch current-user px-2" 
                             disabled
                             aria-disabled="true"
-                            title="Akun Anda yang sedang aktif"
+                            title="Akun Super Admin yang sedang aktif"
+                            data-bs-toggle="tooltip"
                         >
                             <i class="bi bi-person-check-fill"></i>
-                            <span>Akun Aktif</span>
                         </button>
                     `;
                 } else {
                     actionHtml += `
                         <button 
                             type="button" 
-                            class="user-action-btn btn-action-switch btn-switch-user" 
-                            data-bs-toggle="modal"
-                            data-bs-target="#modalSwitchUser"
+                            class="user-action-btn btn-action-switch btn-switch-user px-2" 
+                            data-bs-toggle="tooltip"
                             data-id="${safeId}"
                             data-nama="${safeNama}"
                             data-email="${safeEmail}"
@@ -807,66 +851,73 @@ document.addEventListener('DOMContentLoaded', function() {
                             title="Masuk sebagai ${safeNama} (${safeRole})"
                         >
                             <i class="bi bi-box-arrow-in-right"></i>
-                            <span>Masuk Sebagai</span>
                         </button>
                     `;
                 }
             }
 
+            // 2. Tombol Reset Password (Ikon Kunci dengan Tooltip)
             actionHtml += `
-                    <button 
-                        type="button" 
-                        class="user-action-btn btn-action-edit btn-edit-user" 
-                        data-bs-toggle="modal"
-                        data-bs-target="#modalEditUser"
-                        data-id="${safeId}"
-                        data-nama="${safeNama}"
-                        data-email="${safeEmail}"
-                        data-role-id="${safeRoleId}"
-                        data-opd-id="${opdId}"
-                        data-bidang-id="${bidangId}"
-                        data-active="${isActive ? '1' : '0'}"
-                        title="Edit Akun Pengguna"
-                    >
-                        <i class="bi bi-pencil-square"></i>
-                        <span>Edit</span>
-                    </button>
+                <button 
+                    type="button" 
+                    class="user-action-btn btn-action-edit btn-reset-pw-user px-2" 
+                    data-bs-toggle="tooltip"
+                    data-id="${safeId}"
+                    data-nama="${safeNama}"
+                    data-email="${safeEmail}"
+                    title="Reset Password (${safeNama})"
+                    style="color: #D97706; border-color: #FDE68A; background-color: #FFFBEB;"
+                >
+                    <i class="bi bi-key-fill"></i>
+                </button>
             `;
 
-            // Cek apakah akun ini adalah Admin Pemkab atau akun yang sedang login (dilindungi dari penghapusan)
-            const isAdminPemkab = (row.nama_role || '').trim().toLowerCase() === 'admin_pemkab';
-            const isProtected = isSelf || isAdminPemkab;
+            // 3. Tombol Edit Pengguna (Ikon Pensil dengan Tooltip)
+            actionHtml += `
+                <button 
+                    type="button" 
+                    class="user-action-btn btn-action-edit btn-edit-user px-2" 
+                    data-bs-toggle="tooltip"
+                    data-id="${safeId}"
+                    data-nama="${safeNama}"
+                    data-email="${safeEmail}"
+                    data-role-id="${safeRoleId}"
+                    data-opd-id="${opdId}"
+                    data-bidang-id="${bidangId}"
+                    data-active="${isActive ? '1' : '0'}"
+                    title="Edit Akun (${safeNama})"
+                >
+                    <i class="bi bi-pencil-square"></i>
+                </button>
+            `;
 
+            // 4. Tombol Hapus Pengguna (Ikon Trash dengan Tooltip)
             if (isProtected) {
                 actionHtml += `
                     <button 
                         type="button" 
-                        class="user-action-btn btn-action-delete disabled" 
+                        class="user-action-btn btn-action-delete disabled px-2" 
                         disabled
                         aria-disabled="true"
-                        title="Akun Administrator Pemkab tidak dapat dihapus"
+                        title="Akun ini dilindungi dari penghapusan"
                         data-bs-toggle="tooltip"
                     >
                         <i class="bi bi-trash"></i>
-                        <span>Hapus</span>
                     </button>
                 `;
             } else {
                 actionHtml += `
                     <button 
                         type="button" 
-                        class="user-action-btn btn-action-delete btn-delete-user" 
-                        data-bs-toggle="modal"
-                        data-bs-target="#modalHapusUser"
+                        class="user-action-btn btn-action-delete btn-delete-user px-2" 
+                        data-bs-toggle="tooltip"
                         data-id="${safeId}"
                         data-nama="${safeNama}"
                         data-email="${safeEmail}"
                         data-opd="${safeOpd}"
-                        title="Hapus Akun Pengguna"
-                        data-bs-toggle="tooltip"
+                        title="Hapus Akun (${safeNama})"
                     >
                         <i class="bi bi-trash"></i>
-                        <span>Hapus</span>
                     </button>
                 `;
             }
@@ -1057,8 +1108,44 @@ document.addEventListener('DOMContentLoaded', function() {
         if (editOpdInput) editOpdInput.value = opdId;
         if (editActiveInput) editActiveInput.value = active;
 
-        // Filter bidang sesuai OPD di modal edit
+        // Filter bidang sesuai OPD & sesuaikan visibilitas Role -> OPD -> Bidang di modal edit
         updateBidangOptions(editOpdInput ? editOpdInput.value : '', editBidangInput, bidangId);
+        handleRoleFieldVisibility(editRoleInput, document.getElementById('wrapEditOpd'), editOpdInput, document.getElementById('wrapEditBidang'), editBidangInput);
+    }
+
+    // Logika Dinamis Tampil/Sembunyi OPD & Bidang Berdasarkan Role (Catatan #10 & Transkrip Hal. 6)
+    function handleRoleFieldVisibility(roleSelectEl, opdWrapEl, opdInputEl, bidangWrapEl, bidangSelectEl) {
+        if (!roleSelectEl) return;
+        const selectedOpt = roleSelectEl.options[roleSelectEl.selectedIndex];
+        const rawRoleName = selectedOpt ? (selectedOpt.getAttribute('data-role-name') || selectedOpt.textContent || '') : '';
+        const normRole = rawRoleName.trim().toLowerCase().replace(/\s+/g, '_');
+
+        const isGlobalRole = ['super_admin', 'admin_pemkab'].includes(normRole);
+        const isBidangRole = ['arsiparis', 'kepala_bidang', 'kabid'].includes(normRole);
+
+        if (opdWrapEl) {
+            if (!normRole || isGlobalRole) {
+                opdWrapEl.classList.add('d-none');
+                if (opdInputEl && opdInputEl.tagName === 'SELECT') {
+                    opdInputEl.value = '';
+                    opdInputEl.removeAttribute('required');
+                }
+            } else {
+                opdWrapEl.classList.remove('d-none');
+                if (opdInputEl && opdInputEl.tagName === 'SELECT') {
+                    opdInputEl.setAttribute('required', 'required');
+                }
+            }
+        }
+
+        if (bidangWrapEl) {
+            if (isBidangRole) {
+                bidangWrapEl.classList.remove('d-none');
+            } else {
+                bidangWrapEl.classList.add('d-none');
+                if (bidangSelectEl) bidangSelectEl.value = '';
+            }
+        }
     }
 
     // Helper: Isi Modal Hapus
@@ -1121,16 +1208,42 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Event listener perubahan OPD di modal tambah
+    // Event listener perubahan Role & OPD di modal tambah
+    const createRoleSelect = document.getElementById('create_id_role');
     const createOpdSelect = document.getElementById('create_id_opd');
     const createBidangSelect = document.getElementById('create_id_bidang');
+    const wrapCreateOpd = document.getElementById('wrapCreateOpd');
+    const wrapCreateBidang = document.getElementById('wrapCreateBidang');
+
+    if (createRoleSelect) {
+        createRoleSelect.addEventListener('change', function() {
+            handleRoleFieldVisibility(createRoleSelect, wrapCreateOpd, createOpdSelect, wrapCreateBidang, createBidangSelect);
+        });
+        handleRoleFieldVisibility(createRoleSelect, wrapCreateOpd, createOpdSelect, wrapCreateBidang, createBidangSelect);
+    }
+
     if (createOpdSelect && createBidangSelect) {
         createOpdSelect.addEventListener('change', function() {
             updateBidangOptions(this.value, createBidangSelect);
         });
     }
 
-    // Event listener perubahan OPD di modal edit
+    // Reset form modal tambah setiap kali dibuka kembali (Transkrip Hal. 3 [07:22])
+    const modalTambahEl = document.getElementById('modalTambahUser');
+    const formTambahUser = document.getElementById('formTambahUser');
+    if (modalTambahEl && formTambahUser) {
+        modalTambahEl.addEventListener('show.bs.modal', function() {
+            formTambahUser.reset();
+            handleRoleFieldVisibility(createRoleSelect, wrapCreateOpd, createOpdSelect, wrapCreateBidang, createBidangSelect);
+        });
+    }
+
+    // Event listener perubahan Role & OPD di modal edit
+    if (editRoleInput) {
+        editRoleInput.addEventListener('change', function() {
+            handleRoleFieldVisibility(editRoleInput, document.getElementById('wrapEditOpd'), editOpdInput, document.getElementById('wrapEditBidang'), editBidangInput);
+        });
+    }
     if (editOpdInput && editBidangInput) {
         editOpdInput.addEventListener('change', function() {
             updateBidangOptions(this.value, editBidangInput);
@@ -1207,6 +1320,107 @@ document.addEventListener('DOMContentLoaded', function() {
                 modal.show();
             }
         }
+
+        const resetPwBtn = e.target.closest('.btn-reset-pw-user');
+        if (resetPwBtn) {
+            const id = resetPwBtn.getAttribute('data-id');
+            const nama = resetPwBtn.getAttribute('data-nama');
+            const defaultPwLabel = <?= json_encode($defaultPassword ?? 'Admin123!') ?>;
+            const baseResetUrl = "<?= base_url('/users/reset-password') ?>/" + id;
+
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Reset Password Pengguna?',
+                    html: `<div class="small text-secondary mb-2">Pilih metode reset password untuk <strong>${escapeHtml(nama)}</strong>:</div>`,
+                    showDenyButton: true,
+                    showCancelButton: true,
+                    confirmButtonText: `Default (${defaultPwLabel})`,
+                    denyButtonText: 'Password Random',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#1E60EC',
+                    denyButtonColor: '#0D9488'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = baseResetUrl + '?mode=default';
+                    } else if (result.isDenied) {
+                        window.location.href = baseResetUrl + '?mode=random';
+                    }
+                });
+            } else if (confirm('Reset password ' + nama + ' ke password default?')) {
+                window.location.href = baseResetUrl;
+            }
+        }
+    });
+
+    // Event Listener: Toggle Cepat Aktif/Nonaktif di Kolom Status (Catatan #8)
+    document.addEventListener('change', function(e) {
+        const toggleEl = e.target.closest('.user-status-toggle');
+        if (!toggleEl) return;
+
+        const id = toggleEl.getAttribute('data-id');
+        const nama = toggleEl.getAttribute('data-nama');
+        const intendedState = toggleEl.checked ? 1 : 0;
+        toggleEl.disabled = true;
+
+        fetch("<?= base_url('/users/toggle-status') ?>/" + id, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: "<?= csrf_token() ?>=<?= csrf_hash() ?>"
+        })
+        .then(res => res.json())
+        .then(data => {
+            toggleEl.disabled = false;
+            if (data.status === 'success') {
+                const newActive = parseInt(data.is_active, 10) === 1;
+                toggleEl.checked = newActive;
+
+                // Update rawData & badge
+                const targetItem = rawData.find(u => u.id_user === id);
+                if (targetItem) targetItem.is_active = newActive ? 1 : 0;
+
+                const badgeEl = document.getElementById('statusBadge_' + id);
+                if (badgeEl) {
+                    badgeEl.className = 'user-status-badge ' + (newActive ? 'status-aktif' : 'status-nonaktif');
+                    const dot = badgeEl.querySelector('.status-dot');
+                    const lbl = badgeEl.querySelector('.status-label-text');
+                    if (dot) dot.className = 'status-dot ' + (newActive ? 'dot-aktif' : 'dot-nonaktif');
+                    if (lbl) lbl.textContent = newActive ? 'Aktif' : 'Nonaktif';
+                }
+
+                // Update kartu statistik
+                const activeCnt = rawData.filter(u => parseInt(u.is_active, 10) === 1).length;
+                const inactiveCnt = rawData.length - activeCnt;
+                const statActiveEl = document.getElementById('statActiveUsers');
+                const statInactiveEl = document.getElementById('statInactiveUsers');
+                if (statActiveEl) statActiveEl.textContent = activeCnt.toLocaleString('id-ID');
+                if (statInactiveEl) statInactiveEl.textContent = inactiveCnt.toLocaleString('id-ID');
+
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Status Diperbarui',
+                        text: data.message,
+                        timer: 2000,
+                        showConfirmButton: false,
+                        toast: true,
+                        position: 'top-end'
+                    });
+                }
+            } else {
+                toggleEl.checked = !intendedState;
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({ icon: 'error', title: 'Gagal', text: data.message || 'Gagal mengubah status.' });
+                }
+            }
+        })
+        .catch(() => {
+            toggleEl.disabled = false;
+            toggleEl.checked = !intendedState;
+        });
     });
 
     // Pindahkan modals ke <body> agar terhindar dari stacking context

@@ -101,16 +101,17 @@ Buat Berita Acara - SIAMA
                 </label>
                 <select name="id_spt" id="id_spt" class="form-select">
                     <option value="">-- Tidak Terkait SPT --</option>
+                    <?php $selectedSpt = old('id_spt', $selected_spt_id ?? ''); ?>
                     <?php if (!empty($spt_list)) : ?>
                         <?php foreach ($spt_list as $spt) : ?>
-                            <option value="<?= esc($spt['id_spt']) ?>" <?= old('id_spt') === $spt['id_spt'] ? 'selected' : '' ?>>
+                            <option value="<?= esc($spt['id_spt']) ?>" <?= $selectedSpt === $spt['id_spt'] ? 'selected' : '' ?>>
                                 <?= esc($spt['nomor_spt']) ?> &ndash; <?= esc($spt['perihal']) ?> (<?= esc($spt['tanggal_spt']) ?>)
                             </option>
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </select>
                 <div class="form-text small text-secondary mt-1">
-                    Pilih Surat Perintah Tugas (SPT) yang mendasari pelaksanaan alih media arsip ini.
+                    Pilih Surat Perintah Tugas (SPT) untuk memfilter dan memilih otomatis arsip yang sudah terhubung dengan SPT tersebut.
                 </div>
             </div>
         </div>
@@ -129,7 +130,7 @@ Buat Berita Acara - SIAMA
             </span>
         </div>
 
-        <div class="px-4 py-2 bg-light border-bottom text-secondary small">
+        <div class="px-4 py-2 bg-light border-bottom text-secondary small" id="arsipFilterInfo">
             Centang satu atau beberapa arsip di bawah yang telah selesai dialihmediakan untuk dimasukkan ke dalam Berita Acara ini.
         </div>
 
@@ -143,14 +144,22 @@ Buat Berita Acara - SIAMA
                         <th style="width: 60px;">No</th>
                         <th>Nomor Arsip</th>
                         <th>Nama / Judul Arsip</th>
+                        <th>SPT Terkait</th>
                         <th>Kurun Waktu</th>
                         <th style="padding-right: 20px;">Kondisi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (!empty($arsip_list)) : ?>
-                        <?php $no = 1; foreach ($arsip_list as $arsip) : ?>
-                            <tr class="arsip-row" data-id="<?= esc($arsip['id_arsip']) ?>">
+                        <?php
+                        $oldArsipIds = (array) (old('arsip_ids') ?? []);
+                        $no = 1;
+                        foreach ($arsip_list as $arsip) :
+                            $isChecked = in_array($arsip['id_arsip'], $oldArsipIds, true);
+                        ?>
+                            <tr class="arsip-row <?= $isChecked ? 'row-selected' : '' ?>"
+                                data-id="<?= esc($arsip['id_arsip']) ?>"
+                                data-id-spt="<?= esc($arsip['id_spt'] ?? '') ?>">
                                 <td style="text-align: center; padding-left: 20px;" onclick="event.stopPropagation();">
                                     <input 
                                         class="form-check-input arsip-checkbox" 
@@ -158,13 +167,23 @@ Buat Berita Acara - SIAMA
                                         name="arsip_ids[]" 
                                         value="<?= esc($arsip['id_arsip']) ?>" 
                                         id="arsip_<?= esc($arsip['id_arsip']) ?>"
+                                        <?= $isChecked ? 'checked' : '' ?>
                                     >
                                 </td>
-                                <td style="color: #64748B; font-weight: 500;"><?= $no++ ?></td>
+                                <td class="arsip-row-no" style="color: #64748B; font-weight: 500;"><?= $no++ ?></td>
                                 <td>
                                     <span class="fw-semibold text-primary"><?= esc($arsip['nomor_arsip']) ?></span>
                                 </td>
                                 <td class="text-dark fw-medium"><?= esc($arsip['nama_arsip']) ?></td>
+                                <td>
+                                    <?php if (!empty($arsip['nomor_spt'])) : ?>
+                                        <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle fw-medium px-2 py-1" style="font-size: 11.5px;">
+                                            <?= esc($arsip['nomor_spt']) ?>
+                                        </span>
+                                    <?php else : ?>
+                                        <span class="text-muted small">Tanpa SPT</span>
+                                    <?php endif; ?>
+                                </td>
                                 <td class="text-secondary"><?= esc($arsip['kurun_waktu'] ?? '-') ?></td>
                                 <td style="padding-right: 20px;">
                                     <span class="badge text-bg-light border text-dark fw-medium px-2 py-1" style="font-size: 12px;">
@@ -173,9 +192,16 @@ Buat Berita Acara - SIAMA
                                 </td>
                             </tr>
                         <?php endforeach; ?>
+                        <tr id="emptyFilterArsipRow" class="d-none">
+                            <td colspan="7" class="text-center py-5 text-secondary">
+                                <i class="bi bi-folder-x fs-1 text-muted d-block mb-2"></i>
+                                <div class="fw-semibold text-dark">Tidak ada arsip yang terhubung dengan SPT terpilih</div>
+                                <div class="small text-muted mt-1">Arsip untuk SPT ini belum diunggah atau sudah terlampir di Berita Acara lain.</div>
+                            </td>
+                        </tr>
                     <?php else : ?>
                         <tr>
-                            <td colspan="6" class="text-center py-5 text-secondary">
+                            <td colspan="7" class="text-center py-5 text-secondary">
                                 <i class="bi bi-folder-x fs-1 text-muted d-block mb-2"></i>
                                 <div class="fw-semibold text-dark">Tidak ada arsip yang dapat dipilih</div>
                                 <div class="small text-muted mt-1">Semua arsip sudah masuk ke dalam Berita Acara atau belum ada arsip yang dialihmediakan.</div>
@@ -210,15 +236,27 @@ Buat Berita Acara - SIAMA
 <?= $this->section('scripts') ?>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const sptSelect = document.getElementById('id_spt');
     const checkAll = document.getElementById('checkAllArsip');
     const checkboxes = document.querySelectorAll('.arsip-checkbox');
     const badgeCount = document.getElementById('selectedCountBadge');
     const form = document.getElementById('formBuatBA');
     const alertNoArsip = document.getElementById('alertNoArsipSelected');
+    const filterInfo = document.getElementById('arsipFilterInfo');
+    const emptyFilterRow = document.getElementById('emptyFilterArsipRow');
     const rows = document.querySelectorAll('.arsip-row');
+    const hasOldArsipSelection = <?= !empty(old('arsip_ids')) ? 'true' : 'false' ?>;
+
+    function getVisibleCheckboxes() {
+        return Array.from(checkboxes).filter(cb => {
+            const row = cb.closest('tr');
+            return row && !row.classList.contains('d-none');
+        });
+    }
 
     function updateCount() {
-        const checkedCount = document.querySelectorAll('.arsip-checkbox:checked').length;
+        const visibleCheckboxes = getVisibleCheckboxes();
+        const checkedCount = visibleCheckboxes.filter(cb => cb.checked).length;
         if (badgeCount) {
             badgeCount.textContent = checkedCount + ' arsip terpilih';
             if (checkedCount > 0) {
@@ -228,16 +266,77 @@ document.addEventListener('DOMContentLoaded', function() {
                 badgeCount.className = 'badge bg-primary-subtle text-primary border border-primary-subtle fw-semibold px-2 py-1';
             }
         }
-        if (checkAll && checkboxes.length > 0) {
-            checkAll.checked = (checkedCount === checkboxes.length);
-            checkAll.indeterminate = (checkedCount > 0 && checkedCount < checkboxes.length);
+        if (checkAll) {
+            checkAll.disabled = visibleCheckboxes.length === 0;
+            checkAll.checked = (visibleCheckboxes.length > 0 && checkedCount === visibleCheckboxes.length);
+            checkAll.indeterminate = (checkedCount > 0 && checkedCount < visibleCheckboxes.length);
         }
     }
 
-    // Toggle Check All
+    function applySptFilter(autoCheckMatches) {
+        const selectedSptId = sptSelect ? sptSelect.value.trim() : '';
+        let visibleNo = 1;
+        let matchCount = 0;
+
+        rows.forEach(row => {
+            const rowSptId = (row.getAttribute('data-id-spt') || '').trim();
+            const cb = row.querySelector('.arsip-checkbox');
+            const noCell = row.querySelector('.arsip-row-no');
+            const isMatch = !selectedSptId || rowSptId === selectedSptId;
+
+            if (isMatch) {
+                row.classList.remove('d-none');
+                if (noCell) noCell.textContent = visibleNo++;
+                matchCount++;
+
+                if (cb && autoCheckMatches) {
+                    cb.checked = selectedSptId !== '';
+                }
+            } else {
+                row.classList.add('d-none');
+                if (cb) {
+                    cb.checked = false;
+                }
+            }
+
+            if (cb) {
+                if (cb.checked) row.classList.add('row-selected');
+                else row.classList.remove('row-selected');
+            }
+        });
+
+        if (emptyFilterRow) {
+            if (selectedSptId && matchCount === 0) {
+                emptyFilterRow.classList.remove('d-none');
+            } else {
+                emptyFilterRow.classList.add('d-none');
+            }
+        }
+
+        if (filterInfo) {
+            if (selectedSptId && matchCount > 0) {
+                filterInfo.innerHTML = '<i class="bi bi-magic text-primary me-1"></i> Sistem menampilkan dan memilih otomatis <strong>' + matchCount + ' arsip</strong> yang terhubung dengan SPT terpilih. Anda tetap dapat menyesuaikan centang jika diperlukan.';
+            } else if (selectedSptId && matchCount === 0) {
+                filterInfo.innerHTML = '<i class="bi bi-info-circle text-warning me-1"></i> Belum ada arsip bebas yang terhubung dengan SPT terpilih.';
+            } else {
+                filterInfo.textContent = 'Centang satu atau beberapa arsip di bawah yang telah selesai dialihmediakan untuk dimasukkan ke dalam Berita Acara ini.';
+            }
+        }
+
+        updateCount();
+    }
+
+    if (sptSelect) {
+        sptSelect.addEventListener('change', function() {
+            applySptFilter(true);
+        });
+    }
+
+    // Toggle Check All (khusus baris yang sedang tampil)
     if (checkAll) {
         checkAll.addEventListener('change', function() {
-            checkboxes.forEach(cb => {
+            const visibleCheckboxes = getVisibleCheckboxes();
+            visibleCheckboxes.forEach(cb => {
                 cb.checked = checkAll.checked;
                 const row = cb.closest('tr');
                 if (row) {
@@ -278,7 +377,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Validasi Form saat Submit
     if (form) {
         form.addEventListener('submit', function(e) {
-            const checkedCount = document.querySelectorAll('.arsip-checkbox:checked').length;
+            const checkedCount = getVisibleCheckboxes().filter(cb => cb.checked).length;
             let isValid = form.checkValidity();
 
             if (checkedCount === 0) {
@@ -299,7 +398,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    updateCount();
+    // Terapkan filter & auto-centang jika SPT sudah terpilih saat halaman dibuka
+    if (sptSelect && sptSelect.value.trim() !== '') {
+        applySptFilter(!hasOldArsipSelection);
+    } else {
+        updateCount();
+    }
 });
 </script>
 <?= $this->endSection() ?>

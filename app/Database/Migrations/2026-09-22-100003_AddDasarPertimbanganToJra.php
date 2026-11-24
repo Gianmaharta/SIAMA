@@ -8,13 +8,15 @@ class AddDasarPertimbanganToJra extends Migration
 {
     public function up()
     {
-        $this->forge->addColumn('jra', [
-            'dasar_pertimbangan' => [
-                'type' => 'TEXT',
-                'null' => true,
-                'after' => 'akses_publik'
-            ]
-        ]);
+        if (!$this->db->fieldExists('dasar_pertimbangan', 'jra')) {
+            $this->forge->addColumn('jra', [
+                'dasar_pertimbangan' => [
+                    'type' => 'TEXT',
+                    'null' => true,
+                    'after' => 'akses_publik'
+                ]
+            ]);
+        }
     }
 
     public function down()

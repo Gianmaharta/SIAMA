@@ -69,6 +69,22 @@ class Auth extends BaseController
                 
                 log_access($user['id_user'], 'login');
 
+                if ($this->wantsJson()) {
+                    return $this->response->setJSON([
+                        'status'               => 'success',
+                        'message'              => 'Login berhasil. Selamat datang, ' . $user['nama'] . '!',
+                        'must_change_password' => ((int) $sessionData['is_default_password'] === 1),
+                        'user'                 => [
+                            'user_id'   => $user['id_user'],
+                            'email'     => $user['email'],
+                            'nama'      => $user['nama'],
+                            'nama_role' => $user['nama_role'],
+                            'id_opd'    => $user['id_opd'] ?? null,
+                            'id_bidang' => $user['id_bidang'] ?? null,
+                        ],
+                    ]);
+                }
+
                 if ($sessionData['is_default_password'] == 1) {
                     return redirect()->to('/change-password');
                 }

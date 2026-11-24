@@ -13,7 +13,47 @@ Activity Log - SIAMA
 <!-- HEADER HALAMAN -->
 <div class="act-header-wrapper">
     <h1 class="act-header-title">Activity Log</h1>
-    <p class="act-header-desc">Kelola data aktivitas pengguna pada sistem SIAMA.</p>
+    <p class="act-header-desc">Visualisasi grafik dan rekam jejak aktivitas pengguna pada sistem SIAMA.</p>
+</div>
+
+<!-- PANEL VISUALISASI GRAFIK ACTIVITY LOG (Catatan #11) -->
+<div class="row g-3 g-xl-4 mb-4">
+    <!-- Grafik 1: Tren Aktivitas Harian -->
+    <div class="col-12 col-xl-7">
+        <div class="act-card h-100 p-3 p-md-4 mb-0">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div>
+                    <h5 class="fw-bold text-dark mb-1" style="font-size: 15.5px;">
+                        <i class="bi bi-graph-up-arrow text-primary me-1"></i>
+                        Tren Aktivitas Harian Pengguna
+                    </h5>
+                    <p class="text-secondary small mb-0" style="font-size: 12px;">Volume aktivitas operasional sistem per hari.</p>
+                </div>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1" style="font-size: 11.5px;">
+                    Total: <?= number_format($total ?? 0, 0, ',', '.') ?> Aktivitas
+                </span>
+            </div>
+            <div style="height: 230px; position: relative;">
+                <canvas id="activityTrendChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grafik 2: Distribusi Aktivitas per Modul -->
+    <div class="col-12 col-xl-5">
+        <div class="act-card h-100 p-3 p-md-4 mb-0">
+            <div class="mb-3">
+                <h5 class="fw-bold text-dark mb-1" style="font-size: 15.5px;">
+                    <i class="bi bi-pie-chart-fill text-primary me-1"></i>
+                    Distribusi Aktivitas per Modul
+                </h5>
+                <p class="text-secondary small mb-0" style="font-size: 12px;">Perbandingan frekuensi aktivitas antar modul aplikasi.</p>
+            </div>
+            <div style="height: 230px; position: relative;">
+                <canvas id="activityModuleChart"></canvas>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- CARD UTAMA: FILTER & TABEL ACTIVITY LOG -->
@@ -204,4 +244,76 @@ Activity Log - SIAMA
     </div>
 </div>
 
+<?= $this->endSection() ?>
+
+<?= $this->section('scripts') ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof Chart === 'undefined') return;
+
+    const chartStats = <?= json_encode($chart_stats ?? [
+        'daily_trend' => ['labels' => [], 'values' => []],
+        'by_module'   => ['labels' => [], 'values' => []],
+        'by_action'   => ['labels' => [], 'values' => []]
+    ]) ?>;
+
+    const trendEl = document.getElementById('activityTrendChart');
+    if (trendEl) {
+        new Chart(trendEl.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: chartStats.daily_trend.labels || [],
+                datasets: [{
+                    label: 'Jumlah Aktivitas',
+                    data: chartStats.daily_trend.values || [],
+                    borderColor: '#1E60EC',
+                    backgroundColor: 'rgba(30, 96, 236, 0.12)',
+                    borderWidth: 2.5,
+                    pointBackgroundColor: '#1E60EC',
+                    pointRadius: 4,
+                    fill: true,
+                    tension: 0.35
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true, ticks: { precision: 0 } }
+                }
+            }
+        });
+    }
+
+    const modEl = document.getElementById('activityModuleChart');
+    if (modEl) {
+        new Chart(modEl.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: chartStats.by_module.labels || [],
+                datasets: [{
+                    data: chartStats.by_module.values || [],
+                    backgroundColor: ['#1E60EC', '#10B981', '#F59E0B', '#7C3AED', '#EC4899', '#06B6D4', '#64748B', '#EF4444'],
+                    borderWidth: 2,
+                    borderColor: '#FFFFFF'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '60%',
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { boxWidth: 12, font: { family: 'Poppins', size: 11.5 } }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
 <?= $this->endSection() ?>

@@ -21,19 +21,101 @@ class Jra extends BaseController
     public function index()
     {
         $session = session();
-        if (!in_array($session->get('nama_role'), ['Admin_Pemkab', 'Admin_OPD', 'Administrator OPD'])) {
+        if (!in_array($session->get('nama_role'), ['Super_Admin', 'Admin_Pemkab', 'Admin_OPD', 'Administrator OPD'])) {
             return redirect()->to('/dashboard')->with('error', 'Akses ditolak.');
         }
 
-        $data['title'] = 'Master Jadwal Retensi Arsip (JRA)';
-        $data['jra_list'] = $this->jraModel->getJraWithKlasifikasi();
+        $perPage  = max(1, min(100, (int) ($this->request->getGet('per_page') ?: 25)));
+        $page     = max(1, (int) ($this->request->getGet('page') ?: 1));
+        $offset   = ($page - 1) * $perPage;
+        $totalJra = (int) $this->jraModel->countAllResults();
+        $jraList  = $this->jraModel->getJraWithKlasifikasi(null, $perPage, $offset);
+
+        if ($this->wantsJson()) {
+            return $this->response->setJSON([
+                'status'     => 'success',
+                'total_data' => $totalJra,
+                'page'       => $page,
+                'per_page'   => $perPage,
+                'data'       => $jraList,
+            ]);
+        }
+
+        $data['title']     = 'Master Jadwal Retensi Arsip (JRA)';
+        $data['jra_list']  = $jraList;
+        $data['total_jra'] = $totalJra;
 
         return view('jra/index', $data);
     }
 
+    /**
+     * Endpoint Server-Side DataTables untuk Master JRA (GET /jra/datatable)
+     */
+    public function datatable()
+    {
+        $session = session();
+        if (!in_array($session->get('nama_role'), ['Super_Admin', 'Admin_Pemkab', 'Admin_OPD', 'Administrator OPD'])) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Akses ditolak.'])->setStatusCode(403);
+        }
+
+        $draw   = (int) ($this->request->getGet('draw') ?? 1);
+        $length = (int) ($this->request->getGet('length') ?: $this->request->getGet('per_page') ?: 25);
+        $length = max(1, min(100, $length));
+
+        if ($this->request->getGet('start') !== null) {
+            $start = max(0, (int) $this->request->getGet('start'));
+        } else {
+            $page  = max(1, (int) ($this->request->getGet('page') ?: 1));
+            $start = ($page - 1) * $length;
+        }
+
+        $searchParam = $this->request->getGet('search');
+        $search = is_array($searchParam)
+            ? trim((string) ($searchParam['value'] ?? ''))
+            : trim((string) ($searchParam ?? ''));
+
+        $colMap = [
+            '0'               => 'kode_klasifikasi.kode',
+            '1'               => 'kode_klasifikasi.kode',
+            '2'               => 'jra.retensi_aktif',
+            '3'               => 'jra.retensi_inaktif',
+            '4'               => 'jra.keterangan_retensi',
+            '5'               => 'jra.klasifikasi_keamanan',
+            '6'               => 'jra.dasar_pertimbangan',
+            'no'              => 'kode_klasifikasi.kode',
+            'kode'            => 'kode_klasifikasi.kode',
+            'retensi_aktif'   => 'jra.retensi_aktif',
+            'retensi_inaktif' => 'jra.retensi_inaktif',
+            'keterangan'      => 'jra.keterangan_retensi',
+            'keamanan'        => 'jra.klasifikasi_keamanan',
+            'dasar'           => 'jra.dasar_pertimbangan',
+        ];
+
+        $orderParam = $this->request->getGet('order');
+        if (is_array($orderParam) && isset($orderParam[0]['column'])) {
+            $colKey   = (string) $orderParam[0]['column'];
+            $orderCol = $colMap[$colKey] ?? 'kode_klasifikasi.kode';
+            $orderDir = strtoupper((string) ($orderParam[0]['dir'] ?? 'ASC')) === 'DESC' ? 'DESC' : 'ASC';
+        } else {
+            $sortBy   = (string) ($this->request->getGet('sort_by') ?: 'kode');
+            $orderCol = $colMap[$sortBy] ?? 'kode_klasifikasi.kode';
+            $orderDir = strtoupper((string) ($this->request->getGet('sort_dir') ?: 'ASC')) === 'DESC' ? 'DESC' : 'ASC';
+        }
+
+        $result = $this->jraModel->getJraDatatable($start, $length, $search, $orderCol, $orderDir);
+
+        return $this->response->setJSON([
+            'status'          => 'success',
+            'draw'            => $draw,
+            'recordsTotal'    => $result['recordsTotal'],
+            'recordsFiltered' => $result['recordsFiltered'],
+            'data'            => $result['data'],
+        ]);
+    }
+
     public function create()
     {
-        if (!in_array(session()->get('nama_role'), ['Admin_Pemkab', 'Admin_OPD', 'Administrator OPD'])) {
+        if (!in_array(session()->get('nama_role'), ['Super_Admin', 'Admin_Pemkab', 'Admin_OPD', 'Administrator OPD'])) {
             return redirect()->to('/dashboard')->with('error', 'Akses ditolak.');
         }
 
@@ -45,7 +127,7 @@ class Jra extends BaseController
 
     public function store()
     {
-        if (!in_array(session()->get('nama_role'), ['Admin_Pemkab', 'Admin_OPD', 'Administrator OPD'])) {
+        if (!in_array(session()->get('nama_role'), ['Super_Admin', 'Admin_Pemkab', 'Admin_OPD', 'Administrator OPD'])) {
             return redirect()->to('/dashboard')->with('error', 'Akses ditolak.');
         }
 
@@ -115,7 +197,7 @@ class Jra extends BaseController
 
     public function edit($id)
     {
-        if (!in_array(session()->get('nama_role'), ['Admin_Pemkab', 'Admin_OPD', 'Administrator OPD'])) {
+        if (!in_array(session()->get('nama_role'), ['Super_Admin', 'Admin_Pemkab', 'Admin_OPD', 'Administrator OPD'])) {
             return redirect()->to('/dashboard')->with('error', 'Akses ditolak.');
         }
 
@@ -138,7 +220,7 @@ class Jra extends BaseController
 
     public function update($id)
     {
-        if (!in_array(session()->get('nama_role'), ['Admin_Pemkab', 'Admin_OPD', 'Administrator OPD'])) {
+        if (!in_array(session()->get('nama_role'), ['Super_Admin', 'Admin_Pemkab', 'Admin_OPD', 'Administrator OPD'])) {
             return redirect()->to('/dashboard')->with('error', 'Akses ditolak.');
         }
 
@@ -220,7 +302,7 @@ class Jra extends BaseController
 
     public function delete($id)
     {
-        if (!in_array(session()->get('nama_role'), ['Admin_Pemkab', 'Admin_OPD', 'Administrator OPD'])) {
+        if (!in_array(session()->get('nama_role'), ['Super_Admin', 'Admin_Pemkab', 'Admin_OPD', 'Administrator OPD'])) {
             return redirect()->to('/dashboard')->with('error', 'Akses ditolak.');
         }
 

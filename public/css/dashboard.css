@@ -441,7 +441,7 @@ html, body {
 /* MAIN DASHBOARD CONTENT */
 .main-content {
     padding: 28px 32px 36px 32px;
-    flex: 1;
+    flex: 1 0 auto;
 }
 
 /* STATISTIC CARDS (5 Cards in 1 Row on Desktop) */
@@ -944,6 +944,7 @@ html, body {
     font-size: 12.5px;
     border-top: 1px solid var(--border-color);
     background: var(--white);
+    flex-shrink: 0;
 }
 
 /* RESPONSIVE BREAKPOINTS */

@@ -826,4 +826,121 @@ class NotificationService
 
         return $sentIds;
     }
+
+    /**
+     * Mengecek arsip yang melewati masa retensi aktif maupun inaktif,
+     * lalu mengirim notifikasi ke Admin_OPD terkait (dengan pencegahan duplikasi).
+     * Dapat dipanggil dari CLI (`php spark check:retensi`) maupun otomatis dari aplikasi web.
+     *
+     * @param string|null $onlyOpdId Jika diisi, hanya mengecek arsip milik OPD tersebut.
+     * @return array{expired_aktif: int, expired_inaktif: int, notifications_sent: int}
+     */
+    public function checkAndNotifyExpiredRetention(?string $onlyOpdId = null): array
+    {
+        $today = date('Y-m-d');
+
+        $aktifBuilder = (new ArsipModel())
+            ->where('tanggal_retensi_aktif_berakhir <=', $today)
+            ->where('tanggal_retensi_aktif_berakhir !=', null)
+            ->where('status_retensi_aktif', 'Aktif');
+
+        if (!empty($onlyOpdId)) {
+            $aktifBuilder->where('id_opd', $onlyOpdId);
+        }
+
+        $expiredAktif = $aktifBuilder->findAll();
+
+        $inaktifBuilder = (new ArsipModel())
+            ->where('tanggal_retensi_inaktif_berakhir <=', $today)
+            ->where('tanggal_retensi_inaktif_berakhir !=', null)
+            ->where('status_retensi_aktif', 'Inaktif');
+
+        if (!empty($onlyOpdId)) {
+            $inaktifBuilder->where('id_opd', $onlyOpdId);
+        }
+
+        $expiredInaktif = $inaktifBuilder->findAll();
+
+        $sentCount = 0;
+        $sentCount += $this->dispatchRetentionNotifications(
+            $expiredAktif,
+            'retensi_arsip',
+            'Peringatan Retensi Arsip',
+            fn (array $arsip): string => 'Arsip "' . $arsip['nama_arsip'] . '" (' . $arsip['nomor_arsip'] . ') telah melewati masa retensi aktif.'
+        );
+        $sentCount += $this->dispatchRetentionNotifications(
+            $expiredInaktif,
+            'retensi_inaktif_arsip',
+            'Peringatan Retensi Inaktif Habis',
+            fn (array $arsip): string => 'Masa inaktif untuk Arsip "' . $arsip['nama_arsip'] . '" (' . $arsip['nomor_arsip'] . ') telah habis. Lakukan aksi akhir.'
+        );
+
+        return [
+            'expired_aktif'      => count($expiredAktif),
+            'expired_inaktif'    => count($expiredInaktif),
+            'notifications_sent' => $sentCount,
+        ];
+    }
+
+    /**
+     * Mengirim notifikasi retensi ke seluruh Admin_OPD pada OPD pemilik arsip jika belum pernah dikirim.
+     */
+    private function dispatchRetentionNotifications(
+        array $arsipList,
+        string $actionType,
+        string $title,
+        callable $messageBuilder
+    ): int {
+        if (empty($arsipList)) {
+            return 0;
+        }
+
+        $adminByOpd = [];
+        $sentCount  = 0;
+
+        foreach ($arsipList as $arsip) {
+            $opdId = $arsip['id_opd'] ?? null;
+            if (empty($opdId)) {
+                continue;
+            }
+
+            if (!isset($adminByOpd[$opdId])) {
+                $adminByOpd[$opdId] = $this->db->table('users')
+                    ->select('users.id_user')
+                    ->join('user_roles', 'user_roles.id_user = users.id_user')
+                    ->join('roles', 'roles.id_role = user_roles.id_role')
+                    ->where('users.id_opd', $opdId)
+                    ->where('roles.nama_role', 'Admin_OPD')
+                    ->get()
+                    ->getResultArray();
+            }
+
+            foreach ($adminByOpd[$opdId] as $admin) {
+                $exists = $this->db->table('notifications')
+                    ->where('id_user', $admin['id_user'])
+                    ->where('action_id', $arsip['id_arsip'])
+                    ->where('action_type', $actionType)
+                    ->countAllResults();
+
+                if ($exists > 0) {
+                    continue;
+                }
+
+                $this->notifModel->insert([
+                    'id_user'        => $admin['id_user'],
+                    'title'          => $title,
+                    'message'        => $messageBuilder($arsip),
+                    'type'           => $actionType,
+                    'reference_id'   => $arsip['id_arsip'],
+                    'reference_type' => 'arsip',
+                    'action_type'    => $actionType,
+                    'action_id'      => $arsip['id_arsip'],
+                    'is_read'        => 0,
+                ]);
+                $sentCount++;
+            }
+        }
+
+        return $sentCount;
+    }
 }

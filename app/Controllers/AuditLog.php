@@ -218,15 +218,17 @@ class AuditLog extends BaseController
 
         // Ambil daftar modul unik untuk dropdown filter
         $modules = $this->activityLogModel->getDistinctModules();
+        $chartStats = $this->activityLogModel->getActivityChartStats($startDate, $endDate, $module, $search);
 
         $data = [
-            'logs'       => $logs,
-            'modules'    => $modules,
-            'pager'      => $pager->makeLinks($page, $perPage, $total, 'default_full'),
-            'total'      => $total,
-            'page'       => $page,
-            'perPage'    => $perPage,
-            'filters'    => [
+            'logs'        => $logs,
+            'modules'     => $modules,
+            'chart_stats' => $chartStats,
+            'pager'       => $pager->makeLinks($page, $perPage, $total, 'default_full'),
+            'total'       => $total,
+            'page'        => $page,
+            'perPage'     => $perPage,
+            'filters'     => [
                 'start_date' => $startDate,
                 'end_date'   => $endDate,
                 'module'     => $module,
@@ -236,7 +238,117 @@ class AuditLog extends BaseController
             ],
         ];
 
+        if ($this->wantsJson()) {
+            return $this->response->setJSON([
+                'status'      => 'success',
+                'total'       => $total,
+                'page'        => $page,
+                'per_page'    => $perPage,
+                'chart_stats' => $chartStats,
+                'logs'        => $logs,
+            ]);
+        }
+
         return view('audit_log/activity', $data);
+    }
+
+    /**
+     * Endpoint JSON Data Grafik Activity Log (untuk Postman / AJAX Chart)
+     */
+    public function activityChartData()
+    {
+        $search    = $this->request->getGet('search');
+        $module    = $this->request->getGet('module');
+        $periode   = $this->request->getGet('periode');
+        $startDate = $this->request->getGet('start_date');
+        $endDate   = $this->request->getGet('end_date');
+
+        if ($periode === 'today') {
+            $startDate = date('Y-m-d');
+            $endDate   = date('Y-m-d');
+        } elseif ($periode === 'week') {
+            $startDate = date('Y-m-d', strtotime('-7 days'));
+            $endDate   = date('Y-m-d');
+        } elseif ($periode === 'month') {
+            $startDate = date('Y-m-01');
+            $endDate   = date('Y-m-t');
+        } elseif ($periode === 'year') {
+            $startDate = date('Y-01-01');
+            $endDate   = date('Y-12-31');
+        }
+
+        $chartStats = $this->activityLogModel->getActivityChartStats($startDate, $endDate, $module, $search);
+
+        return $this->response->setJSON([
+            'status'      => 'success',
+            'chart_stats' => $chartStats,
+        ]);
+    }
+
+    /**
+     * Endpoint Server-Side DataTables untuk Activity Log
+     */
+    public function activityDatatable()
+    {
+        $draw   = (int) ($this->request->getGet('draw') ?? 1);
+        $start  = max(0, (int) ($this->request->getGet('start') ?? 0));
+        $length = (int) ($this->request->getGet('length') ?? 25);
+        if ($length <= 0 || $length > 500) {
+            $length = 25;
+        }
+
+        $searchParam = $this->request->getGet('search');
+        $searchValue = is_array($searchParam) ? trim((string) ($searchParam['value'] ?? '')) : trim((string) $searchParam);
+        $module      = trim((string) $this->request->getGet('module'));
+        $startDate   = trim((string) $this->request->getGet('start_date'));
+        $endDate     = trim((string) $this->request->getGet('end_date'));
+
+        $recordsTotal = (int) $this->activityLogModel->db->table('activity_log')->countAllResults();
+        $builder      = $this->activityLogModel->getActivityLogsWithFilter($startDate ?: null, $endDate ?: null, $module ?: null, $searchValue ?: null);
+        $recordsFiltered = (int) (clone $builder)->countAllResults();
+
+        $rows = $builder->limit($length, $start)->get()->getResultArray();
+
+        return $this->response->setJSON([
+            'status'          => 'success',
+            'draw'            => $draw,
+            'recordsTotal'    => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data'            => $rows,
+        ]);
+    }
+
+    /**
+     * Endpoint Server-Side DataTables untuk Access Log
+     */
+    public function accessDatatable()
+    {
+        $draw   = (int) ($this->request->getGet('draw') ?? 1);
+        $start  = max(0, (int) ($this->request->getGet('start') ?? 0));
+        $length = (int) ($this->request->getGet('length') ?? 25);
+        if ($length <= 0 || $length > 500) {
+            $length = 25;
+        }
+
+        $searchParam = $this->request->getGet('search');
+        $searchValue = is_array($searchParam) ? trim((string) ($searchParam['value'] ?? '')) : trim((string) $searchParam);
+        $action      = trim((string) $this->request->getGet('action'));
+        $startDate   = trim((string) $this->request->getGet('start_date'));
+        $endDate     = trim((string) $this->request->getGet('end_date'));
+
+        $recordsTotal = (int) $this->accessLogModel->db->table('access_log')->countAllResults();
+        $builder      = $this->accessLogModel->getAccessLogsWithFilter($startDate ?: null, $endDate ?: null, $searchValue ?: null, $action ?: null);
+        $recordsFiltered = (int) (clone $builder)->countAllResults();
+
+        $rows = $builder->limit($length, $start)->get()->getResultArray();
+
+        return $this->response->setJSON([
+            'status'          => 'success',
+            'draw'            => $draw,
+            'recordsTotal'    => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data'            => $rows,
+        ]);
     }
 
     /**

@@ -51,7 +51,7 @@ if (empty($jra_list)) {
         ]
     ];
 }
-$totalData = count($jra_list);
+$totalData = (int) ($total_jra ?? count($jra_list));
 ?>
 
 <!-- Header Halaman -->
@@ -199,32 +199,35 @@ $totalData = count($jra_list);
                             <?= esc($dasar) ?>
                         </td>
                         <td class="col-aksi text-center">
-                            <div class="jra-btn-action-group">
+                            <div class="jra-btn-action-group justify-content-center">
                                 <?php if ($isMusnah) : ?>
                                     <button 
                                         type="button" 
                                         class="jra-action-btn btn-action-disabled" 
                                         disabled 
+                                        style="width:34px;height:34px;padding:0;justify-content:center;"
+                                        data-bs-toggle="tooltip"
                                         title="Data JRA dengan status Musnah tidak dapat diedit"
                                         aria-label="Edit dinonaktifkan (Status Musnah)"
                                     >
                                         <i class="bi bi-pencil-square"></i>
-                                        <span>Edit</span>
                                     </button>
                                     <button 
                                         type="button" 
                                         class="jra-action-btn btn-action-disabled" 
                                         disabled 
+                                        style="width:34px;height:34px;padding:0;justify-content:center;"
+                                        data-bs-toggle="tooltip"
                                         title="Data JRA dengan status Musnah tidak dapat dihapus"
                                         aria-label="Hapus dinonaktifkan (Status Musnah)"
                                     >
                                         <i class="bi bi-trash"></i>
-                                        <span>Hapus</span>
                                     </button>
                                 <?php else : ?>
                                     <button 
                                         type="button" 
                                         class="jra-action-btn btn-action-edit" 
+                                        style="width:34px;height:34px;padding:0;justify-content:center;"
                                         title="Edit JRA"
                                         data-bs-toggle="modal" 
                                         data-bs-target="#modalEditJra"
@@ -242,11 +245,11 @@ $totalData = count($jra_list);
                                         data-unit-pengolah="<?= esc($unitPengolah) ?>"
                                     >
                                         <i class="bi bi-pencil-square"></i>
-                                        <span>Edit</span>
                                     </button>
                                     <button 
                                         type="button" 
                                         class="jra-action-btn btn-action-delete" 
+                                        style="width:34px;height:34px;padding:0;justify-content:center;"
                                         title="Hapus JRA"
                                         data-bs-toggle="modal" 
                                         data-bs-target="#modalHapusJra"
@@ -255,7 +258,6 @@ $totalData = count($jra_list);
                                         data-keterangan="<?= esc($keterangan) ?>"
                                     >
                                         <i class="bi bi-trash"></i>
-                                        <span>Hapus</span>
                                     </button>
                                 <?php endif; ?>
                             </div>
@@ -671,14 +673,123 @@ document.addEventListener('DOMContentLoaded', function() {
     const emptyState = document.getElementById('jraEmptyState');
     const paginationInfo = document.getElementById('jraPaginationInfo');
     const paginationList = document.getElementById('jraPaginationList');
-    let tableRows = Array.from(document.querySelectorAll('.jra-row'));
-    const totalData = tableRows.length;
+
     const rowsPerPage = 25;
     let currentPage = 1;
-    let filteredRows = [...tableRows];
+    let totalFiltered = <?= (int) $totalData ?>;
+    let currentSortBy = 'kode';
+    let currentSortDir = 'ASC';
+    let searchTimeout = null;
 
-    function renderPagination() {
-        const totalFiltered = filteredRows.length;
+    function escHtml(str) {
+        return String(str ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function initTooltips() {
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+            bootstrap.Tooltip.getOrCreateInstance(el);
+        });
+    }
+
+    function renderRows(rows, startIdx) {
+        if (!tableBody) return;
+        if (!rows || rows.length === 0) {
+            tableBody.innerHTML = '';
+            if (emptyState) emptyState.classList.remove('d-none');
+            return;
+        }
+        if (emptyState) emptyState.classList.add('d-none');
+
+        const html = rows.map((row, idx) => {
+            const no = startIdx + idx + 1;
+            const kode = row.kode || '';
+            const nama = row.nama_klasifikasi || '';
+            const kodeText = (kode + ' - ' + nama).trim();
+            const retensiAktif = row.retensi_aktif ?? '0';
+            const retensiInaktif = row.retensi_inaktif ?? '0';
+            const keterangan = row.keterangan_retensi || '-';
+            const keamanan = row.klasifikasi_keamanan || 'Biasa';
+            const dasar = row.dasar_pertimbangan || '-';
+            const deskripsi = row.deskripsi || '';
+            const hakAkses = row.hak_akses || 'Terbuka';
+            const aksesPublik = row.akses_publik || '';
+            const unitPengolah = row.unit_pengolah || '';
+
+            const ketLower = keterangan.toLowerCase().trim();
+            const isMusnah = ketLower.includes('musnah');
+            let badgeKeteranganClass = 'badge-dot-biasa';
+            if (isMusnah) badgeKeteranganClass = 'badge-dot-musnah';
+            else if (ketLower.includes('permanen')) badgeKeteranganClass = 'badge-dot-permanen';
+            else if (ketLower.includes('dinilai')) badgeKeteranganClass = 'badge-dot-dinilai';
+
+            const keamLower = keamanan.toLowerCase().trim();
+            let badgeKeamananClass = 'badge-dot-biasa';
+            if (keamLower.includes('terbatas')) badgeKeamananClass = 'badge-dot-terbatas';
+            else if (keamLower.includes('rahasia')) badgeKeamananClass = 'badge-dot-rahasia';
+
+            const actionsHtml = isMusnah
+                ? `<button type="button" class="jra-action-btn btn-action-disabled" disabled style="width:34px;height:34px;padding:0;justify-content:center;" data-bs-toggle="tooltip" title="Data JRA dengan status Musnah tidak dapat diedit" aria-label="Edit dinonaktifkan (Status Musnah)">
+                        <i class="bi bi-pencil-square"></i>
+                   </button>
+                   <button type="button" class="jra-action-btn btn-action-disabled" disabled style="width:34px;height:34px;padding:0;justify-content:center;" data-bs-toggle="tooltip" title="Data JRA dengan status Musnah tidak dapat dihapus" aria-label="Hapus dinonaktifkan (Status Musnah)">
+                        <i class="bi bi-trash"></i>
+                   </button>`
+                : `<button type="button" class="jra-action-btn btn-action-edit" style="width:34px;height:34px;padding:0;justify-content:center;" title="Edit JRA"
+                        data-bs-toggle="modal" data-bs-target="#modalEditJra"
+                        data-id="${escHtml(row.id_jra)}"
+                        data-kode="${escHtml(kode)}"
+                        data-nama="${escHtml(nama)}"
+                        data-deskripsi="${escHtml(deskripsi)}"
+                        data-retensi-aktif="${escHtml(retensiAktif)}"
+                        data-retensi-inaktif="${escHtml(retensiInaktif)}"
+                        data-keterangan="${escHtml(keterangan)}"
+                        data-keamanan="${escHtml(keamanan)}"
+                        data-hak-akses="${escHtml(hakAkses)}"
+                        data-akses-publik="${escHtml(aksesPublik)}"
+                        data-dasar="${escHtml(dasar)}"
+                        data-unit-pengolah="${escHtml(unitPengolah)}">
+                        <i class="bi bi-pencil-square"></i>
+                   </button>
+                   <button type="button" class="jra-action-btn btn-action-delete" style="width:34px;height:34px;padding:0;justify-content:center;" title="Hapus JRA"
+                        data-bs-toggle="modal" data-bs-target="#modalHapusJra"
+                        data-id="${escHtml(row.id_jra)}"
+                        data-kode="${escHtml(kodeText)}"
+                        data-keterangan="${escHtml(keterangan)}">
+                        <i class="bi bi-trash"></i>
+                   </button>`;
+
+            return `<tr class="jra-row">
+                <td class="col-no">${no}</td>
+                <td class="col-kode"><span class="fw-bold text-dark">${escHtml(kodeText)}</span></td>
+                <td class="col-retensi">${escHtml(retensiAktif)} Tahun</td>
+                <td class="col-retensi">${escHtml(retensiInaktif)} Tahun</td>
+                <td class="col-keterangan">
+                    <span class="badge-dot-pill ${badgeKeteranganClass}">
+                        <span class="badge-dot"></span>${escHtml(keterangan)}
+                    </span>
+                </td>
+                <td class="col-keamanan">
+                    <span class="badge-dot-pill ${badgeKeamananClass}">
+                        <span class="badge-dot"></span>${escHtml(keamanan)}
+                    </span>
+                </td>
+                <td class="col-dasar">${escHtml(dasar)}</td>
+                <td class="col-aksi text-center">
+                    <div class="jra-btn-action-group justify-content-center">${actionsHtml}</div>
+                </td>
+            </tr>`;
+        }).join('');
+
+        tableBody.innerHTML = html;
+        initTooltips();
+    }
+
+    function renderPaginationControls() {
         const totalPages = Math.max(1, Math.ceil(totalFiltered / rowsPerPage));
         if (currentPage > totalPages) currentPage = totalPages;
         if (currentPage < 1) currentPage = 1;
@@ -686,22 +797,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const startIdx = (currentPage - 1) * rowsPerPage;
         const endIdx = Math.min(startIdx + rowsPerPage, totalFiltered);
 
-        // Hide all rows first, then show current page slice
-        tableRows.forEach(r => { r.style.display = 'none'; });
-        for (let i = startIdx; i < endIdx; i++) {
-            filteredRows[i].style.display = '';
-            const noCell = filteredRows[i].querySelector('.col-no');
-            if (noCell) noCell.textContent = (i + 1);
-        }
-
         if (totalFiltered === 0) {
-            emptyState.classList.remove('d-none');
             if (paginationInfo) paginationInfo.textContent = 'Menampilkan 0 data';
-        } else {
-            emptyState.classList.add('d-none');
-            if (paginationInfo) {
-                paginationInfo.textContent = `Menampilkan ${startIdx + 1} - ${endIdx} dari ${totalFiltered} data`;
-            }
+        } else if (paginationInfo) {
+            paginationInfo.textContent = `Menampilkan ${startIdx + 1} - ${endIdx} dari ${totalFiltered} data`;
         }
 
         if (!paginationList) return;
@@ -717,7 +816,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!disabled && !active && page !== null) {
                 btn.addEventListener('click', function() {
                     currentPage = page;
-                    renderPagination();
+                    fetchServerPage();
                 });
             }
             li.appendChild(btn);
@@ -726,7 +825,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         addBtn('<i class="bi bi-chevron-left"></i>', currentPage - 1, currentPage <= 1, false, 'Halaman Sebelumnya');
 
-        // Build compact page number list with ellipsis
         const pages = [];
         if (totalPages <= 7) {
             for (let p = 1; p <= totalPages; p++) pages.push(p);
@@ -751,50 +849,64 @@ document.addEventListener('DOMContentLoaded', function() {
         addBtn('<i class="bi bi-chevron-right"></i>', currentPage + 1, currentPage >= totalPages, false, 'Halaman Selanjutnya');
     }
 
-    // Filter Pencarian Real-Time
-    function filterTable() {
-        const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
-        
-        if (clearBtn) {
-            if (query.length > 0) {
-                clearBtn.classList.remove('d-none');
-            } else {
-                clearBtn.classList.add('d-none');
-            }
-        }
-
-        filteredRows = tableRows.filter(row => {
-            if (!query) return true;
-            const kode = row.getAttribute('data-kode') || '';
-            const retensiAktif = row.getAttribute('data-retensi-aktif') || '';
-            const retensiInaktif = row.getAttribute('data-retensi-inaktif') || '';
-            const keterangan = row.getAttribute('data-keterangan') || '';
-            const keamanan = row.getAttribute('data-keamanan') || '';
-            const dasar = row.getAttribute('data-dasar') || '';
-
-            return kode.includes(query) ||
-                   retensiAktif.includes(query) ||
-                   retensiInaktif.includes(query) ||
-                   keterangan.includes(query) ||
-                   keamanan.includes(query) ||
-                   dasar.includes(query);
+    async function fetchServerPage() {
+        const query = searchInput ? searchInput.value.trim() : '';
+        const startIdx = (currentPage - 1) * rowsPerPage;
+        const params = new URLSearchParams({
+            start: String(startIdx),
+            length: String(rowsPerPage),
+            search: query,
+            sort_by: currentSortBy,
+            sort_dir: currentSortDir
         });
 
-        currentPage = 1;
-        renderPagination();
+        try {
+            const res = await fetch('<?= base_url('jra/datatable') ?>?' + params.toString(), {
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            if (!res.ok) return;
+            const json = await res.json();
+            totalFiltered = Number(json.recordsFiltered ?? 0);
+            renderRows(json.data || [], startIdx);
+            renderPaginationControls();
+        } catch (err) {
+            console.error('Gagal memuat data JRA:', err);
+        }
     }
 
-    renderPagination();
+    renderPaginationControls();
+    initTooltips();
 
     if (searchInput) {
-        searchInput.addEventListener('input', filterTable);
+        searchInput.addEventListener('input', function() {
+            const query = searchInput.value.trim();
+            if (clearBtn) {
+                clearBtn.classList.toggle('d-none', query.length === 0);
+            }
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                currentPage = 1;
+                fetchServerPage();
+            }, 250);
+        });
     }
 
     if (clearBtn) {
         clearBtn.addEventListener('click', function() {
-            searchInput.value = '';
-            filterTable();
-            searchInput.focus();
+            if (searchInput) searchInput.value = '';
+            clearBtn.classList.add('d-none');
+            currentPage = 1;
+            fetchServerPage();
+            if (searchInput) searchInput.focus();
+        });
+    }
+
+    // Reset Form Tambah JRA saat Modal ditutup/dibuka ulang (kecuali sedang error validasi)
+    const modalTambahJra = document.getElementById('modalTambahJra');
+    if (modalTambahJra) {
+        modalTambahJra.addEventListener('hidden.bs.modal', function() {
+            const formTambah = document.getElementById('formTambahJra');
+            if (formTambah) formTambah.reset();
         });
     }
 
@@ -866,46 +978,32 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Sortable Headers
-    let sortDirection = {};
+    // Sortable Headers (Server-Side Sorting)
     document.querySelectorAll('.sortable-th').forEach(th => {
         th.addEventListener('click', function() {
             const sortKey = this.getAttribute('data-sort-key');
             if (!sortKey) return;
 
-            const isAsc = !sortDirection[sortKey];
-            sortDirection = {}; // reset others
-            sortDirection[sortKey] = isAsc;
+            if (currentSortBy === sortKey) {
+                currentSortDir = currentSortDir === 'ASC' ? 'DESC' : 'ASC';
+            } else {
+                currentSortBy = sortKey;
+                currentSortDir = 'ASC';
+            }
 
-            // Reset icons
             document.querySelectorAll('.jra-sort-icon').forEach(icon => {
                 icon.className = 'bi bi-arrow-down-up jra-sort-icon';
             });
 
             const currentIcon = this.querySelector('.jra-sort-icon');
             if (currentIcon) {
-                currentIcon.className = isAsc ? 'bi bi-sort-down jra-sort-icon text-primary' : 'bi bi-sort-up jra-sort-icon text-primary';
+                currentIcon.className = currentSortDir === 'ASC'
+                    ? 'bi bi-sort-down jra-sort-icon text-primary'
+                    : 'bi bi-sort-up jra-sort-icon text-primary';
             }
 
-            const rows = Array.from(tableBody.querySelectorAll('.jra-row'));
-            rows.sort((a, b) => {
-                let valA = a.getAttribute('data-' + sortKey.replace('_', '-')) || '';
-                let valB = b.getAttribute('data-' + sortKey.replace('_', '-')) || '';
-
-                // Try numeric comparison if retensi
-                const numA = parseInt(valA, 10);
-                const numB = parseInt(valB, 10);
-                if (!isNaN(numA) && !isNaN(numB)) {
-                    return isAsc ? numA - numB : numB - numA;
-                }
-
-                return isAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
-            });
-
-            // Re-append sorted rows and re-render pagination
-            rows.forEach(r => tableBody.appendChild(r));
-            tableRows = rows;
-            filterTable();
+            currentPage = 1;
+            fetchServerPage();
         });
     });
 
@@ -918,7 +1016,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     <?php if (session()->getFlashdata('error') && old('kode')) : ?>
-        // Otomatis buka kembali modal jika ada error validasi
         const modalTambah = document.getElementById('modalTambahJra');
         if (modalTambah) {
             bootstrap.Modal.getOrCreateInstance(modalTambah).show();

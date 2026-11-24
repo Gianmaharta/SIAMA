@@ -69,7 +69,8 @@ class Arsip extends BaseController
         $user_id  = $session->get('user_id');
 
         switch ($nama_role) {
-            case 'Admin_Pemkab': // Admin_Pemkab: semua arsip se-Kabupaten
+            case 'Super_Admin':
+            case 'Admin_Pemkab': // Super_Admin & Admin_Pemkab: semua arsip se-Kabupaten
                 $arsip_list = $this->arsipModel->getArsipWithRelations();
                 break;
 
@@ -139,6 +140,20 @@ class Arsip extends BaseController
             }
         }
 
+        if ($this->wantsJson()) {
+            return $this->response->setJSON([
+                'status'              => 'success',
+                'user_role'           => $nama_role,
+                'total_arsip'         => $totalArsip,
+                'sudah_diverifikasi'  => $sudahDiverifikasi,
+                'menunggu_verifikasi' => $menungguVerifikasi,
+                'sudah_dinilai'       => $sudahDinilai,
+                'belum_dinilai'       => $belumDinilai,
+                'draft'               => $draft,
+                'data'                => $arsip_list,
+            ]);
+        }
+
         return view('arsip/index', [
             'arsip_list'         => $arsip_list,
             'bidang_list'        => $bidang_list,
@@ -151,6 +166,91 @@ class Arsip extends BaseController
             'belumDinilai'       => $belumDinilai,
             'draft'              => $draft,
             'title'              => 'Pengelolaan Arsip - SIAMA',
+        ]);
+    }
+
+    /**
+     * Endpoint Server-Side DataTables untuk Pengelolaan Arsip (GET /arsip/datatable)
+     */
+    public function datatable()
+    {
+        $session   = session();
+        $nama_role = $session->get('nama_role');
+        $id_opd    = $session->get('id_opd');
+        $id_bidang = $session->get('id_bidang');
+        $user_id   = $session->get('user_id');
+
+        $draw   = (int) ($this->request->getGet('draw') ?? 1);
+        $length = max(1, min(100, (int) ($this->request->getGet('length') ?: $this->request->getGet('per_page') ?: 25)));
+        $start  = $this->request->getGet('start') !== null
+            ? max(0, (int) $this->request->getGet('start'))
+            : (max(1, (int) ($this->request->getGet('page') ?: 1)) - 1) * $length;
+
+        $searchParam = $this->request->getGet('search');
+        $search = is_array($searchParam)
+            ? trim((string) ($searchParam['value'] ?? ''))
+            : trim((string) ($searchParam ?? ''));
+
+        $baseBuilder = $this->db->table('arsip')
+            ->select('arsip.*, opd.nama_opd, bidang.nama_bidang, kode_klasifikasi.kode AS kode_klasifikasi_text, kode_klasifikasi.nama_klasifikasi, spt.nomor_spt')
+            ->join('opd', 'opd.id_opd = arsip.id_opd', 'left')
+            ->join('bidang', 'bidang.id_bidang = arsip.id_bidang', 'left')
+            ->join('kode_klasifikasi', 'kode_klasifikasi.id_kode_klasifikasi = arsip.id_kode_klasifikasi', 'left')
+            ->join('spt', 'spt.id_spt = arsip.id_spt', 'left');
+
+        if (in_array($nama_role, ['Pimpinan', 'Admin_OPD'], true) && !empty($id_opd)) {
+            $baseBuilder->where('arsip.id_opd', $id_opd);
+        } elseif ($nama_role === 'Kepala_Bidang') {
+            if (!empty($id_opd)) {
+                $baseBuilder->where('arsip.id_opd', $id_opd);
+            }
+            if (!empty($id_bidang)) {
+                $baseBuilder->where('arsip.id_bidang', $id_bidang);
+            }
+        } elseif ($nama_role === 'Arsiparis' && !empty($user_id)) {
+            $escapedUser = $this->db->escape($user_id);
+            $baseBuilder->where("(arsip.created_by = {$escapedUser} OR arsip.id_user_upload = {$escapedUser} OR arsip.id_spt IN (SELECT id_spt FROM spt_assignments WHERE id_user = {$escapedUser}))", null, false);
+        }
+
+        $totalBuilder = clone $baseBuilder;
+        $recordsTotal = (int) $totalBuilder->countAllResults();
+
+        if ($search !== '') {
+            $baseBuilder->groupStart()
+                ->like('arsip.nomor_arsip', $search)
+                ->orLike('arsip.nama_arsip', $search)
+                ->orLike('opd.nama_opd', $search)
+                ->orLike('bidang.nama_bidang', $search)
+                ->orLike('kode_klasifikasi.kode', $search)
+                ->orLike('kode_klasifikasi.nama_klasifikasi', $search)
+                ->groupEnd();
+        }
+
+        $filterStatus = trim((string) ($this->request->getGet('status_verifikasi') ?? ''));
+        if ($filterStatus !== '') {
+            $baseBuilder->where('arsip.status_verifikasi', $filterStatus);
+        }
+
+        $filterBidang = trim((string) ($this->request->getGet('id_bidang') ?? ''));
+        if ($filterBidang !== '') {
+            $baseBuilder->where('arsip.id_bidang', $filterBidang);
+        }
+
+        $filteredBuilder = clone $baseBuilder;
+        $recordsFiltered = (int) $filteredBuilder->countAllResults();
+
+        $rows = $baseBuilder
+            ->orderBy('arsip.created_at', 'DESC')
+            ->limit($length, $start)
+            ->get()
+            ->getResultArray();
+
+        return $this->response->setJSON([
+            'status'          => 'success',
+            'draw'            => $draw,
+            'recordsTotal'    => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data'            => $rows,
         ]);
     }
 
@@ -262,6 +362,26 @@ class Arsip extends BaseController
             'kondisi'          => 'permit_empty|max_length[50]',
         ])) {
             return redirect()->back()->withInput()->with('error', implode('<br>', $this->validator->getErrors()));
+        }
+
+        // Pastikan id_opd selalu terisi (fallback dari Bidang atau SPT jika session id_opd kosong)
+        if (empty($id_opd)) {
+            $postedBidang = $this->request->getPost('id_bidang');
+            if (!empty($postedBidang)) {
+                $bidangRow = $this->bidangModel->find($postedBidang);
+                if (!empty($bidangRow['id_opd'])) {
+                    $id_opd = $bidangRow['id_opd'];
+                }
+            }
+        }
+        if (empty($id_opd)) {
+            $postedSpt = $this->request->getPost('id_spt');
+            if (!empty($postedSpt)) {
+                $sptRow = $this->sptModel->find($postedSpt);
+                if (!empty($sptRow['id_opd'])) {
+                    $id_opd = $sptRow['id_opd'];
+                }
+            }
         }
 
         // ----- Validasi & Upload File Digital -----
@@ -713,7 +833,7 @@ class Arsip extends BaseController
     {
         $session = session();
         $userRole = $session->get('nama_role') ?? $session->get('role');
-        if (!in_array($userRole, ['Kepala_Bidang', 'Kabid', 'Admin_Pemkab'], true)) {
+        if (!in_array($userRole, ['Kepala_Bidang', 'Kabid', 'Admin_Pemkab', 'Super_Admin'], true)) {
             return redirect()->to('/arsip')->with('error', 'Akses ditolak. Hanya Kepala Bidang yang dapat memverifikasi arsip.');
         }
 
@@ -729,7 +849,7 @@ class Arsip extends BaseController
         }
 
         // Pastikan Kabid hanya bisa memverifikasi arsip di OPD-nya
-        if ($userRole !== 'Admin_Pemkab' && !empty($session->get('id_opd')) && $arsip['id_opd'] != $session->get('id_opd')) {
+        if (!in_array($userRole, ['Admin_Pemkab', 'Super_Admin'], true) && !empty($session->get('id_opd')) && $arsip['id_opd'] != $session->get('id_opd')) {
             return redirect()->to('/arsip/detail/' . $id)->with('error', 'Anda tidak berhak memverifikasi arsip dari OPD lain.');
         }
 

@@ -61,6 +61,21 @@ class Dashboard extends BaseController
             $data['nama_bidang'] = $bidangRow['nama_bidang'] ?? null;
         }
 
+        // Pemicu otomatis pengecekan retensi saat Admin_OPD membuka Dashboard (dibatasi 15 menit sekali per OPD)
+        if ($data['nama_role'] === 'Admin_OPD' && !empty($data['id_opd'])) {
+            $cacheKey = 'retensi_check_opd_' . $data['id_opd'];
+            $cache    = cache();
+            if (!$cache->get($cacheKey)) {
+                try {
+                    helper('notification');
+                    notification_service()->checkAndNotifyExpiredRetention((string) $data['id_opd']);
+                    $cache->save($cacheKey, time(), 900);
+                } catch (\Throwable $e) {
+                    log_message('error', 'Auto check retention on Dashboard::index failed: ' . $e->getMessage());
+                }
+            }
+        }
+
         $stats = [];
         $data['users_opd'] = [];
         $data['bidang_opd'] = [];
@@ -113,12 +128,145 @@ class Dashboard extends BaseController
 
         // Logika penarikan data sesuai nama_role
         switch ($data['nama_role']) {
-            case 'Admin_Pemkab':
+            case 'Super_Admin':
+                helper('setting');
                 $stats['total_opd']          = $db->table('opd')->countAllResults();
+                $stats['total_bidang']       = $db->tableExists('bidang') ? $db->table('bidang')->countAllResults() : 0;
+                $stats['total_jra']          = $db->tableExists('jra') ? $db->table('jra')->countAllResults() : 0;
                 $stats['total_users']        = $userModel->countAllResults();
+                $stats['active_users']       = $db->table('users')->where('is_active', 1)->countAllResults();
+                $stats['inactive_users']     = $db->table('users')->where('is_active', 0)->countAllResults();
+                $stats['default_pw_users']   = $db->table('users')->where('is_default_password', 1)->countAllResults();
                 $stats['total_arsip']        = $arsipModel->countAllGlobal();
                 $stats['total_spt']          = $sptModel->countAllGlobal();
                 $stats['total_berita_acara'] = $beritaAcaraModel->countAllGlobal();
+
+                $stats['total_activity_logs'] = $db->tableExists('activity_log') ? $db->table('activity_log')->countAllResults() : 0;
+                $stats['today_activity_logs'] = $db->tableExists('activity_log')
+                    ? $db->table('activity_log')->where('DATE(created_at)', date('Y-m-d'))->countAllResults()
+                    : 0;
+                $stats['total_access_logs']   = $db->tableExists('access_log') ? $db->table('access_log')->countAllResults() : 0;
+                $stats['login_success_count'] = $db->tableExists('access_log')
+                    ? $db->table('access_log')->where('event', 'login')->countAllResults()
+                    : 0;
+                $stats['login_failed_count']  = $db->tableExists('access_log')
+                    ? $db->table('access_log')->where('event', 'failed_login')->countAllResults()
+                    : 0;
+                $stats['total_notifications'] = $db->tableExists('notifications') ? $db->table('notifications')->countAllResults() : 0;
+                $stats['unread_notifications']= $db->tableExists('notifications')
+                    ? $db->table('notifications')->where('is_read', 0)->countAllResults()
+                    : 0;
+
+                // Konfigurasi Sistem Aktif (Transkrip Hal. 6: notifikasi, password, log)
+                $data['system_settings'] = get_all_settings();
+
+                // Distribusi Akun per Role Hierarki
+                $roleDistRows = $db->table('roles r')
+                    ->select('r.nama_role, COUNT(ur.id_user) as total')
+                    ->join('user_roles ur', 'ur.id_role = r.id_role', 'left')
+                    ->groupBy('r.nama_role')
+                    ->get()
+                    ->getResultArray();
+                $roleOrder = ['Super_Admin', 'Admin_Pemkab', 'Pimpinan', 'Admin_OPD', 'Kepala_Bidang', 'Arsiparis'];
+                $roleDistMap = [];
+                foreach ($roleDistRows as $rRow) {
+                    $roleDistMap[$rRow['nama_role']] = (int) $rRow['total'];
+                }
+                $roleLabels = [];
+                $roleValues = [];
+                foreach ($roleOrder as $rName) {
+                    $roleLabels[] = str_replace('_', ' ', $rName);
+                    $roleValues[] = $roleDistMap[$rName] ?? 0;
+                }
+                $data['super_role_chart'] = [
+                    'labels' => $roleLabels,
+                    'values' => $roleValues,
+                ];
+
+                // Tren Aktivitas Sistem & Login 7 Hari Terakhir
+                $trendLabels = [];
+                $trendActivity = [];
+                $trendLoginSuccess = [];
+                $trendLoginFailed = [];
+                for ($i = 6; $i >= 0; $i--) {
+                    $d = date('Y-m-d', strtotime("-{$i} days"));
+                    $trendLabels[] = date('d M', strtotime($d));
+                    $trendActivity[] = $db->tableExists('activity_log')
+                        ? (int) $db->table('activity_log')->where('DATE(created_at)', $d)->countAllResults()
+                        : 0;
+                    $trendLoginSuccess[] = $db->tableExists('access_log')
+                        ? (int) $db->table('access_log')->where('DATE(created_at)', $d)->where('event', 'login')->countAllResults()
+                        : 0;
+                    $trendLoginFailed[] = $db->tableExists('access_log')
+                        ? (int) $db->table('access_log')->where('DATE(created_at)', $d)->where('event', 'failed_login')->countAllResults()
+                        : 0;
+                }
+                $data['super_trend_chart'] = [
+                    'labels'       => $trendLabels,
+                    'activity'     => $trendActivity,
+                    'login_ok'     => $trendLoginSuccess,
+                    'login_failed' => $trendLoginFailed,
+                ];
+
+                // Daftar Cepat Switch User (Akun selain Super Admin yang sedang login)
+                $data['quick_switch_users'] = $db->table('users u')
+                    ->select('u.id_user, u.nama, u.email, u.is_active, u.is_default_password, r.nama_role, o.nama_opd')
+                    ->join('user_roles ur', 'ur.id_user = u.id_user', 'left')
+                    ->join('roles r', 'r.id_role = ur.id_role', 'left')
+                    ->join('opd o', 'o.id_opd = u.id_opd', 'left')
+                    ->where('u.id_user !=', (string) $data['user_id'])
+                    ->orderBy('u.created_at', 'DESC')
+                    ->limit(8)
+                    ->get()
+                    ->getResultArray();
+
+                // Log Akses Keamanan Terbaru (Access Log)
+                $data['recent_access_logs'] = $db->tableExists('access_log')
+                    ? $db->table('access_log al')
+                        ->select('al.*, al.event as status, u.nama as nama_user, u.email as email_user, r.nama_role')
+                        ->join('users u', 'u.id_user = al.user_id', 'left')
+                        ->join('user_roles ur', 'ur.id_user = u.id_user', 'left')
+                        ->join('roles r', 'r.id_role = ur.id_role', 'left')
+                        ->orderBy('al.created_at', 'DESC')
+                        ->limit(8)
+                        ->get()
+                        ->getResultArray()
+                    : [];
+
+                // Notifikasi Sistem Terbaru Lintas Pengguna
+                $data['recent_system_notifications'] = $db->tableExists('notifications')
+                    ? $db->table('notifications n')
+                        ->select('n.*, u.nama as penerima_nama, r.nama_role as penerima_role')
+                        ->join('users u', 'u.id_user = n.id_user', 'left')
+                        ->join('user_roles ur', 'ur.id_user = u.id_user', 'left')
+                        ->join('roles r', 'r.id_role = ur.id_role', 'left')
+                        ->orderBy('n.created_at', 'DESC')
+                        ->limit(6)
+                        ->get()
+                        ->getResultArray()
+                    : [];
+                break;
+
+            case 'Admin_Pemkab':
+                $stats['total_opd']          = $db->table('opd')->countAllResults();
+                $stats['total_users']        = $db->table('users u')
+                    ->join('user_roles ur', 'ur.id_user = u.id_user', 'left')
+                    ->join('roles r', 'r.id_role = ur.id_role', 'left')
+                    ->where("(r.nama_role IS NULL OR r.nama_role NOT IN ('Super_Admin', 'Super Admin'))", null, false)
+                    ->countAllResults();
+                $stats['total_arsip']        = $arsipModel->countAllGlobal();
+                $stats['total_spt']          = $sptModel->countAllGlobal();
+                $stats['total_berita_acara'] = $beritaAcaraModel->countAllGlobal();
+                $stats['arsip_menunggu_penilaian'] = $db->table('arsip')
+                    ->where('status_verifikasi', 'Selesai')
+                    ->groupStart()
+                        ->where('skor_prioritas IS NULL')
+                        ->orWhere('status_autentikasi', 'Belum Dinilai')
+                    ->groupEnd()
+                    ->countAllResults();
+                $stats['arsip_sudah_dinilai'] = $db->table('arsip')
+                    ->where('skor_prioritas IS NOT NULL')
+                    ->countAllResults();
 
                 $data['pending_work_summary']     = $this->getPendingWorkSummary();
                 $data['workflow_monitoring_list'] = $this->getWorkflowMonitoring();
@@ -775,7 +923,7 @@ class Dashboard extends BaseController
             ->select('id_opd, kode_opd, nama_opd')
             ->orderBy('nama_opd', 'ASC');
 
-        if ($data['nama_role'] !== 'Admin_Pemkab' && !empty($data['id_opd'])) {
+        if (!in_array($data['nama_role'], ['Super_Admin', 'Admin_Pemkab'], true) && !empty($data['id_opd'])) {
             $opdBuilder->where('id_opd', $data['id_opd']);
         }
         $allOpd = $opdBuilder->get()->getResultArray();
@@ -814,7 +962,7 @@ class Dashboard extends BaseController
             ->select('o.id_opd, o.nama_opd, o.kode_opd, COUNT(a.id_arsip) AS total_arsip')
             ->join('arsip a', 'a.id_opd = o.id_opd', 'left');
 
-        if ($data['nama_role'] !== 'Admin_Pemkab' && !empty($data['id_opd'])) {
+        if (!in_array($data['nama_role'], ['Super_Admin', 'Admin_Pemkab'], true) && !empty($data['id_opd'])) {
             $chartBuilder->where('o.id_opd', $data['id_opd']);
         }
 
@@ -1001,8 +1149,8 @@ class Dashboard extends BaseController
         $namaRole   = $session->get('nama_role');
         $sessionOpd = $session->get('id_opd');
 
-        // Scoping jika role terikat ke OPD tertentu (bukan Admin_Pemkab)
-        if ($namaRole !== 'Admin_Pemkab' && !empty($sessionOpd)) {
+        // Scoping jika role terikat ke OPD tertentu (bukan Super_Admin / Admin_Pemkab)
+        if (!in_array($namaRole, ['Super_Admin', 'Admin_Pemkab'], true) && !empty($sessionOpd)) {
             $idOpd = $sessionOpd;
         }
 

@@ -1,7 +1,11 @@
 <?php
+helper('setting');
 $uri = service('uri');
 $currentSegment = $uri->getSegment(1) ?? 'dashboard';
 $role = session()->get('nama_role') ?? 'Admin_Pemkab';
+$isTopAdmin = in_array($role, ['Super_Admin', 'Admin_Pemkab'], true);
+$customLogo = get_setting('site_logo', 'logo siama1.png');
+$siteName   = get_setting('site_name', 'SIAMA');
 
 $notifModel = new \App\Models\NotificationModel();
 $unread = 0;
@@ -12,12 +16,14 @@ if (session()->get('user_id')) {
 <aside class="sidebar" id="appSidebar">
     <div class="sidebar-brand-wrapper">
         <a href="<?= base_url('/dashboard') ?>" class="sidebar-brand">
-            <?php if (file_exists(FCPATH . 'logo siama1.png')) : ?>
-                <img src="<?= base_url('logo siama1.png') ?>" alt="Logo SIAMA" class="sidebar-logo">
+            <?php if (!empty($customLogo) && file_exists(FCPATH . $customLogo)) : ?>
+                <img src="<?= base_url($customLogo) ?>" alt="Logo <?= esc($siteName) ?>" class="sidebar-logo">
+            <?php elseif (file_exists(FCPATH . 'logo siama1.png')) : ?>
+                <img src="<?= base_url('logo siama1.png') ?>" alt="Logo <?= esc($siteName) ?>" class="sidebar-logo">
             <?php elseif (file_exists(FCPATH . 'Images/logo siama1.png')) : ?>
-                <img src="<?= base_url('Images/logo siama1.png') ?>" alt="Logo SIAMA" class="sidebar-logo">
+                <img src="<?= base_url('Images/logo siama1.png') ?>" alt="Logo <?= esc($siteName) ?>" class="sidebar-logo">
             <?php else: ?>
-                <span class="fs-4 fw-bold text-white">SIAMA</span>
+                <span class="fs-4 fw-bold text-white"><?= esc($siteName) ?></span>
             <?php endif; ?>
         </a>
         <button type="button" class="sidebar-close-btn d-lg-none" id="sidebarCloseBtn" aria-label="Tutup Menu">
@@ -25,7 +31,78 @@ if (session()->get('user_id')) {
         </button>
     </div>
 
-    <?php if (in_array($role, ['Pimpinan', 'Kepala_Dinas', 'Kepala Dinas', 'Kepala_Bidang', 'Kepala Bidang', 'Kabid', 'Arsiparis'])) : ?>
+    <?php if ($role === 'Super_Admin') : ?>
+        <!-- Menu Khusus Super Admin (Pusat Kendali Sistem, Konfigurasi, Audit & Seluruh Modul) -->
+        <ul class="sidebar-menu">
+            <li class="menu-group-label">PUSAT KENDALI</li>
+            <li class="nav-item">
+                <a href="<?= base_url('/dashboard') ?>" class="nav-link <?= ($currentSegment === '' || $currentSegment === 'dashboard') ? 'active' : '' ?>">
+                    <i class="bi bi-cpu"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <li class="menu-group-label">ADMINISTRASI SISTEM</li>
+            <li class="nav-item">
+                <a href="<?= base_url('/settings') ?>" class="nav-link <?= ($currentSegment === 'settings') ? 'active' : '' ?>">
+                    <i class="bi bi-sliders"></i>
+                    <span>Pengaturan Website</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="<?= base_url('/users') ?>" class="nav-link <?= ($currentSegment === 'users') ? 'active' : '' ?>">
+                    <i class="bi bi-people"></i>
+                    <span>Manajemen Akun</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="<?= base_url('/swagger') ?>" class="nav-link <?= ($currentSegment === 'swagger') ? 'active' : '' ?>">
+                    <i class="bi bi-braces-asterisk"></i>
+                    <span>Dokumentasi API</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="<?= base_url('/system-cleanse') ?>" class="nav-link <?= ($currentSegment === 'system-cleanse') ? 'active' : '' ?>">
+                    <i class="bi bi-database-gear"></i>
+                    <span>Reset &amp; Cleansing</span>
+                </a>
+            </li>
+
+            <li class="menu-group-label">DATA MASTER GLOBAL</li>
+            <li class="nav-item">
+                <a href="<?= base_url('/opd') ?>" class="nav-link <?= ($currentSegment === 'opd') ? 'active' : '' ?>">
+                    <i class="bi bi-bank"></i>
+                    <span>Master OPD</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="<?= base_url('/bidang') ?>" class="nav-link <?= ($currentSegment === 'bidang') ? 'active' : '' ?>">
+                    <i class="bi bi-layers"></i>
+                    <span>Master Bidang</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="<?= base_url('/jra') ?>" class="nav-link <?= ($currentSegment === 'jra') ? 'active' : '' ?>">
+                    <i class="bi bi-journal-bookmark"></i>
+                    <span>Master JRA</span>
+                </a>
+            </li>
+
+            <li class="menu-group-label">AUDIT &amp; KEAMANAN</li>
+            <li class="nav-item">
+                <a href="<?= base_url('/audit-log/access') ?>" class="nav-link <?= ($currentSegment === 'audit-log' && $uri->getSegment(2) === 'access') ? 'active' : '' ?>">
+                    <i class="bi bi-shield-lock"></i>
+                    <span>Access Log</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="<?= base_url('/audit-log/activity') ?>" class="nav-link <?= ($currentSegment === 'audit-log' && $uri->getSegment(2) === 'activity') ? 'active' : '' ?>">
+                    <i class="bi bi-clock-history"></i>
+                    <span>Activity Log</span>
+                </a>
+            </li>
+        </ul>
+    <?php elseif (in_array($role, ['Pimpinan', 'Kepala_Dinas', 'Kepala Dinas', 'Kepala_Bidang', 'Kepala Bidang', 'Kabid', 'Arsiparis'])) : ?>
         <!-- Menu Khusus Pimpinan / Kepala Bidang / Arsiparis -->
         <ul class="sidebar-menu sidebar-menu-pimpinan">
             <li class="nav-item">
@@ -54,6 +131,7 @@ if (session()->get('user_id')) {
             </li>
         </ul>
     <?php else : ?>
+        <!-- Menu Khusus Admin_Pemkab & Admin_OPD -->
         <ul class="sidebar-menu">
             <li class="menu-group-label">DASHBOARD</li>
             <li class="nav-item">
@@ -83,12 +161,14 @@ if (session()->get('user_id')) {
                         </a>
                     </li>
                 <?php endif; ?>
-                <li class="nav-item">
-                    <a href="<?= base_url('/bidang') ?>" class="nav-link <?= ($currentSegment === 'bidang') ? 'active' : '' ?>">
-                        <i class="bi bi-layers"></i>
-                        <span>Master Bidang</span>
-                    </a>
-                </li>
+                <?php if (in_array($role, ['Admin_OPD', 'Administrator OPD'])) : ?>
+                    <li class="nav-item">
+                        <a href="<?= base_url('/bidang') ?>" class="nav-link <?= ($currentSegment === 'bidang') ? 'active' : '' ?>">
+                            <i class="bi bi-layers"></i>
+                            <span>Master Bidang</span>
+                        </a>
+                    </li>
+                <?php endif; ?>
                 <li class="nav-item">
                     <a href="<?= base_url('/jra') ?>" class="nav-link <?= ($currentSegment === 'jra') ? 'active' : '' ?>">
                         <i class="bi bi-folder"></i>
@@ -124,23 +204,7 @@ if (session()->get('user_id')) {
                     <span>Berita Acara</span>
                 </a>
             </li>
-
-        <?php if ($role === 'Admin_Pemkab') : ?>
-            <li class="menu-group-label">AUDIT LOG</li>
-            <li class="nav-item">
-                <a href="<?= base_url('/audit-log/access') ?>" class="nav-link <?= ($currentSegment === 'audit-log' && $uri->getSegment(2) === 'access') ? 'active' : '' ?>">
-                    <i class="bi bi-file-earmark-lock"></i>
-                    <span>Access Log</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="<?= base_url('/audit-log/activity') ?>" class="nav-link <?= ($currentSegment === 'audit-log' && $uri->getSegment(2) === 'activity') ? 'active' : '' ?>">
-                    <i class="bi bi-clock-history"></i>
-                    <span>Activity Log</span>
-                </a>
-            </li>
-        <?php endif; ?>
-    </ul>
+        </ul>
     <?php endif; ?>
 </aside>
 <div class="sidebar-backdrop" id="sidebarBackdrop"></div>

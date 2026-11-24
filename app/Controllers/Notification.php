@@ -29,6 +29,16 @@ class Notification extends BaseController
             return redirect()->to('/login');
         }
 
+        // Pemicu otomatis pengecekan retensi saat Admin_OPD membuka halaman Notifikasi
+        if ($session->get('nama_role') === 'Admin_OPD' && !empty($session->get('id_opd'))) {
+            try {
+                helper('notification');
+                notification_service()->checkAndNotifyExpiredRetention((string) $session->get('id_opd'));
+            } catch (\Throwable $e) {
+                log_message('error', 'Auto check retention on Notification::index failed: ' . $e->getMessage());
+            }
+        }
+
         $filter = $this->request->getGet('filter') ?: 'all';
         if (!in_array($filter, ['all', 'unread', 'read'])) {
             $filter = 'all';

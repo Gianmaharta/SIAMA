@@ -37,8 +37,8 @@ class BeritaAcara extends BaseController
         ];
 
         // Tarik data berita acara
-        // Jika Admin Pemkab, lihat semua. Jika OPD, lihat milik OPD-nya.
-        if ($role === 'Admin_Pemkab') {
+        // Jika Super Admin atau Admin Pemkab, lihat semua. Jika OPD, lihat milik OPD-nya.
+        if (in_array($role, ['Super_Admin', 'Admin_Pemkab'], true)) {
             $data['berita_acara'] = $this->beritaAcaraModel->getBeritaAcaraWithRelations(null, null, $filters);
         } else {
             $data['berita_acara'] = $this->beritaAcaraModel->getBeritaAcaraWithRelations(null, $id_opd, $filters);
@@ -66,15 +66,19 @@ class BeritaAcara extends BaseController
         }
         $data['spt_list'] = $sptQuery->where('status', 'Aktif')->findAll();
 
-        // Ambil Arsip milik OPD yang belum punya id_berita_acara
-        $arsipQuery = $this->arsipModel;
+        $data['selected_spt_id'] = trim((string) $this->request->getGet('id_spt'));
+
+        // Ambil Arsip milik OPD yang belum punya id_berita_acara beserta info nomor SPT terkait
+        $arsipQuery = $this->arsipModel
+            ->select('arsip.*, spt.nomor_spt')
+            ->join('spt', 'spt.id_spt = arsip.id_spt', 'left');
         if (!empty($id_opd)) {
-            $arsipQuery = $arsipQuery->where('id_opd', $id_opd);
+            $arsipQuery->where('arsip.id_opd', $id_opd);
         }
-        $data['arsip_list'] = $arsipQuery->where('id_berita_acara', null)
-            ->orderBy('COALESCE(created_at, updated_at)', 'DESC', false)
-            ->orderBy('created_at', 'DESC')
-            ->orderBy('id_arsip', 'DESC')
+        $data['arsip_list'] = $arsipQuery->where('arsip.id_berita_acara', null)
+            ->orderBy('COALESCE(arsip.created_at, arsip.updated_at)', 'DESC', false)
+            ->orderBy('arsip.created_at', 'DESC')
+            ->orderBy('arsip.id_arsip', 'DESC')
             ->findAll();
         $data['user_role'] = $role;
 

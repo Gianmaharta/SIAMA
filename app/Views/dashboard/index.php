@@ -28,7 +28,9 @@ Dashboard - SIAMA
     </div>
 <?php endif; ?>
 
-<?php if (in_array($nama_role, ['Admin_OPD', 'Administrator OPD'])) : ?>
+<?php if (in_array($nama_role, ['Super_Admin', 'Super Admin'], true)) : ?>
+    <?= $this->include('dashboard/super_admin') ?>
+<?php elseif (in_array($nama_role, ['Admin_OPD', 'Administrator OPD'])) : ?>
     <?= $this->include('dashboard/admin_opd') ?>
 <?php elseif (in_array($nama_role, ['Pimpinan', 'Kepala_Dinas', 'Kepala Dinas'])) : ?>
     <?= $this->include('dashboard/pimpinan') ?>
@@ -38,13 +40,36 @@ Dashboard - SIAMA
     <?= $this->include('dashboard/arsiparis') ?>
 <?php else : ?>
 
-<!-- Header Khusus Admin Pemkab -->
-<div class="dashboard-header mb-4">
-    <h1 class="h3 fw-bold text-dark mb-1" style="font-size: 24px; letter-spacing: -0.3px;">Selamat Datang, <?= esc($nama_lengkap ?? 'Administrator Pemkab') ?>!</h1>
-    <p class="text-secondary mb-0" style="font-size: 14px;">Administrator Pemerintah Kabupaten &bull; Pantau ringkasan statistik dan aktivitas sistem alih media arsip se-kabupaten.</p>
+<!-- Header Khusus Admin Pemkab (Operasional & Pengawasan Kearsipan Kabupaten) -->
+<div class="dashboard-header mb-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
+    <div>
+        <div class="d-inline-flex align-items-center gap-2 px-2.5 py-1 rounded-pill mb-2" style="background-color: #EFF6FF; color: #1E60EC; font-size: 11.5px; font-weight: 600; border: 1px solid #BFDBFE;">
+            <i class="bi bi-building-check"></i>
+            <span>Pengawasan &amp; Evaluasi Kearsipan Daerah (Admin Pemkab)</span>
+        </div>
+        <h1 class="h3 fw-bold text-dark mb-1" style="font-size: 24px; letter-spacing: -0.3px;">Selamat Datang, <?= esc($nama_lengkap ?? 'Administrator Pemkab') ?>!</h1>
+        <p class="text-secondary mb-0" style="font-size: 14px;">Pantau capaian alih media arsip lintas Perangkat Daerah, kelola Master OPD &amp; JRA, serta lakukan penilaian prioritas arsip.</p>
+    </div>
+    <div class="d-flex flex-wrap align-items-center gap-2">
+        <a href="<?= base_url('/penilaian') ?>" class="btn btn-primary btn-sm px-3 py-2 rounded-3 fw-semibold d-inline-flex align-items-center gap-2 shadow-sm" style="background-color: #1E60EC; border-color: #1E60EC;">
+            <i class="bi bi-check2-square"></i>
+            <span>Penilaian Arsip</span>
+            <?php if (!empty($stats['arsip_menunggu_penilaian'])) : ?>
+                <span class="badge bg-white text-primary rounded-pill ms-1"><?= (int) $stats['arsip_menunggu_penilaian'] ?></span>
+            <?php endif; ?>
+        </a>
+        <a href="<?= base_url('/opd') ?>" class="btn btn-white border bg-white btn-sm px-3 py-2 rounded-3 fw-medium text-dark d-inline-flex align-items-center gap-2 shadow-sm">
+            <i class="bi bi-bank"></i>
+            <span>Master OPD</span>
+        </a>
+        <a href="<?= base_url('/jra') ?>" class="btn btn-white border bg-white btn-sm px-3 py-2 rounded-3 fw-medium text-dark d-inline-flex align-items-center gap-2 shadow-sm">
+            <i class="bi bi-journal-bookmark"></i>
+            <span>Master JRA</span>
+        </a>
+    </div>
 </div>
 
-<!-- Statistic Cards: Row 1 -->
+<!-- Statistic Cards: Row 1 (Fokus Kearsipan & Evaluasi Admin Pemkab) -->
 <?php if ($nama_role == 'Admin_Pemkab' || empty($nama_role)) : ?>
     <div class="stats-grid">
         <!-- Card 1: Total OPD -->
@@ -53,40 +78,40 @@ Dashboard - SIAMA
                 <i class="bi bi-bank2"></i>
             </div>
             <div class="stat-content">
-                <div class="stat-label">Total OPD</div>
+                <div class="stat-label">Total Perangkat Daerah</div>
                 <div class="stat-value"><?= number_format($stats['total_opd'] ?? 0, 0, ',', '.') ?></div>
             </div>
         </div>
 
-        <!-- Card 2: Total Pengguna -->
-        <div class="stat-card card-green">
-            <div class="stat-icon-box">
-                <i class="bi bi-people-fill"></i>
-            </div>
-            <div class="stat-content">
-                <div class="stat-label">Total Pengguna</div>
-                <div class="stat-value"><?= number_format($stats['total_users'] ?? 0, 0, ',', '.') ?></div>
-            </div>
-        </div>
-
-        <!-- Card 3: Total Arsip Global -->
+        <!-- Card 2: Total Arsip Global -->
         <div class="stat-card card-purple">
             <div class="stat-icon-box">
                 <i class="bi bi-file-earmark-text-fill"></i>
             </div>
             <div class="stat-content">
-                <div class="stat-label">Total Arsip Global</div>
+                <div class="stat-label">Total Arsip Digital</div>
                 <div class="stat-value"><?= number_format($stats['total_arsip'] ?? 0, 0, ',', '.') ?></div>
             </div>
         </div>
 
-        <!-- Card 4: Total SPT Global -->
+        <!-- Card 3: Arsip Menunggu Penilaian -->
         <div class="stat-card card-amber">
+            <div class="stat-icon-box">
+                <i class="bi bi-clipboard2-check-fill"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-label">Menunggu Penilaian</div>
+                <div class="stat-value"><?= number_format($stats['arsip_menunggu_penilaian'] ?? 0, 0, ',', '.') ?></div>
+            </div>
+        </div>
+
+        <!-- Card 4: Total SPT Global -->
+        <div class="stat-card card-green">
             <div class="stat-icon-box">
                 <i class="bi bi-file-text-fill"></i>
             </div>
             <div class="stat-content">
-                <div class="stat-label">Total SPT Global</div>
+                <div class="stat-label">Total SPT Diterbitkan</div>
                 <div class="stat-value"><?= number_format($stats['total_spt'] ?? 0, 0, ',', '.') ?></div>
             </div>
         </div>
@@ -97,7 +122,7 @@ Dashboard - SIAMA
                 <i class="bi bi-file-earmark-check-fill"></i>
             </div>
             <div class="stat-content">
-                <div class="stat-label">Total Berita Acara Global</div>
+                <div class="stat-label">Total Berita Acara</div>
                 <div class="stat-value"><?= number_format($stats['total_berita_acara'] ?? 0, 0, ',', '.') ?></div>
             </div>
         </div>

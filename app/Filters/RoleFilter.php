@@ -29,10 +29,15 @@ class RoleFilter implements FilterInterface
         }
 
         // Ambil role dari session
-        $userRole = session()->get('nama_role');
+        $userRole = (string) session()->get('nama_role');
+
+        // Super_Admin memiliki hak akses penuh pada seluruh modul Admin_Pemkab maupun modul sistem
+        if ($userRole === 'Super_Admin' && (in_array('Super_Admin', $arguments, true) || in_array('Admin_Pemkab', $arguments, true))) {
+            return;
+        }
 
         // Cek apakah role user ada di dalam daftar argumen (role yang diizinkan)
-        if (! in_array((string)$userRole, $arguments)) {
+        if (! in_array($userRole, $arguments)) {
             // Jika role tidak sesuai, tolak akses dan arahkan ke dashboard/halaman sebelumnya
             return redirect()->to('/dashboard')->with('error', 'Akses Ditolak: Anda tidak memiliki hak akses untuk halaman ini.');
         }

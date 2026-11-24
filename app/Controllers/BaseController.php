@@ -42,4 +42,13 @@ abstract class BaseController extends Controller
         // Preload any models, libraries, etc, here.
         // $this->session = service('session');
     }
+
+    /**
+     * Deteksi apakah client (misal Postman / API) meminta respons JSON
+     */
+    protected function wantsJson(): bool
+    {
+        $accept = strtolower($this->request->getHeaderLine('Accept'));
+        return str_contains($accept, 'application/json') || $this->request->getGet('format') === 'json';
+    }
 }

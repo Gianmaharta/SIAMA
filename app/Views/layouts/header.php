@@ -6,6 +6,8 @@ $userInitial = !empty($userName) ? strtoupper(mb_substr(trim($userName), 0, 1)) 
 
 // Mapping nama role yang rapi dan profesional
 $roleDisplayMap = [
+    'Super_Admin'       => 'Super Admin',
+    'Super Admin'       => 'Super Admin',
     'Admin_Pemkab'      => 'Admin Pemkab',
     'Admin_OPD'         => 'Admin OPD',
     'Administrator OPD' => 'Admin OPD',
@@ -59,7 +61,7 @@ if (session()->get('user_id')) {
             <?php endif; ?>
         </div>
         <a href="<?= base_url('/users/switch-back') ?>" class="impersonation-btn">
-            <i class="bi bi-arrow-left me-1"></i> Kembali ke Akun Admin Pemkab
+            <i class="bi bi-arrow-left me-1"></i> Kembali ke Akun Super Admin
         </a>
     </div>
 <?php endif; ?>

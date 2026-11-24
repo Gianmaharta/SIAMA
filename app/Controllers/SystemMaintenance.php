@@ -22,7 +22,7 @@ class SystemMaintenance extends BaseController
         $session = session();
         $role = $session->get('nama_role');
 
-        if ($role !== 'Admin_Pemkab') {
+        if (!in_array($role, ['Super_Admin', 'Admin_Pemkab'], true)) {
             return redirect()->to('/dashboard')->with('error', 'Akses ditolak. Fitur Data Cleansing hanya dapat diakses oleh Admin Pemkab utama.');
         }
 
@@ -46,7 +46,7 @@ class SystemMaintenance extends BaseController
         $session = session();
         $role = $session->get('nama_role');
 
-        if ($role !== 'Admin_Pemkab') {
+        if (!in_array($role, ['Super_Admin', 'Admin_Pemkab'], true)) {
             return $this->response->setJSON([
                 'status'  => 'error',
                 'message' => 'Akses ditolak. Hanya Admin Pemkab utama yang berwenang melakukan data cleansing.'

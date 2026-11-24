@@ -8,14 +8,16 @@ class AddRetensiInaktifToArsip extends Migration
 {
     public function up()
     {
-        $fields = [
-            'tanggal_retensi_inaktif_berakhir' => [
-                'type' => 'DATE',
-                'null' => true,
-                'after' => 'tanggal_retensi_aktif_berakhir',
-            ],
-        ];
-        $this->forge->addColumn('arsip', $fields);
+        if (!$this->db->fieldExists('tanggal_retensi_inaktif_berakhir', 'arsip')) {
+            $fields = [
+                'tanggal_retensi_inaktif_berakhir' => [
+                    'type' => 'DATE',
+                    'null' => true,
+                    'after' => 'tanggal_retensi_aktif_berakhir',
+                ],
+            ];
+            $this->forge->addColumn('arsip', $fields);
+        }
     }
 
     public function down()
