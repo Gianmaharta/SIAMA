@@ -98,13 +98,13 @@ body {
     box-shadow: 0 6px 16px rgba(30, 96, 236, 0.35);
 }
 
-/* HERO SECTION */
+/* HERO SECTION DENGAN BACKGROUND FOTO & SUBTLE GLASS EFFECT */
 .lp-hero-section {
     position: relative;
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
-    padding: 85px 0 120px;
+    padding: 95px 0 120px;
     color: #FFFFFF;
 }
 
@@ -114,7 +114,8 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(180deg, rgba(11, 25, 48, 0.88) 0%, rgba(15, 35, 66, 0.94) 100%);
+    /* Overlay navy transparan agar gambar TINOL.jpeg tetap terlihat jelas dengan kontras teks tajam */
+    background: linear-gradient(180deg, rgba(11, 25, 48, 0.74) 0%, rgba(11, 25, 48, 0.83) 50%, rgba(11, 25, 48, 0.92) 100%);
     z-index: 1;
 }
 
@@ -123,18 +124,28 @@ body {
     z-index: 2;
 }
 
+/* Badge Identitas SPBE dengan Subtle Frosted Glass */
 .lp-pill-badge {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    background: rgba(16, 185, 129, 0.12);
-    border: 1px solid rgba(16, 185, 129, 0.35);
-    color: #34D399;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 6px 16px;
+    gap: 9px;
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #FFFFFF;
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 7px 18px;
     border-radius: 50px;
-    margin-bottom: 22px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14);
+    transition: all 0.25s ease;
+}
+
+.lp-pill-badge:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.26);
 }
 
 .lp-pulse-dot {
@@ -168,6 +179,7 @@ body {
     line-height: 1.15;
     letter-spacing: -0.6px;
     color: #FFFFFF;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
 }
 
 .lp-hero-title-accent {
@@ -180,6 +192,7 @@ body {
     line-height: 1.7;
     max-width: 740px;
     margin: 0 auto 28px;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
 }
 
 .lp-btn-cta-primary {
@@ -195,17 +208,21 @@ body {
     text-decoration: none;
     transition: all 0.2s ease;
     box-shadow: 0 8px 24px rgba(30, 96, 236, 0.35);
-    border: none;
+    border: 1px solid var(--lp-blue-primary);
 }
 
 .lp-btn-cta-primary:hover {
     background-color: var(--lp-blue-hover);
+    border-color: var(--lp-blue-hover);
     transform: translateY(-2px);
     box-shadow: 0 12px 28px rgba(30, 96, 236, 0.45);
 }
 
+/* Tombol Sekunder Panduan & Regulasi dengan Subtle Frosted Glass */
 .lp-btn-cta-outline {
-    background-color: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     color: #FFFFFF !important;
     font-size: 14.5px;
     font-weight: 500;
@@ -215,28 +232,70 @@ body {
     align-items: center;
     gap: 8px;
     text-decoration: none;
-    border: 1px solid rgba(255, 255, 255, 0.22);
-    backdrop-filter: blur(6px);
-    transition: all 0.2s ease;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transition: all 0.25s ease;
 }
 
 .lp-btn-cta-outline:hover {
-    background-color: rgba(255, 255, 255, 0.16);
-    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.32);
     transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+    color: #FFFFFF !important;
 }
 
-/* FLOATING SEARCH CARD (CAR I ARSIP / CEK STATUS) */
-.lp-hero-search-card {
-    background: #FFFFFF;
-    border-radius: 20px;
-    padding: 24px 28px;
-    box-shadow: 0 20px 45px rgba(11, 25, 48, 0.22);
-    border: 1px solid #EEF2F6;
-    max-width: 680px;
-    margin: 40px auto 0;
-    text-align: left;
-    color: var(--lp-text-dark);
+/* Panel Informasi Pendukung dengan Subtle Glassmorphism */
+.lp-hero-glass-panel {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 50px;
+    padding: 10px 24px;
+    margin-top: 36px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.16);
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.25s ease;
+}
+
+.lp-hero-glass-panel:hover {
+    background: rgba(255, 255, 255, 0.13);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.lp-hero-glass-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.lp-hero-glass-divider {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+@media (max-width: 767.98px) {
+    .lp-hero-glass-panel {
+        border-radius: 16px;
+        flex-direction: column;
+        gap: 10px;
+        padding: 14px 20px;
+        width: 100%;
+        max-width: 380px;
+    }
+    .lp-hero-glass-divider {
+        display: none;
+    }
 }
 
 .lp-search-card-title {

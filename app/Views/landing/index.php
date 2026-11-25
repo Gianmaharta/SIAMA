@@ -88,7 +88,7 @@
         <div class="lp-hero-overlay"></div>
         <div class="container text-center lp-hero-content">
             
-            <!-- SPBE Pill Badge -->
+                        <!-- SPBE Pill Badge dengan Subtle Glass Effect -->
             <div class="lp-pill-badge">
                 <span class="lp-pulse-dot"></span>
                 <span>Sistem Pemerintahan Berbasis Elektronik (SPBE) &bull; Pemkab Buleleng</span>
@@ -124,64 +124,21 @@
                 </a>
             </div>
 
-            <!-- 3. FLOATING SEARCH CARD: CARI ARSIP / CEK STATUS -->
-            <div class="lp-hero-search-card" id="heroSearchWidget">
-                <div class="d-flex align-items-center justify-content-between mb-1">
-                    <div class="lp-search-card-title">Cek Status Alih Media &amp; Keaslian Berkas</div>
-                    <span class="badge bg-primary-subtle text-primary fw-semibold" style="font-size: 10px;">Layanan Publik</span>
+            <!-- Panel Informasi Pendukung dengan Subtle Glass Effect -->
+            <div class="lp-hero-glass-panel">
+                <div class="lp-hero-glass-item">
+                    <i class="bi bi-shield-check text-info"></i>
+                    <span>Standar Regulasi ANRI &amp; SPBE</span>
                 </div>
-                <div class="lp-search-card-sub">
-                    Masukkan nomor arsip, nomor berita acara (BA), atau kata kunci naskah dinas
+                <div class="lp-hero-glass-divider"></div>
+                <div class="lp-hero-glass-item">
+                    <i class="bi bi-patch-check text-warning"></i>
+                    <span>TTE &amp; Watermark Autentik</span>
                 </div>
-
-                <!-- Input Group Pencarian -->
-                <form id="landingSearchForm" action="<?= base_url('/cari-arsip') ?>" method="GET" onsubmit="executeArchiveSearch(event)">
-                    <div class="lp-search-input-wrap">
-                        <i class="bi bi-search text-secondary ms-1"></i>
-                        <input 
-                            type="text" 
-                            name="q" 
-                            id="landingSearchInput" 
-                            class="lp-search-input" 
-                            placeholder="Contoh: ARSIP/DISKOMINFO/2026 atau 001/BA/DISKOMINFO/2026..." 
-                            value="<?= esc($searchKeyword ?? '') ?>"
-                            autocomplete="off"
-                        >
-                        <button type="submit" class="lp-btn-search" id="btnExecuteSearch">
-                            <span class="spinner-border spinner-border-sm d-none" id="searchLoadingSpinner" role="status" aria-hidden="true"></span>
-                            <span id="searchBtnText"><i class="bi bi-search me-1"></i> Lacak Berkas</span>
-                        </button>
-                    </div>
-                </form>
-
-                <!-- Area Hasil Pencarian Instan di Hero -->
-                <div id="heroSearchResultsContainer" class="mt-3 <?= !empty($searchPerformed) ? '' : 'd-none' ?>">
-                    <?php if (!empty($searchPerformed)) : ?>
-                        <?php if (!empty($searchResults)) : ?>
-                            <div class="d-flex align-items-center justify-content-between mb-2 pb-1 border-bottom">
-                                <span class="small fw-semibold text-dark">Ditemukan <?= count($searchResults) ?> arsip terkait:</span>
-                                <span class="badge bg-success-subtle text-success small">Terverifikasi Database</span>
-                            </div>
-                            <div style="max-height: 280px; overflow-y: auto; padding-right: 4px;">
-                                <?php foreach ($searchResults as $item) : ?>
-                                    <div class="p-2.5 rounded-3 border bg-light mb-2" style="font-size: 12.5px;">
-                                        <div class="d-flex align-items-start justify-content-between gap-2 mb-1">
-                                            <strong class="text-primary"><?= esc($item['nomor_arsip']) ?></strong>
-                                            <span class="badge <?= $item['is_terbuka'] ? 'bg-success text-white' : 'bg-warning text-dark' ?>" style="font-size: 9.5px;">
-                                                <?= esc($item['akses_publik']) ?>
-                                            </span>
-                                        </div>
-                                        <div class="fw-semibold text-dark"><?= esc($item['nama_arsip']) ?></div>
-                                        <div class="text-secondary small mt-0.5"><?= esc($item['nama_opd']) ?> &bull; BA: <?= esc($item['nomor_ba']) ?></div>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php else : ?>
-                            <div class="p-3 rounded-3 bg-light text-center text-muted small">
-                                <i class="bi bi-info-circle me-1"></i> Data arsip dengan kata kunci "<strong><?= esc($searchKeyword ?? '') ?></strong>" tidak ditemukan.
-                            </div>
-                        <?php endif; ?>
-                    <?php endif; ?>
+                <div class="lp-hero-glass-divider"></div>
+                <div class="lp-hero-glass-item">
+                    <i class="bi bi-building-check text-success"></i>
+                    <span>Terintegrasi Seluruh Perangkat Daerah</span>
                 </div>
             </div>
 
@@ -849,73 +806,6 @@
         `;
     }
 
-    // Pencarian dari Hero Search Card
-    function executeArchiveSearch(event) {
-        event.preventDefault();
-        const input = document.getElementById('landingSearchInput');
-        const spinner = document.getElementById('searchLoadingSpinner');
-        const container = document.getElementById('heroSearchResultsContainer');
-        const q = input ? input.value.trim() : '';
-
-        if (!q || q.length < 2) {
-            alert('Silakan masukkan minimal 2 karakter untuk melacak arsip.');
-            if (input) input.focus();
-            return;
-        }
-
-        if (spinner) spinner.classList.remove('d-none');
-
-        fetch(`<?= base_url('/cari-arsip') ?>?q=${encodeURIComponent(q)}`, {
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        })
-        .then(response => response.json())
-        .then(res => {
-            if (spinner) spinner.classList.add('d-none');
-            if (container) {
-                container.classList.remove('d-none');
-                if (res.status === 'success' && res.data && res.data.length > 0) {
-                    let html = `
-                        <div class="d-flex align-items-center justify-content-between mb-2 pb-1 border-bottom">
-                            <span class="small fw-semibold text-dark">Ditemukan ${res.count} arsip terkait:</span>
-                            <span class="badge bg-success-subtle text-success small">Terverifikasi Database</span>
-                        </div>
-                        <div style="max-height: 280px; overflow-y: auto; padding-right: 4px;">
-                    `;
-                    res.data.forEach(item => {
-                        html += `
-                            <div class="p-2.5 rounded-3 border bg-light mb-2" style="font-size: 12.5px;">
-                                <div class="d-flex align-items-start justify-content-between gap-2 mb-1">
-                                    <strong class="text-primary">${item.nomor_arsip}</strong>
-                                    <span class="badge ${item.is_terbuka ? 'bg-success text-white' : 'bg-warning text-dark'}" style="font-size: 9.5px;">
-                                        ${item.akses_publik}
-                                    </span>
-                                </div>
-                                <div class="fw-semibold text-dark">${item.nama_arsip}</div>
-                                <div class="text-secondary small mt-0.5">${item.nama_opd} &bull; BA: ${item.nomor_ba}</div>
-                            </div>
-                        `;
-                    });
-                    html += `</div>`;
-                    container.innerHTML = html;
-                } else {
-                    container.innerHTML = `
-                        <div class="p-3 rounded-3 bg-light text-center text-muted small">
-                            <i class="bi bi-info-circle me-1"></i> Data arsip dengan kata kunci "<strong>${q}</strong>" tidak ditemukan.
-                        </div>
-                    `;
-                }
-            }
-
-            // Sinkronkan juga ke input dedicated section jika ada
-            const dedicatedInput = document.getElementById('dedicatedSearchInput');
-            if (dedicatedInput) dedicatedInput.value = q;
-        })
-        .catch(err => {
-            if (spinner) spinner.classList.add('d-none');
-            console.error('Search error:', err);
-        });
-    }
-
     // Pencarian dari Dedicated Section #cari-arsip
     function executeDedicatedSearch(event) {
         event.preventDefault();
@@ -967,10 +857,6 @@
                     `;
                 }
             }
-
-            // Sinkronkan juga ke input hero jika ada
-            const heroInput = document.getElementById('landingSearchInput');
-            if (heroInput) heroInput.value = q;
         })
         .catch(err => {
             if (spinner) spinner.classList.add('d-none');
