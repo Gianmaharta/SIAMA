@@ -31,71 +31,238 @@ body {
     scroll-behavior: smooth;
 }
 
-/* NAVBAR */
+/* ==============================================================
+ * NAVBAR KAPSUL FROSTED GLASS (PREMIUM GLASSMORPHISM)
+ * ============================================================== */
+
+.lp-navbar-wrapper {
+    position: fixed;
+    top: 18px;
+    left: 0;
+    right: 0;
+    z-index: 1050;
+    padding: 0 24px;
+    pointer-events: none;
+    transition: top 0.3s ease;
+}
+
 .lp-navbar {
-    background: #FFFFFF;
-    border-bottom: 1px solid var(--lp-border-subtle);
-    padding: 14px 0;
-    position: sticky;
-    top: 0;
-    z-index: 1040;
-    box-shadow: 0 2px 12px rgba(11, 25, 48, 0.04);
+    pointer-events: auto;
+    max-width: 1320px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow: 0 8px 32px rgba(15, 23, 42, 0.1);
+    border-radius: 999px;
+    padding: 8px 14px 8px 22px;
+    transition: background 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease, border-radius 0.25s ease;
+}
+
+/* Scrolled state: slightly more solid for maximum contrast when over white body sections */
+.lp-navbar.scrolled {
+    background: rgba(255, 255, 255, 0.94);
+    border-color: rgba(226, 232, 240, 0.85);
+    box-shadow: 0 10px 35px rgba(15, 23, 42, 0.14);
+}
+
+.lp-nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* 1. Branding Kiri */
+.lp-brand-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.lp-brand-logo {
+    height: 38px;
+    max-width: 135px;
+    object-fit: contain;
 }
 
 .lp-brand-title {
-    font-size: 16.5px;
+    font-size: 15.5px;
     font-weight: 700;
-    color: var(--lp-navy-dark);
-    line-height: 1.1;
+    color: #0B1528;
+    line-height: 1.15;
     letter-spacing: -0.2px;
 }
 
 .lp-brand-sub {
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 600;
-    color: var(--lp-text-muted);
+    color: #64748B;
     letter-spacing: 0.5px;
     text-transform: uppercase;
     margin-top: 2px;
+    line-height: 1.15;
+}
+
+/* 2. Navigasi Tengah & Separator Vertikal */
+.lp-nav-center-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lp-nav-divider {
+    width: 1px;
+    height: 22px;
+    background: rgba(11, 21, 40, 0.1);
+    margin: 0 14px;
+    flex-shrink: 0;
+}
+
+.lp-nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    background: transparent;
 }
 
 .lp-nav-link {
-    color: #475569;
-    font-size: 13.5px;
+    color: #0B1528;
+    font-size: 13px;
     font-weight: 500;
     text-decoration: none;
-    padding: 6px 12px;
-    border-radius: 8px;
-    transition: all 0.2s ease;
+    padding: 7px 13px;
+    border-radius: 50px;
+    transition: all 0.22s ease;
+    white-space: nowrap;
 }
 
-.lp-nav-link:hover,
-.lp-nav-link:focus {
-    color: var(--lp-blue-primary);
-    background-color: var(--lp-blue-light);
+/* Menu aktif Beranda menggunakan background biru #1E60EC berbentuk pill */
+.lp-nav-link.active {
+    background-color: #1E60EC !important;
+    color: #FFFFFF !important;
+    font-weight: 600;
+    box-shadow: 0 4px 14px rgba(30, 96, 236, 0.3);
+}
+
+.lp-nav-link:not(.active):hover {
+    color: #1E60EC;
+    background-color: rgba(30, 96, 236, 0.08);
+}
+
+/* 3. Tombol Kanan (Ke Dashboard) */
+.lp-nav-right {
+    flex-shrink: 0;
 }
 
 .lp-btn-login {
-    background-color: var(--lp-blue-primary);
+    background-color: #1E60EC;
     color: #FFFFFF !important;
-    font-size: 13.5px;
+    font-size: 13px;
     font-weight: 600;
-    padding: 9px 22px;
-    border-radius: 10px;
+    padding: 8.5px 20px;
+    border-radius: 50px;
     display: inline-flex;
     align-items: center;
     gap: 7px;
     text-decoration: none;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 12px rgba(30, 96, 236, 0.25);
-    border: 1px solid var(--lp-blue-primary);
+    transition: all 0.22s ease;
+    box-shadow: 0 4px 14px rgba(30, 96, 236, 0.28);
+    border: 1px solid #1E60EC;
+    white-space: nowrap;
 }
 
 .lp-btn-login:hover {
-    background-color: var(--lp-blue-hover);
-    border-color: var(--lp-blue-hover);
+    background-color: #154EC2;
+    border-color: #154EC2;
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(30, 96, 236, 0.35);
+    box-shadow: 0 6px 18px rgba(30, 96, 236, 0.38);
+}
+
+/* Mobile Hamburger Button */
+.lp-hamburger-btn {
+    background: rgba(11, 21, 40, 0.05);
+    border: 1px solid rgba(11, 21, 40, 0.08);
+    color: #0B1528;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.lp-hamburger-btn:hover {
+    background: rgba(11, 21, 40, 0.1);
+}
+
+/* Mobile Menu Dropdown Panel */
+.lp-navbar.menu-open {
+    border-radius: 24px;
+}
+
+.lp-mobile-menu-inner {
+    margin-top: 14px;
+    padding: 12px 6px;
+    border-top: 1px solid rgba(11, 21, 40, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.lp-mobile-nav-link {
+    color: #0B1528;
+    font-size: 13.5px;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 9px 16px;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    display: block;
+}
+
+.lp-mobile-nav-link.active {
+    background-color: #1E60EC;
+    color: #FFFFFF;
+    font-weight: 600;
+}
+
+.lp-mobile-nav-link:not(.active):hover {
+    color: #1E60EC;
+    background-color: rgba(30, 96, 236, 0.08);
+}
+
+@media (max-width: 991.98px) {
+    .lp-navbar-wrapper {
+        top: 12px;
+        padding: 0 12px;
+    }
+    .lp-navbar {
+        border-radius: 50px;
+        padding: 7px 12px 7px 16px;
+    }
+    .lp-brand-wrap {
+        gap: 12px;
+    }
+    .lp-brand-logo {
+        height: 32px;
+    }
+    .lp-brand-title {
+        font-size: 13.5px;
+    }
+    .lp-brand-sub {
+        font-size: 8.5px;
+    }
+    .lp-btn-login {
+        font-size: 11.5px;
+        padding: 7px 14px;
+        gap: 5px;
+    }
 }
 
 /* HERO SECTION DENGAN BACKGROUND FOTO & SUBTLE GLASS EFFECT */
@@ -104,8 +271,14 @@ body {
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
-    padding: 95px 0 120px;
+    padding: 145px 0 120px;
     color: #FFFFFF;
+}
+
+@media (max-width: 991.98px) {
+    .lp-hero-section {
+        padding: 125px 0 100px;
+    }
 }
 
 .lp-hero-overlay {
@@ -446,259 +619,436 @@ body {
     line-height: 1.6;
 }
 
-/* 5 TAHAPAN ALUR KERJA */
-.lp-step-col {
-    display: flex;
+/* ==============================================================
+ * 5 TAHAPAN ALUR KERJA - HORIZONTAL TIMELINE STEPPER DENGAN ANIMASI
+ * ============================================================== */
+
+.lp-timeline-section {
+    background: #FFFFFF;
+    padding-top: 48px !important;
+    padding-bottom: 24px !important;
 }
 
-.lp-step-card-modern {
-    background: #FFFFFF;
-    border: 1px solid var(--lp-border-subtle);
-    border-radius: 18px;
-    padding: 22px 18px;
+.lp-timeline-main-title {
+    font-size: clamp(1.85rem, 3.2vw, 2.35rem);
+    font-weight: 800;
+    color: #0B1528;
+    letter-spacing: -0.4px;
+    margin-bottom: 12px;
+}
+
+.lp-timeline-main-sub {
+    font-size: 14.5px;
+    color: #64748B;
+    line-height: 1.6;
+    margin: 0 auto;
+}
+
+.lp-timeline-stepper {
+    position: relative;
+    margin-top: 45px;
+}
+
+/* Horizontal connecting track */
+.lp-timeline-track {
+    position: absolute;
+    top: 26px; /* Center of 52px node */
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.lp-timeline-track-base {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
     height: 100%;
+    background: #E2E8F0;
+    border-radius: 999px;
+}
+
+.lp-timeline-track-progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #1E60EC 0%, #3B82F6 70%, #F59E0B 100%);
+    border-radius: 999px;
+    transition: width 0.75s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Traveling animated dot moving to the next step */
+.lp-timeline-traveling-dot {
+    position: absolute;
+    top: -4px;
+    left: 0%;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #1E60EC;
+    box-shadow: 0 0 12px rgba(30, 96, 236, 0.8), 0 0 0 4px rgba(30, 96, 236, 0.2);
+    transform: translateX(-50%);
+    transition: left 0.75s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s ease, box-shadow 0.4s ease;
+    z-index: 2;
+}
+
+.lp-timeline-row {
+    position: relative;
+    z-index: 2;
+}
+
+.lp-timeline-col {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    transition: all 0.25s ease;
-    position: relative;
-    width: 100%;
 }
 
-.lp-step-card-modern:hover {
-    transform: translateY(-4px);
-    border-color: #93C5FD;
-    box-shadow: 0 14px 30px rgba(30, 96, 236, 0.08);
-}
-
-.lp-step-card-final {
-    border: 1.5px solid #FDE68A !important;
-    background: #FFFDF7 !important;
-}
-
-.lp-step-top {
+.lp-timeline-item {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: 14px;
+    text-align: center;
+    padding: 0 6px;
+    cursor: pointer;
+    transition: transform 0.25s ease;
+    height: 100%;
 }
 
-.lp-step-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    background: var(--lp-blue-light);
-    color: var(--lp-blue-primary);
+.lp-timeline-item:hover {
+    transform: translateY(-3px);
+}
+
+.lp-timeline-node-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 22px;
+}
+
+.lp-timeline-node {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 2px solid #E2E8F0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #64748B;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+    transition: all 0.35s ease;
+    position: relative;
 }
 
-.lp-step-icon-final {
+/* Active and Hover Step Node States */
+.lp-timeline-node.active,
+.lp-timeline-item:hover .lp-timeline-node {
+    border-color: #1E60EC;
+    color: #1E60EC;
+    background: #EFF6FF;
+    box-shadow: 0 0 0 6px rgba(30, 96, 236, 0.12), 0 6px 18px rgba(30, 96, 236, 0.18);
+    transform: scale(1.08);
+}
+
+/* Node 5: Golden Accent */
+.lp-timeline-node-final {
     background: #FEF3C7 !important;
-    color: #D97706 !important;
+    border-color: #FDE68A !important;
+    color: #B45309 !important;
+    box-shadow: 0 4px 14px rgba(217, 119, 6, 0.12);
 }
 
-.lp-step-watermark-num {
-    font-size: 26px;
-    font-weight: 800;
-    color: #E2E8F0;
-    line-height: 1;
+.lp-timeline-node-final.active,
+.lp-timeline-item-final:hover .lp-timeline-node-final {
+    border-color: #F59E0B !important;
+    color: #B45309 !important;
+    background: #FEF3C7 !important;
+    box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.22), 0 6px 20px rgba(217, 119, 6, 0.25) !important;
+    transform: scale(1.08);
 }
 
-.lp-step-watermark-num-final {
-    color: #FCD34D !important;
-}
-
-.lp-step-tag {
-    font-size: 9.5px;
+.lp-timeline-title {
+    font-size: 15.5px;
     font-weight: 700;
-    color: var(--lp-blue-primary);
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    margin-bottom: 6px;
-}
-
-.lp-step-tag-final {
-    color: #D97706 !important;
-}
-
-.lp-step-title {
-    font-size: 14.5px;
-    font-weight: 700;
-    color: var(--lp-text-dark);
-    margin-bottom: 8px;
+    color: #0B1528;
+    margin-bottom: 10px;
     letter-spacing: -0.2px;
+    transition: color 0.25s ease;
 }
 
-.lp-step-desc {
+.lp-timeline-item.active .lp-timeline-title,
+.lp-timeline-item:hover .lp-timeline-title {
+    color: #1E60EC;
+}
+
+.lp-timeline-item-final.active .lp-timeline-title,
+.lp-timeline-item-final:hover .lp-timeline-title {
+    color: #B45309;
+}
+
+.lp-timeline-desc {
     font-size: 12.5px;
-    color: var(--lp-text-muted);
+    color: #64748B;
     line-height: 1.6;
-    margin-bottom: 16px;
+    margin-bottom: 18px;
+    max-width: 215px;
+    min-height: 62px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.lp-step-authority {
-    font-size: 11px;
+.lp-timeline-badge-wrap {
+    margin-top: auto;
+}
+
+.lp-timeline-badge {
+    display: inline-block;
+    font-size: 11.5px;
+    font-weight: 500;
     color: #64748B;
     background: #F8FAFC;
-    border: 1px solid #EEF2F6;
-    border-radius: 8px;
-    padding: 6px 10px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 50px;
+    border: 1px solid #E2E8F0;
+    white-space: nowrap;
+    transition: all 0.25s ease;
 }
 
-.lp-step-authority-final {
+.lp-timeline-item.active .lp-timeline-badge,
+.lp-timeline-item:hover .lp-timeline-badge {
+    background: #EFF6FF;
+    color: #1E60EC;
+    border-color: #BFDBFE;
+}
+
+/* Badge 5: Golden Accent */
+.lp-timeline-badge-final {
     background: #FEF3C7 !important;
     color: #92400E !important;
     border-color: #FDE68A !important;
+    font-weight: 600;
+}
+
+.lp-timeline-item-final.active .lp-timeline-badge-final,
+.lp-timeline-item-final:hover .lp-timeline-badge-final {
+    background: #FDE68A !important;
+    color: #78350F !important;
+    border-color: #F59E0B !important;
+}
+
+@media (max-width: 767.98px) {
+    .lp-timeline-desc {
+        max-width: 100%;
+        min-height: auto;
+    }
+    .lp-timeline-item {
+        padding: 16px 12px;
+        border-bottom: 1px dashed #E2E8F0;
+    }
+    .lp-timeline-col:last-child .lp-timeline-item {
+        border-bottom: none;
+    }
 }
 
 /* PERAN DAN PENGGUNA */
 .lp-role-card {
     background: #FFFFFF;
     border: 1px solid var(--lp-border-subtle);
-    border-radius: 20px;
-    padding: 26px 26px;
+    border-radius: 18px;
+    padding: 24px 22px;
     height: 100%;
     box-shadow: 0 4px 16px rgba(11, 21, 40, 0.03);
     transition: all 0.25s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
 }
 
 .lp-role-card:hover {
     border-color: #BFDBFE;
-    transform: translateY(-3px);
-    box-shadow: 0 12px 30px rgba(30, 96, 236, 0.08);
-}
-
-.lp-role-header {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 14px;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(30, 96, 236, 0.08);
 }
 
 .lp-role-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-    background: var(--lp-blue-light);
-    color: var(--lp-blue-primary);
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: #EFF6FF;
+    color: #1E60EC;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
+    font-size: 20px;
     flex-shrink: 0;
+    margin-top: 2px;
 }
 
-.lp-role-badge {
-    font-size: 10.5px;
-    font-weight: 600;
-    color: #1E60EC;
-    background: #EFF6FF;
-    border: 1px solid #DBEAFE;
-    border-radius: 50px;
-    padding: 4px 12px;
-    display: inline-block;
+.lp-role-content {
+    flex: 1;
 }
 
 .lp-role-title {
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--lp-text-dark);
     margin-bottom: 6px;
+    letter-spacing: -0.2px;
 }
 
 .lp-role-desc {
-    font-size: 13.5px;
+    font-size: 12.5px;
     color: var(--lp-text-muted);
-    line-height: 1.6;
-    margin-bottom: 0;
-}
-
-/* TATA KELOLA TERSTANDAR (DARK NAVY CONTAINER) */
-.lp-governance-box {
-    background: var(--lp-navy-dark);
-    border-radius: 26px;
-    padding: 56px 44px;
-    color: #FFFFFF;
-    box-shadow: 0 20px 50px rgba(11, 25, 48, 0.2);
-    position: relative;
-    overflow: hidden;
-}
-
-.lp-gov-pill {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #93C5FD;
-    font-size: 11.5px;
-    font-weight: 600;
-    padding: 5px 16px;
-    border-radius: 50px;
-    display: inline-flex;
-    margin-bottom: 18px;
-}
-
-.lp-gov-card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    padding: 22px 18px;
-    text-align: left;
-    height: 100%;
-    transition: all 0.2s ease;
-}
-
-.lp-gov-card:hover {
-    background: rgba(255, 255, 255, 0.09);
-    border-color: rgba(255, 255, 255, 0.18);
-    transform: translateY(-2px);
-}
-
-.lp-gov-card-icon {
-    font-size: 22px;
-    color: var(--lp-blue-accent);
-    margin-bottom: 12px;
-}
-
-.lp-gov-card-title {
-    font-size: 14.5px;
-    font-weight: 700;
-    color: #FFFFFF;
-    margin-bottom: 6px;
-}
-
-.lp-gov-card-desc {
-    font-size: 12px;
-    color: #94A3B8;
     line-height: 1.55;
     margin-bottom: 0;
 }
 
-/* PUSAT ASISTENSI & BANTUAN */
-.lp-helpdesk-card {
+/* TATA KELOLA TERSTANDAR (CLEAN WHITE CARD CONTAINER) */
+.lp-governance-box {
     background: #FFFFFF;
     border: 1px solid var(--lp-border-subtle);
-    border-radius: 20px;
-    padding: 28px 36px;
-    box-shadow: 0 6px 20px rgba(11, 25, 48, 0.03);
+    border-radius: 28px;
+    padding: 56px 48px;
+    box-shadow: 0 10px 35px rgba(15, 23, 42, 0.04);
+    position: relative;
 }
 
-.lp-btn-doc {
-    background: #F8FAFC;
+.lp-gov-title {
+    font-size: clamp(1.8rem, 2.7vw, 2.35rem);
+    font-weight: 800;
+    color: var(--lp-text-dark);
+    letter-spacing: -0.4px;
+    line-height: 1.25;
+    margin-bottom: 14px;
+}
+
+.lp-gov-subtitle {
+    color: var(--lp-blue-primary);
+}
+
+.lp-gov-desc {
+    font-size: 13.5px;
+    color: var(--lp-text-muted);
+    line-height: 1.65;
+    margin-bottom: 0;
+}
+
+.lp-gov-card {
+    background: #FFFFFF;
     border: 1px solid #E2E8F0;
+    border-radius: 16px;
+    padding: 20px 18px;
+    text-align: left;
+    height: 100%;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    box-shadow: 0 2px 8px rgba(11, 21, 40, 0.02);
+    transition: all 0.25s ease;
+}
+
+.lp-gov-card:hover {
+    border-color: #BFDBFE;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(30, 96, 236, 0.08);
+}
+
+.lp-gov-card-icon {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
     border-radius: 12px;
-    padding: 10px 20px;
-    font-size: 13px;
+    background: #EFF6FF;
+    color: var(--lp-blue-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.lp-gov-card-body {
+    flex: 1;
+}
+
+.lp-gov-card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--lp-text-dark);
+    margin-bottom: 4px;
+    letter-spacing: -0.2px;
+    line-height: 1.35;
+}
+
+.lp-gov-card-desc {
+    font-size: 12.5px;
+    color: var(--lp-text-muted);
+    line-height: 1.5;
+    margin-bottom: 0;
+}
+
+@media (max-width: 767.98px) {
+    .lp-governance-box {
+        padding: 36px 20px;
+        border-radius: 20px;
+    }
+    .lp-gov-card {
+        padding: 16px 14px;
+    }
+}
+
+/* ==============================================================
+ * FAQ (PERTANYAAN UMUM) ACCORDION
+ * ============================================================== */
+.lp-faq-accordion .accordion-item {
+    background: #FFFFFF;
+    border: 1px solid var(--lp-border-subtle);
+    border-radius: 14px !important;
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: all 0.25s ease;
+}
+
+.lp-faq-accordion .accordion-item:hover {
+    border-color: #BFDBFE;
+    box-shadow: 0 4px 16px rgba(30, 96, 236, 0.05);
+}
+
+.lp-faq-accordion .accordion-button {
+    font-size: 14.5px;
     font-weight: 600;
     color: var(--lp-text-dark);
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
+    background: #FFFFFF;
+    padding: 18px 22px;
+    box-shadow: none !important;
+    border-radius: 14px !important;
+    line-height: 1.45;
+}
+
+.lp-faq-accordion .accordion-button:not(.collapsed) {
+    color: var(--lp-blue-primary);
+    background: #F8FAFC;
+    border-bottom: 1px solid #E2E8F0;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+
+.lp-faq-accordion .accordion-button:focus {
+    box-shadow: none !important;
+}
+
+.lp-faq-accordion .accordion-body {
+    font-size: 13.5px;
+    color: var(--lp-text-muted);
+    line-height: 1.7;
+    padding: 20px 22px;
+    background: #FFFFFF;
+    text-align: justify;
     transition: all 0.2s ease;
 }
 
@@ -730,41 +1080,202 @@ body {
     box-shadow: 0 6px 18px rgba(5, 150, 105, 0.35);
 }
 
-/* CARI ARSIP RESULT CARDS */
+/* ==============================================================
+ * CARI ARSIP RESULT CARDS (REDESIGN PREMIUM & CLEAN)
+ * ============================================================== */
 .lp-archive-result-card {
     background: #FFFFFF;
-    border: 1px solid var(--lp-border-subtle);
+    border: 1px solid #E5EAF1;
     border-radius: 16px;
-    padding: 20px 22px;
-    margin-bottom: 14px;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 14px rgba(11, 21, 40, 0.03);
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
     text-align: left;
+    transition: all 0.25s ease;
 }
 
 .lp-archive-result-card:hover {
-    border-color: #93C5FD;
-    box-shadow: 0 8px 24px rgba(30, 96, 236, 0.08);
+    border-color: #BFDBFE;
+    box-shadow: 0 8px 26px rgba(30, 96, 236, 0.08);
+    transform: translateY(-2px);
 }
 
-.lp-badge-public {
-    background: #ECFDF5;
-    color: #065F46;
-    border: 1px solid #A7F3D0;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: 50px;
+/* Baris 1: Identitas Arsip */
+.lp-card-identity-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.lp-card-no-arsip {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #1E60EC;
+    word-break: break-word;
+    letter-spacing: -0.2px;
+}
+
+.lp-card-sep {
+    color: #CBD5E1;
+    font-size: 13px;
+    font-weight: 300;
+}
+
+.lp-card-no-ba {
+    font-size: 13px;
+    font-weight: 500;
+    color: #64748B;
+    word-break: break-word;
+}
+
+/* Baris 2: Klasifikasi Keamanan (Badge) */
+.lp-card-badge-row {
+    margin-bottom: 10px;
 }
 
 .lp-badge-internal {
+    display: inline-flex;
+    align-items: center;
     background: #FEF3C7;
     color: #92400E;
     border: 1px solid #FDE68A;
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 600;
-    padding: 4px 10px;
-    border-radius: 50px;
+    padding: 3.5px 11px;
+    border-radius: 6px;
+    width: fit-content;
+}
+
+.lp-badge-public {
+    display: inline-flex;
+    align-items: center;
+    background: #ECFDF5;
+    color: #065F46;
+    border: 1px solid #A7F3D0;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 3.5px 11px;
+    border-radius: 6px;
+    width: fit-content;
+}
+
+/* Baris 3: Judul Arsip */
+.lp-card-archive-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #0B1528;
+    line-height: 1.45;
+    margin-bottom: 8px;
+    word-break: break-word;
+}
+
+/* Baris 4: Informasi OPD */
+.lp-card-opd-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 13px;
+    color: #475569;
+    margin-bottom: 6px;
+    line-height: 1.5;
+}
+
+.lp-card-opd {
+    font-weight: 500;
+}
+
+.lp-card-dot {
+    color: #94A3B8;
+}
+
+.lp-card-bidang {
+    color: #64748B;
+}
+
+/* Baris 5: Kurun Waktu */
+.lp-card-year-row {
+    font-size: 12.5px;
+    color: #64748B;
+    margin-bottom: 16px;
+}
+
+.lp-card-year-val {
+    color: #0B1528;
+    font-weight: 600;
+}
+
+/* Baris 6: Bottom Bar (Informasi Klasifikasi & Tombol Aksi) */
+.lp-card-bottom-bar {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.lp-card-klasifikasi {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    color: #64748B;
+    flex-wrap: wrap;
+}
+
+.lp-card-klasifikasi-label {
+    font-weight: 500;
+    color: #64748B;
+}
+
+.lp-card-klasifikasi-val {
+    font-weight: 700;
+    color: #0B1528;
+}
+
+.lp-btn-card-action {
+    background-color: #1E60EC;
+    color: #FFFFFF !important;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 18px;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.lp-btn-card-action:hover {
+    background-color: #154EC4;
+    color: #FFFFFF !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(30, 96, 236, 0.25);
+}
+
+@media (max-width: 767.98px) {
+    .lp-archive-result-card {
+        padding: 18px 16px;
+    }
+    .lp-card-bottom-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 12px 14px;
+    }
+    .lp-btn-card-action {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 /* FOOTER */
@@ -789,6 +1300,26 @@ body {
 .lp-footer-partner-card:hover {
     background: rgba(255, 255, 255, 0.07);
     border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Logo partner nyata (BSrE, Kominfosanti) */
+.lp-footer-partner-logo-wrap {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    padding: 4px;
+}
+
+.lp-footer-partner-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 /* RESPONSIVE TWEAKS */

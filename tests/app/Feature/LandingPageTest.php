@@ -14,34 +14,39 @@ class LandingPageTest extends CIUnitTestCase
         $result = $this->get('/');
         $result->assertOK();
 
-        // 1. Header & Brand
+        // 1. Header & Brand (Dynamic sesuai konfigurasi Super Admin)
         $result->assertSee('SIAMA Buleleng');
-        $result->assertSee('Dinas Kearsipan &amp; Perpustakaan Daerah');
+        $result->assertSee('Sistem Informasi Alih Media Arsip');
+        $result->assertSee('Ke Dashboard');
 
         // 2. Hero Section (clean & classy dengan heading, deskripsi, dan tombol aksi frosted glass)
         $result->assertSee('Layanan Alih Media Arsip');
         $result->assertSee('Digital');
+        $result->assertSee('Platform terpadu digitalisasi');
+        $result->assertSee('Masuk ke SIAMA');
         $result->assertSee('Lihat Buku Panduan');
         $this->assertStringNotContainsString('heroSearchWidget', $result->getBody());
         $this->assertStringNotContainsString('lp-hero-glass-panel', $result->getBody());
 
-        // 3. Workflow 5 Tahapan
+        // 3. Workflow 5 Tahapan (Horizontal Animated Timeline Stepper)
         $result->assertSee('5 Tahapan Alih Media Arsip di SIAMA');
         $result->assertSee('Penerbitan SPT');
         $result->assertSee('Penugasan Arsiparis');
         $result->assertSee('Unggah &amp; Watermark');
-        $result->assertSee('Verifikasi Kabid');
+        $result->assertSee('Verifikasi Hasil');
         $result->assertSee('Pengesahan &amp; Evaluasi');
 
-        // 4. Peran & Otoritas
+        // 4. Peran & Otoritas (5 Peran: Pimpinan OPD, Kepala Bidang, Arsiparis, Admin OPD, Admin Pemkab)
         $result->assertSee('Siapa Saja yang Menggunakan Aplikasi SIAMA?');
         $result->assertSee('Pimpinan OPD');
         $result->assertSee('Kepala Bidang');
         $result->assertSee('Arsiparis Pelaksana');
-        $result->assertSee('Admin OPD / Admin Pemkab');
+        $result->assertSee('Admin OPD');
+        $result->assertSee('Admin Pemkab');
 
-        // 5. Standar Tata Kelola
-        $result->assertSee('Tata Kelola Alih Media Arsip Terstandar &amp; Teruji');
+        // 5. Standar Tata Kelola (Clean White Card Container)
+        $result->assertSee('Tata Kelola Alih Media Arsip');
+        $result->assertSee('Terstandar &amp; Teruji');
         $result->assertSee('Penugasan SPT');
         $result->assertSee('Jadwal Retensi (JRA)');
         $result->assertSee('TTE &amp; Watermark');
@@ -51,8 +56,10 @@ class LandingPageTest extends CIUnitTestCase
         $result->assertSee('Cari Arsip');
         $result->assertSee('Temukan informasi arsip berdasarkan kata kunci');
 
-        // 7. Bantuan & Footer
-        $result->assertSee('Pusat Asistensi &amp; Layanan Bantuan SIAMA');
+        // 7. FAQ & Footer
+        $result->assertSee('Pertanyaan yang Sering Diajukan');
+        $result->assertSee('FAQ');
+        $result->assertSee('KONTAK &amp; ALAMAT LAYANAN');
         $result->assertSee('ANRI');
         $result->assertSee('BSrE BSSN');
         $result->assertSee('Diskominfosanti');

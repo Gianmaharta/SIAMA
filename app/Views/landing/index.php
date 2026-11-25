@@ -4,12 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php
-    $siteName    = $settings['site_name'] ?? 'SIAMA';
-    $siteTagline = $settings['site_tagline'] ?? 'Sistem Informasi Alih Media Arsip';
-    $instansi    = $settings['instansi_name'] ?? 'Pemerintah Kabupaten Buleleng';
-    $desc        = $settings['site_description'] ?? 'Penyelenggaraan alih media dokumen fisik kearsipan menjadi format digital autentik, penatausahaan surat perintah tugas, dan sertifikasi digital terpadu bagi seluruh Perangkat Daerah Kabupaten Buleleng.';
-    $logoPath    = $settings['site_logo'] ?? 'logo siama1.png';
-    $logoUrl     = file_exists(FCPATH . $logoPath) ? base_url($logoPath) : (file_exists(FCPATH . 'Images/logo siama1.png') ? base_url('Images/logo siama1.png') : base_url('logo siama1.png'));
+    $siteName    = !empty($settings['site_name']) ? $settings['site_name'] : 'SIAMA';
+    $siteTagline = !empty($settings['site_tagline']) ? $settings['site_tagline'] : 'Sistem Informasi Alih Media Arsip';
+    $instansi    = !empty($settings['instansi_name']) ? $settings['instansi_name'] : 'Pemerintah Kabupaten Buleleng';
+    $desc        = !empty($settings['site_description']) ? $settings['site_description'] : 'Platform terpadu digitalisasi, autentikasi watermark, verifikasi berjenjang, dan manajemen Jadwal Retensi Arsip (JRA) dinamis di lingkungan Pemerintah Kabupaten Buleleng.';
+    $logoPath    = !empty($settings['site_logo']) ? $settings['site_logo'] : 'logo siama1.png';
+    if (file_exists(FCPATH . $logoPath)) {
+        $logoUrl = base_url($logoPath);
+    } elseif (file_exists(FCPATH . 'uploads/branding/' . basename($logoPath))) {
+        $logoUrl = base_url('uploads/branding/' . basename($logoPath));
+    } elseif (file_exists(FCPATH . 'Images/' . basename($logoPath))) {
+        $logoUrl = base_url('Images/' . basename($logoPath));
+    } elseif (file_exists(FCPATH . 'Images/logo siama1.png')) {
+        $logoUrl = base_url('Images/logo siama1.png');
+    } else {
+        $logoUrl = base_url('logo siama1.png');
+    }
     $heroBgUrl   = file_exists(FCPATH . 'Images/TINOL.jpeg') ? base_url('Images/TINOL.jpeg') : (file_exists(FCPATH . 'Images/TINOL.jpg') ? base_url('Images/TINOL.jpg') : '');
     ?>
     <title><?= esc($siteName) ?> &ndash; <?= esc($siteTagline) ?> | <?= esc($instansi) ?></title>
@@ -28,60 +38,68 @@
 </head>
 <body id="beranda">
 
-    <!-- 1. NAVBAR PUTIH (CLASSY, CLEAN, MODERN) -->
-    <nav class="lp-navbar">
-        <div class="container d-flex align-items-center justify-content-between">
-            <a href="<?= base_url('/') ?>" class="d-flex align-items-center gap-3 text-decoration-none">
-                <img src="<?= esc($logoUrl) ?>" alt="<?= esc($siteName) ?>" style="height: 42px; max-width: 150px; object-fit: contain;">
-                <div>
-                    <div class="lp-brand-title"><?= esc($siteName) ?> Buleleng</div>
-                    <div class="lp-brand-sub">Dinas Kearsipan &amp; Perpustakaan Daerah</div>
+    <!-- 1. NAVBAR KAPSUL FROSTED GLASS (PREMIUM GLASSMORPHISM) -->
+    <header class="lp-navbar-wrapper" id="navbarWrapper">
+        <nav class="lp-navbar" id="mainNavbar">
+            <div class="d-flex align-items-center justify-content-between w-100 lp-nav-container">
+                <!-- Bagian Kiri: Identitas & Logo -->
+                <div class="d-flex align-items-center">
+                    <a href="<?= base_url('/') ?>" class="d-flex align-items-center gap-3 text-decoration-none lp-brand-wrap">
+                        <img src="<?= esc($logoUrl) ?>" alt="<?= esc($siteName) ?>" class="lp-brand-logo">
+                        <div class="d-flex flex-column justify-content-center">
+                            <span class="lp-brand-title"><?= esc($siteName) ?> Buleleng</span>
+                            <span class="lp-brand-sub"><?= esc($siteTagline) ?></span>
+                        </div>
+                    </a>
                 </div>
-            </a>
 
-            <!-- Menu Desktop -->
-            <div class="d-none d-lg-flex align-items-center gap-2">
-                <a href="#beranda" class="lp-nav-link">Beranda</a>
-                <a href="#alur" class="lp-nav-link">Alur Alih Media</a>
-                <a href="#peran" class="lp-nav-link">Peran &amp; Otoritas</a>
-                <a href="#tata-kelola" class="lp-nav-link">Standar Tata Kelola</a>
-                <a href="#cari-arsip" class="lp-nav-link">Cari Arsip</a>
-                <a href="#bantuan" class="lp-nav-link">Bantuan</a>
+                <!-- Bagian Tengah: Menu Navigasi Desktop -->
+                <div class="d-none d-lg-flex align-items-center lp-nav-center-wrap">
+                    <div class="lp-nav-divider d-none d-xl-block"></div>
+                    <nav class="d-flex align-items-center gap-1 lp-nav-menu" aria-label="Navigasi Utama">
+                        <a href="#beranda" class="lp-nav-link active">Beranda</a>
+                        <a href="#alur" class="lp-nav-link">Alur Alih Media</a>
+                        <a href="#peran" class="lp-nav-link">Peran &amp; Otoritas</a>
+                        <a href="#tata-kelola" class="lp-nav-link">Standar Tata Kelola</a>
+                        <a href="#cari-arsip" class="lp-nav-link">Cari Arsip</a>
+                        <a href="#faq" class="lp-nav-link">FAQ</a>
+                    </nav>
+                </div>
+
+                <!-- Bagian Kanan: Tombol Aksi Dashboard & Hamburger -->
+                <div class="d-flex align-items-center gap-2.5 lp-nav-right">
+                    <?php if (!empty($isLoggedIn)) : ?>
+                        <a href="<?= base_url('/dashboard') ?>" class="lp-btn-login" title="Akses Dashboard SIAMA">
+                            <i class="bi bi-speedometer2"></i>
+                            <span>Ke Dashboard</span>
+                        </a>
+                    <?php else : ?>
+                        <a href="<?= base_url('/login') ?>" class="lp-btn-login" title="Login ke Dashboard SIAMA">
+                            <i class="bi bi-box-arrow-in-right"></i>
+                            <span>Ke Dashboard</span>
+                        </a>
+                    <?php endif; ?>
+
+                    <!-- Mobile Menu Button -->
+                    <button class="lp-hamburger-btn d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNavMenu" aria-controls="mobileNavMenu" aria-expanded="false" aria-label="Toggle navigation">
+                        <i class="bi bi-list fs-4"></i>
+                    </button>
+                </div>
             </div>
 
-            <!-- Tombol Masuk / Login -->
-            <div class="d-flex align-items-center gap-2">
-                <?php if (!empty($isLoggedIn)) : ?>
-                    <a href="<?= base_url('/dashboard') ?>" class="lp-btn-login">
-                        <i class="bi bi-speedometer2"></i>
-                        <span>Ke Dashboard</span>
-                    </a>
-                <?php else : ?>
-                    <a href="<?= base_url('/login') ?>" class="lp-btn-login">
-                        <i class="bi bi-box-arrow-in-right"></i>
-                        <span>Login ASN</span>
-                    </a>
-                <?php endif; ?>
-
-                <!-- Mobile Menu Button -->
-                <button class="btn btn-light d-lg-none border-0 text-dark p-2" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNavMenu" aria-controls="mobileNavMenu" aria-expanded="false" aria-label="Toggle navigation">
-                    <i class="bi bi-list fs-4"></i>
-                </button>
+            <!-- Mobile Menu Dropdown Panel (Frosted Glass) -->
+            <div class="collapse d-lg-none w-100" id="mobileNavMenu">
+                <div class="lp-mobile-menu-inner">
+                    <a href="#beranda" class="lp-mobile-nav-link active" onclick="closeMobileNav(this)">Beranda</a>
+                    <a href="#alur" class="lp-mobile-nav-link" onclick="closeMobileNav(this)">Alur Alih Media</a>
+                    <a href="#peran" class="lp-mobile-nav-link" onclick="closeMobileNav(this)">Peran &amp; Otoritas</a>
+                    <a href="#tata-kelola" class="lp-mobile-nav-link" onclick="closeMobileNav(this)">Standar Tata Kelola</a>
+                    <a href="#cari-arsip" class="lp-mobile-nav-link" onclick="closeMobileNav(this)">Cari Arsip</a>
+                    <a href="#faq" class="lp-mobile-nav-link" onclick="closeMobileNav(this)">FAQ</a>
+                </div>
             </div>
-        </div>
-
-        <!-- Mobile Menu Dropdown -->
-        <div class="collapse d-lg-none px-3 pt-3 pb-2 border-top mt-2 bg-white" id="mobileNavMenu">
-            <div class="d-flex flex-column gap-1">
-                <a href="#beranda" class="lp-nav-link">Beranda</a>
-                <a href="#alur" class="lp-nav-link">Alur Alih Media</a>
-                <a href="#peran" class="lp-nav-link">Peran &amp; Otoritas</a>
-                <a href="#tata-kelola" class="lp-nav-link">Standar Tata Kelola</a>
-                <a href="#cari-arsip" class="lp-nav-link">Cari Arsip</a>
-                <a href="#bantuan" class="lp-nav-link">Bantuan &amp; Kontak</a>
-            </div>
-        </div>
-    </nav>
+        </nav>
+    </header>
 
     <!-- 2. HERO SECTION DENGAN BACKGROUND TINOL.JPEG & NAVY OVERLAY -->
     <header class="lp-hero-section" style="<?= $heroBgUrl ? "background-image: url('" . esc($heroBgUrl) . "');" : "background-color: var(--lp-navy-dark);" ?>">
@@ -109,7 +127,7 @@
                 <?php else : ?>
                     <a href="<?= base_url('/login') ?>" class="lp-btn-cta-primary">
                         <i class="bi bi-box-arrow-in-right"></i>
-                        <span>Masuk Portal ASN</span>
+                        <span>Masuk ke SIAMA</span>
                     </a>
                 <?php endif; ?>
                 <a href="#bantuan" class="lp-btn-cta-outline">
@@ -178,133 +196,114 @@
         </div>
     </section>
 
-    <!-- 5. ALUR KERJA SISTEM: 5 TAHAPAN ALIH MEDIA ARSIP -->
-    <section id="alur" class="py-5" style="padding-top: 85px !important; padding-bottom: 70px !important;">
-        <div class="container py-2">
-            <div class="text-center mx-auto mb-5" style="max-width: 660px;">
-                <div class="lp-section-badge">
-                    <i class="bi bi-diagram-3-fill"></i>
-                    <span>ALUR TERSTRUKTUR &amp; AKUNTABEL</span>
-                </div>
-                <h2 class="lp-section-title">5 Tahapan Alih Media Arsip di SIAMA</h2>
-                <p class="lp-section-sub">
+    <!-- 5. ALUR KERJA SISTEM: 5 TAHAPAN ALIH MEDIA ARSIP (HORIZONTAL TIMELINE STEPPER DENGAN ANIMASI PERJALANAN) -->
+    <section id="alur" class="lp-timeline-section">
+        <div class="container">
+            <div class="text-center mx-auto mb-4" style="max-width: 680px;">
+                <h2 class="lp-timeline-main-title">5 Tahapan Alih Media Arsip di SIAMA</h2>
+                <p class="lp-timeline-main-sub">
                     Alur terstandar mulai dari penerbitan surat tugas hingga pengesahan Berita Acara dan penilaian arsip.
                 </p>
             </div>
 
-            <!-- 5 Kolom Kartu Tahapan -->
-            <div class="row g-3 g-xl-4 align-items-stretch">
-                <!-- Tahap 1: Penerbitan SPT -->
-                <div class="col-12 col-md-6 col-lg lp-step-col">
-                    <div class="lp-step-card-modern">
-                        <div>
-                            <div class="lp-step-top">
-                                <div class="lp-step-icon">
-                                    <i class="bi bi-file-earmark-text"></i>
-                                </div>
-                                <div class="lp-step-watermark-num">01</div>
-                            </div>
-                            <div class="lp-step-tag">1. PERSIAPAN</div>
-                            <h3 class="lp-step-title">Penerbitan SPT</h3>
-                            <p class="lp-step-desc">
-                                Pimpinan OPD menerbitkan Surat Perintah Tugas (SPT) pelaksanaan alih media arsip.
-                            </p>
-                        </div>
-                        <div class="lp-step-authority">
-                            <i class="bi bi-shield-check text-primary"></i>
-                            <span>Otoritas: Pimpinan OPD</span>
-                        </div>
-                    </div>
+            <!-- Horizontal Stepper Wrapper -->
+            <div class="lp-timeline-stepper" id="workflowStepper">
+                <!-- Connecting Line Track -->
+                <div class="lp-timeline-track d-none d-md-block">
+                    <div class="lp-timeline-track-base"></div>
+                    <div class="lp-timeline-track-progress" id="stepperProgressBar"></div>
+                    <div class="lp-timeline-traveling-dot" id="stepperTravelDot"></div>
                 </div>
 
-                <!-- Tahap 2: Penugasan Arsiparis -->
-                <div class="col-12 col-md-6 col-lg lp-step-col">
-                    <div class="lp-step-card-modern">
-                        <div>
-                            <div class="lp-step-top">
-                                <div class="lp-step-icon">
-                                    <i class="bi bi-people-fill"></i>
+                <!-- 5 Stepper Items -->
+                <div class="row g-4 lp-timeline-row">
+                    <!-- Step 1: Penerbitan SPT -->
+                    <div class="col-12 col-md lp-timeline-col" data-step="0">
+                        <div class="lp-timeline-item active" id="timelineItem0">
+                            <div class="lp-timeline-node-wrap">
+                                <div class="lp-timeline-node active" id="timelineNode0">
+                                    <span>01</span>
                                 </div>
-                                <div class="lp-step-watermark-num">02</div>
                             </div>
-                            <div class="lp-step-tag">2. PENUGASAN</div>
-                            <h3 class="lp-step-title">Penugasan Arsiparis</h3>
-                            <p class="lp-step-desc">
-                                Kepala Bidang menunjuk Arsiparis pelaksana sesuai SPT yang diterbitkan.
+                            <h4 class="lp-timeline-title">Penerbitan SPT</h4>
+                            <p class="lp-timeline-desc">
+                                Pimpinan OPD menerbitkan surat perintah tugas (SPT) pelaksanaan alih media arsip.
                             </p>
-                        </div>
-                        <div class="lp-step-authority">
-                            <i class="bi bi-shield-check text-primary"></i>
-                            <span>Otoritas: Kepala Bidang</span>
+                            <div class="lp-timeline-badge-wrap">
+                                <span class="lp-timeline-badge">Oleh: Pimpinan OPD</span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Tahap 3: Unggah & Watermark -->
-                <div class="col-12 col-md-6 col-lg lp-step-col">
-                    <div class="lp-step-card-modern">
-                        <div>
-                            <div class="lp-step-top">
-                                <div class="lp-step-icon">
-                                    <i class="bi bi-cloud-arrow-up-fill"></i>
+                    <!-- Step 2: Penugasan Arsiparis -->
+                    <div class="col-12 col-md lp-timeline-col" data-step="1">
+                        <div class="lp-timeline-item" id="timelineItem1">
+                            <div class="lp-timeline-node-wrap">
+                                <div class="lp-timeline-node" id="timelineNode1">
+                                    <span>02</span>
                                 </div>
-                                <div class="lp-step-watermark-num">03</div>
                             </div>
-                            <div class="lp-step-tag">3. DIGITALISASI</div>
-                            <h3 class="lp-step-title">Unggah &amp; Watermark</h3>
-                            <p class="lp-step-desc">
-                                Arsiparis mengunggah dokumen digital, memilih klasifikasi JRA, dan menyusun draf Berita Acara.
+                            <h4 class="lp-timeline-title">Penugasan Arsiparis</h4>
+                            <p class="lp-timeline-desc">
+                                Kepala Bidang menugaskan Arsiparis pelaksana sesuai SPT yang diterbitkan.
                             </p>
-                        </div>
-                        <div class="lp-step-authority">
-                            <i class="bi bi-shield-check text-primary"></i>
-                            <span>Otoritas: Arsiparis Pelaksana</span>
+                            <div class="lp-timeline-badge-wrap">
+                                <span class="lp-timeline-badge">Oleh: Kepala Bidang</span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Tahap 4: Verifikasi Kabid -->
-                <div class="col-12 col-md-6 col-lg lp-step-col">
-                    <div class="lp-step-card-modern">
-                        <div>
-                            <div class="lp-step-top">
-                                <div class="lp-step-icon">
-                                    <i class="bi bi-clipboard-check-fill"></i>
+                    <!-- Step 3: Unggah & Watermark -->
+                    <div class="col-12 col-md lp-timeline-col" data-step="2">
+                        <div class="lp-timeline-item" id="timelineItem2">
+                            <div class="lp-timeline-node-wrap">
+                                <div class="lp-timeline-node" id="timelineNode2">
+                                    <span>03</span>
                                 </div>
-                                <div class="lp-step-watermark-num">04</div>
                             </div>
-                            <div class="lp-step-tag">4. VERIFIKASI</div>
-                            <h3 class="lp-step-title">Verifikasi Kabid</h3>
-                            <p class="lp-step-desc">
+                            <h4 class="lp-timeline-title">Unggah &amp; Watermark</h4>
+                            <p class="lp-timeline-desc">
+                                Arsiparis mengunggah dokumen digital, menambahkan watermark, dan menyusun draf Berita Acara.
+                            </p>
+                            <div class="lp-timeline-badge-wrap">
+                                <span class="lp-timeline-badge">Oleh: Arsiparis</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Verifikasi Hasil -->
+                    <div class="col-12 col-md lp-timeline-col" data-step="3">
+                        <div class="lp-timeline-item" id="timelineItem3">
+                            <div class="lp-timeline-node-wrap">
+                                <div class="lp-timeline-node" id="timelineNode3">
+                                    <span>04</span>
+                                </div>
+                            </div>
+                            <h4 class="lp-timeline-title">Verifikasi Hasil</h4>
+                            <p class="lp-timeline-desc">
                                 Kepala Bidang memeriksa kelengkapan berkas digital dan memverifikasi draf Berita Acara.
                             </p>
-                        </div>
-                        <div class="lp-step-authority">
-                            <i class="bi bi-shield-check text-primary"></i>
-                            <span>Otoritas: Pengawas / Kabid</span>
+                            <div class="lp-timeline-badge-wrap">
+                                <span class="lp-timeline-badge">Oleh: Kepala Bidang</span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Tahap 5: Pengesahan & Evaluasi (Final Accent) -->
-                <div class="col-12 col-md-6 col-lg lp-step-col">
-                    <div class="lp-step-card-modern lp-step-card-final">
-                        <div>
-                            <div class="lp-step-top">
-                                <div class="lp-step-icon lp-step-icon-final">
-                                    <i class="bi bi-patch-check-fill"></i>
+                    <!-- Step 5: Pengesahan & Evaluasi (Final Accent) -->
+                    <div class="col-12 col-md lp-timeline-col" data-step="4">
+                        <div class="lp-timeline-item lp-timeline-item-final" id="timelineItem4">
+                            <div class="lp-timeline-node-wrap">
+                                <div class="lp-timeline-node lp-timeline-node-final" id="timelineNode4">
+                                    <span>05</span>
                                 </div>
-                                <div class="lp-step-watermark-num lp-step-watermark-num-final">05</div>
                             </div>
-                            <div class="lp-step-tag lp-step-tag-final">5. PENGESAHAN (FINAL)</div>
-                            <h3 class="lp-step-title">Pengesahan &amp; Evaluasi</h3>
-                            <p class="lp-step-desc">
-                                Pimpinan mengesahkan Berita Acara dan Admin Pemkab melakukan penilaian prioritas arsip.
+                            <h4 class="lp-timeline-title">Pengesahan &amp; Evaluasi</h4>
+                            <p class="lp-timeline-desc">
+                                Pimpinan mengesahkan Berita Acara dan menetapkan penilaian prioritas arsip.
                             </p>
-                        </div>
-                        <div class="lp-step-authority lp-step-authority-final">
-                            <i class="bi bi-award-fill"></i>
-                            <span>Otoritas: Pimpinan &amp; Admin Pemkab</span>
+                            <div class="lp-timeline-badge-wrap">
+                                <span class="lp-timeline-badge lp-timeline-badge-final">Oleh: Pimpinan OPD</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -313,168 +312,174 @@
     </section>
 
     <!-- 6. PERAN DAN PENGGUNA SISTEM -->
-    <section id="peran" class="py-5" style="background-color: var(--lp-bg-gray); padding-top: 80px !important; padding-bottom: 80px !important;">
-        <div class="container py-2">
-            <div class="text-center mx-auto mb-5" style="max-width: 660px;">
-                <div class="lp-section-badge">
-                    <i class="bi bi-person-lock"></i>
-                    <span>HAK AKSES &amp; OTORITAS</span>
-                </div>
+    <section id="peran" style="background-color: #FFFFFF; padding-top: 24px !important; padding-bottom: 24px !important;">
+        <div class="container">
+            <div class="text-center mx-auto mb-4" style="max-width: 680px;">
                 <h2 class="lp-section-title">Siapa Saja yang Menggunakan Aplikasi SIAMA?</h2>
                 <p class="lp-section-sub">
-                    Sistem berjenjang dengan pembagian wewenang ketat untuk menjaga integritas, kerahasiaan, dan akuntabilitas arsip.
+                    Sistem dirancang untuk mendukung kolaborasi antar peran dalam proses alih media arsip di lingkungan Pemerintah Kabupaten Buleleng.
                 </p>
             </div>
 
-            <!-- 2x2 Grid Peran Pengguna -->
-            <div class="row g-4">
-                <!-- Role 1: Pimpinan OPD -->
-                <div class="col-12 col-md-6">
+            <!-- Baris Atas: 3 Card Peran -->
+            <div class="row g-3 g-lg-4 mb-3 mb-lg-4">
+                <!-- 1. Pimpinan OPD -->
+                <div class="col-12 col-md-6 col-lg-4">
                     <div class="lp-role-card">
-                        <div class="lp-role-header">
-                            <div class="lp-role-icon">
-                                <i class="bi bi-bank2"></i>
-                            </div>
-                            <div>
-                                <span class="lp-role-badge">Kepala Perangkat Daerah &bull; Pengesahan</span>
-                                <h3 class="lp-role-title mt-1 mb-0">Pimpinan OPD</h3>
-                            </div>
+                        <div class="lp-role-icon">
+                            <i class="bi bi-people-fill"></i>
                         </div>
-                        <p class="lp-role-desc">
-                            Menerbitkan Surat Perintah Tugas (SPT) alih media arsip serta mengesahkan Berita Acara Alih Media secara digital di lingkungan OPD masing-masing.
-                        </p>
+                        <div class="lp-role-content">
+                            <h3 class="lp-role-title">Pimpinan OPD</h3>
+                            <p class="lp-role-desc">
+                                Menerbitkan SPT alih media arsip, mengesahkan Berita Acara, dan memberikan penilaian.
+                            </p>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Role 2: Kepala Bidang -->
-                <div class="col-12 col-md-6">
+                <!-- 2. Kepala Bidang -->
+                <div class="col-12 col-md-6 col-lg-4">
                     <div class="lp-role-card">
-                        <div class="lp-role-header">
-                            <div class="lp-role-icon">
-                                <i class="bi bi-person-badge-fill"></i>
-                            </div>
-                            <div>
-                                <span class="lp-role-badge">Pengawas Unit &bull; Verifikasi</span>
-                                <h3 class="lp-role-title mt-1 mb-0">Kepala Bidang</h3>
-                            </div>
+                        <div class="lp-role-icon">
+                            <i class="bi bi-briefcase-fill"></i>
                         </div>
-                        <p class="lp-role-desc">
-                            Menunjuk Arsiparis pelaksana sesuai SPT, memeriksa kelengkapan berkas digital hasil alih media, serta memverifikasi draf Berita Acara sebelum disahkan.
-                        </p>
+                        <div class="lp-role-content">
+                            <h3 class="lp-role-title">Kepala Bidang</h3>
+                            <p class="lp-role-desc">
+                                Menunjuk Arsiparis pelaksana, memeriksa kelengkapan berkas digital, dan memverifikasi hasil alih media.
+                            </p>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Role 3: Arsiparis Pelaksana -->
+                <!-- 3. Arsiparis Pelaksana -->
+                <div class="col-12 col-md-12 col-lg-4">
+                    <div class="lp-role-card">
+                        <div class="lp-role-icon">
+                            <i class="bi bi-file-earmark-text-fill"></i>
+                        </div>
+                        <div class="lp-role-content">
+                            <h3 class="lp-role-title">Arsiparis Pelaksana</h3>
+                            <p class="lp-role-desc">
+                                Melakukan identifikasi arsip, alih media, mengunggah dokumen digital, memberikan watermark, dan menyusun draf Berita Acara.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Baris Bawah: 2 Card Peran (Admin OPD & Admin Pemkab) -->
+            <div class="row g-3 g-lg-4">
+                <!-- 4. Admin OPD -->
                 <div class="col-12 col-md-6">
                     <div class="lp-role-card">
-                        <div class="lp-role-header">
-                            <div class="lp-role-icon">
-                                <i class="bi bi-file-earmark-person-fill"></i>
-                            </div>
-                            <div>
-                                <span class="lp-role-badge">Pelaksana Teknis &bull; Digitalisasi</span>
-                                <h3 class="lp-role-title mt-1 mb-0">Arsiparis Pelaksana</h3>
-                            </div>
+                        <div class="lp-role-icon">
+                            <i class="bi bi-gear-fill"></i>
                         </div>
-                        <p class="lp-role-desc">
-                            Melakukan pemindaian arsip fisik, mengunggah dokumen digital ke sistem, menerapkan watermark otomatis OPD, memeriksa kode klasifikasi JRA, dan menyusun draf Berita Acara.
-                        </p>
+                        <div class="lp-role-content">
+                            <h3 class="lp-role-title">Admin OPD</h3>
+                            <p class="lp-role-desc">
+                                Mengelola pengguna di lingkup OPD, mengelola master data, dan memantau progres alih media arsip.
+                            </p>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Role 4: Admin OPD / Admin Pemkab -->
+                <!-- 5. Admin Pemkab -->
                 <div class="col-12 col-md-6">
                     <div class="lp-role-card">
-                        <div class="lp-role-header">
-                            <div class="lp-role-icon" style="background-color: #FEF3C7; color: #D97706;">
-                                <i class="bi bi-shield-fill-check"></i>
-                            </div>
-                            <div>
-                                <span class="lp-role-badge" style="background-color: #FEF3C7; color: #92400E; border-color: #FDE68A;">Pengelola Sistem &bull; Evaluasi &amp; JRA</span>
-                                <h3 class="lp-role-title mt-1 mb-0">Admin OPD / Admin Pemkab</h3>
-                            </div>
+                        <div class="lp-role-icon">
+                            <i class="bi bi-shield-check"></i>
                         </div>
-                        <p class="lp-role-desc">
-                            Memantau notifikasi jatuh tempo Jadwal Retensi Arsip (JRA), mengelola master data klasifikasi, serta melakukan penilaian prioritas arsip tingkat Kabupaten.
-                        </p>
+                        <div class="lp-role-content">
+                            <h3 class="lp-role-title">Admin Pemkab</h3>
+                            <p class="lp-role-desc">
+                                Mengelola data master JRA dan klasifikasi, memverifikasi konfigurasi sistem, serta memantau progres seluruh OPD.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 7. STANDAR TATA KELOLA KEARSIPAN (NAVY BOX CONTAINER) -->
-    <section id="tata-kelola" class="py-5">
-        <div class="container py-2">
+    <!-- 7. STANDAR TATA KELOLA KEARSIPAN (CLEAN WHITE CARD CONTAINER) -->
+    <section id="tata-kelola" style="background-color: #FFFFFF; padding-top: 24px !important; padding-bottom: 24px !important;">
+        <div class="container">
             <div class="lp-governance-box">
-                <div class="text-center mx-auto" style="max-width: 700px;">
-                    <div class="lp-gov-pill">
-                        <i class="bi bi-patch-check-fill me-1.5"></i>
-                        <span>Standar &amp; Regulasi Kearsipan Elektronik</span>
-                    </div>
-                    <h2 class="fw-bold mb-2 text-white" style="font-size: clamp(1.8rem, 2.8vw, 2.4rem); letter-spacing: -0.4px;">
-                        Tata Kelola Alih Media Arsip Terstandar &amp; Teruji
+                <div class="text-center mx-auto mb-4 pb-2" style="max-width: 760px;">
+                    <h2 class="lp-gov-title">
+                        Tata Kelola Alih Media Arsip
+                        <span class="d-block lp-gov-subtitle">Terstandar &amp; Teruji</span>
                     </h2>
-                    <p class="small text-white-50 mb-4" style="line-height: 1.7;">
+                    <p class="lp-gov-desc">
                         Diselenggarakan selaras dengan pedoman Arsip Nasional Republik Indonesia (ANRI) dan Peraturan Bupati Buleleng tentang Penyelenggaraan SPBE di Lingkungan Pemerintah Kabupaten Buleleng.
                     </p>
                 </div>
 
-                <!-- 4 Kotak Tata Kelola -->
-                <div class="row g-3 g-md-4 mt-2 mb-4 pb-2">
+                <!-- 4 Kotak Tata Kelola Horizontal -->
+                <div class="row g-3 g-xl-4">
+                    <!-- 1. Penugasan SPT -->
                     <div class="col-12 col-sm-6 col-lg-3">
                         <div class="lp-gov-card">
-                            <div class="lp-gov-card-icon"><i class="bi bi-file-earmark-check"></i></div>
-                            <div class="lp-gov-card-title">Penugasan SPT</div>
-                            <p class="lp-gov-card-desc">Didasari wewenang sah Kepala Perangkat Daerah</p>
+                            <div class="lp-gov-card-icon">
+                                <i class="bi bi-file-earmark-check"></i>
+                            </div>
+                            <div class="lp-gov-card-body">
+                                <h3 class="lp-gov-card-title">Penugasan SPT</h3>
+                                <p class="lp-gov-card-desc">Didasari wewenang sah Kepala Perangkat Daerah.</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-6 col-lg-3">
-                        <div class="lp-gov-card">
-                            <div class="lp-gov-card-icon"><i class="bi bi-calendar2-range"></i></div>
-                            <div class="lp-gov-card-title">Jadwal Retensi (JRA)</div>
-                            <p class="lp-gov-card-desc">Otomatisasi masa simpan aktif dan inaktif dokumen</p>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-6 col-lg-3">
-                        <div class="lp-gov-card">
-                            <div class="lp-gov-card-icon"><i class="bi bi-shield-lock"></i></div>
-                            <div class="lp-gov-card-title">TTE &amp; Watermark</div>
-                            <p class="lp-gov-card-desc">Proteksi dokumen dengan logo instansi watermark PDF</p>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-6 col-lg-3">
-                        <div class="lp-gov-card">
-                            <div class="lp-gov-card-icon"><i class="bi bi-award"></i></div>
-                            <div class="lp-gov-card-title">Berita Acara Otentik</div>
-                            <p class="lp-gov-card-desc">Naskah legalitas alih media arsip resmi dan akuntabel</p>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Tombol Masuk ke SIAMA & Helpdesk -->
-                <div class="d-flex flex-wrap align-items-center justify-content-center gap-3 pt-2">
-                    <a href="<?= base_url('/login') ?>" class="lp-btn-cta-primary" style="padding: 11px 26px;">
-                        <span>Masuk ke <?= esc($siteName) ?></span>
-                        <i class="bi bi-arrow-up-right"></i>
-                    </a>
-                    <a href="#bantuan" class="lp-btn-cta-outline" style="padding: 11px 24px;">
-                        <i class="bi bi-headset"></i>
-                        <span>Hubungi Helpdesk Layanan</span>
-                    </a>
+                    <!-- 2. Jadwal Retensi (JRA) -->
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="lp-gov-card">
+                            <div class="lp-gov-card-icon">
+                                <i class="bi bi-layers"></i>
+                            </div>
+                            <div class="lp-gov-card-body">
+                                <h3 class="lp-gov-card-title">Jadwal Retensi (JRA)</h3>
+                                <p class="lp-gov-card-desc">Otomatisasi masa simpan aktif dan inaktif dokumen.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. TTE & Watermark -->
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="lp-gov-card">
+                            <div class="lp-gov-card-icon">
+                                <i class="bi bi-shield"></i>
+                            </div>
+                            <div class="lp-gov-card-body">
+                                <h3 class="lp-gov-card-title">TTE &amp; Watermark</h3>
+                                <p class="lp-gov-card-desc">Proteksi dokumen dengan logo instansi dan watermark PDF.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Berita Acara Otentik -->
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="lp-gov-card">
+                            <div class="lp-gov-card-icon">
+                                <i class="bi bi-award"></i>
+                            </div>
+                            <div class="lp-gov-card-body">
+                                <h3 class="lp-gov-card-title">Berita Acara Otentik</h3>
+                                <p class="lp-gov-card-desc">Naskah legalitas alih media arsip resmi dan akuntabel.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- 8. FITUR BARU: SECTION CARI ARSIP INTERAKTIF -->
-    <section id="cari-arsip" class="py-5" style="background-color: var(--lp-bg-gray); padding-top: 80px !important; padding-bottom: 80px !important;">
-        <div class="container py-2">
+    <section id="cari-arsip" style="background-color: #FFFFFF; padding-top: 24px !important; padding-bottom: 24px !important;">
+        <div class="container">
             <div class="text-center mx-auto mb-4" style="max-width: 660px;">
-                <div class="lp-section-badge">
-                    <i class="bi bi-search"></i>
-                    <span>LAYANAN PENCARIAN PUBLIK</span>
-                </div>
                 <h2 class="lp-section-title">Cari Arsip</h2>
                 <p class="lp-section-sub">
                     Temukan informasi arsip berdasarkan kata kunci atau identitas arsip yang tersedia.
@@ -520,47 +525,45 @@
                             </div>
                             <?php foreach ($searchResults as $item) : ?>
                                 <div class="lp-archive-result-card">
-                                    <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap mb-2">
-                                        <div>
-                                            <span class="font-monospace fw-bold text-primary small d-inline-block me-2">
-                                                <?= esc($item['nomor_arsip']) ?>
-                                            </span>
-                                            <?php if ($item['nomor_ba'] !== '-') : ?>
-                                                <span class="text-muted small">&bull; BA: <?= esc($item['nomor_ba']) ?></span>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div>
-                                            <span class="<?= $item['is_terbuka'] ? 'lp-badge-public' : 'lp-badge-internal' ?>">
-                                                <i class="bi <?= $item['is_terbuka'] ? 'bi-unlock-fill' : 'bi-lock-fill' ?> me-1"></i>
-                                                <?= esc($item['akses_publik']) ?>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <h5 class="fw-bold text-dark mb-2" style="font-size: 16px;">
-                                        <?= esc($item['nama_arsip']) ?>
-                                    </h5>
-                                    <div class="d-flex flex-wrap align-items-center gap-3 text-secondary small mb-3">
-                                        <span><i class="bi bi-building me-1"></i> <?= esc($item['nama_opd']) ?></span>
-                                        <?php if ($item['nama_bidang'] !== '-') : ?>
-                                            <span>&bull; <?= esc($item['nama_bidang']) ?></span>
+                                    <!-- Baris 1: Identitas Arsip -->
+                                    <div class="lp-card-identity-row">
+                                        <span class="lp-card-no-arsip"><?= esc($item['nomor_arsip']) ?></span>
+                                        <?php if (!empty($item['nomor_ba']) && $item['nomor_ba'] !== '-') : ?>
+                                            <span class="lp-card-sep">|</span>
+                                            <span class="lp-card-no-ba">BA: <?= esc($item['nomor_ba']) ?></span>
                                         <?php endif; ?>
-                                        <span><i class="bi bi-calendar3 me-1"></i> Kurun Waktu: <?= esc($item['kurun_waktu']) ?></span>
                                     </div>
-                                    <div class="p-2.5 rounded-3 bg-light border d-flex flex-wrap align-items-center justify-content-between gap-2" style="font-size: 12px;">
-                                        <div class="text-muted">
-                                            <i class="bi bi-info-circle me-1 text-primary"></i>
-                                            <span>Klasifikasi: <strong><?= esc($item['kode_klasifikasi']) ?></strong></span>
+
+                                    <!-- Baris 2: Judul Arsip -->
+                                    <h3 class="lp-card-archive-title">
+                                        <?= esc($item['nama_arsip']) ?>
+                                    </h3>
+
+                                    <!-- Baris 4: Informasi OPD -->
+                                    <div class="lp-card-opd-row">
+                                        <span class="lp-card-opd"><?= esc($item['nama_opd']) ?></span>
+                                        <?php if (!empty($item['nama_bidang']) && $item['nama_bidang'] !== '-') : ?>
+                                            <span class="lp-card-dot">&bull;</span>
+                                            <span class="lp-card-bidang"><?= esc($item['nama_bidang']) ?></span>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <!-- Baris 5: Kurun Waktu -->
+                                    <div class="lp-card-year-row">
+                                        <span>Kurun Waktu: <strong class="lp-card-year-val"><?= esc($item['kurun_waktu']) ?></strong></span>
+                                    </div>
+
+                                    <!-- Baris 6: Informasi Klasifikasi dan Aksi -->
+                                    <div class="lp-card-bottom-bar">
+                                        <div class="lp-card-klasifikasi">
+                                            <span class="lp-card-klasifikasi-label">Klasifikasi:</span>
+                                            <span class="lp-card-klasifikasi-val"><?= esc($item['kode_klasifikasi']) ?></span>
                                         </div>
-                                        <div>
-                                            <?php if (!empty($isLoggedIn)) : ?>
-                                                <a href="<?= base_url('/arsip') ?>" class="btn btn-sm btn-outline-primary py-1 px-3 rounded-2 fw-medium">
-                                                    Buka di Dashboard <i class="bi bi-arrow-right ms-1"></i>
-                                                </a>
-                                            <?php else : ?>
-                                                <a href="<?= base_url('/login') ?>" class="btn btn-sm btn-light border py-1 px-3 rounded-2 text-secondary fw-medium">
-                                                    <i class="bi bi-box-arrow-in-right me-1"></i> Login untuk Unduh Berkas
-                                                </a>
-                                            <?php endif; ?>
+                                        <div class="lp-card-action">
+                                            <a href="<?= !empty($isLoggedIn) ? base_url('/arsip') : base_url('/login') ?>" class="lp-btn-card-action">
+                                                <span>Buka di Dashboard</span>
+                                                <i class="bi bi-arrow-right"></i>
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -580,45 +583,92 @@
                                 </button>
                             </div>
                         <?php endif; ?>
-                    <?php else : ?>
-                        <!-- Initial State -->
-                        <div class="text-center py-4 px-3 bg-white rounded-4 border text-muted small">
-                            <i class="bi bi-file-earmark-text fs-4 text-primary d-block mb-1"></i>
-                            Ketik nomor arsip atau kata kunci untuk menampilkan data naskah kearsipan daerah.
-                        </div>
                     <?php endif; ?>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 9. PUSAT ASISTENSI & LAYANAN BANTUAN SIAMA -->
-    <section id="bantuan" class="py-4 mb-5">
+    <!-- 9. PERTANYAAN YANG SERING DIAJUKAN (FAQ) -->
+    <section id="faq" style="background-color: #FFFFFF; padding-top: 24px !important; padding-bottom: 56px !important;">
         <div class="container">
-            <div class="lp-helpdesk-card">
-                <div class="row align-items-center g-4">
-                    <div class="col-12 col-lg-7">
-                        <div class="d-flex align-items-start gap-3">
-                            <div class="rounded-3 bg-primary-subtle text-primary d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px; font-size: 24px;">
-                                <i class="bi bi-headset"></i>
-                            </div>
-                            <div>
-                                <h3 class="fw-bold text-dark mb-1" style="font-size: 17.5px;">Pusat Asistensi &amp; Layanan Bantuan SIAMA</h3>
-                                <p class="text-secondary small mb-0" style="line-height: 1.6;">
-                                    Tim Helpdesk Dinas Kearsipan dan Perpustakaan Daerah Kabupaten Buleleng siap mendampingi ASN setiap hari kerja Senin &ndash; Jumat, pukul 08.00 &ndash; 16.00 WITA.
-                                </p>
+            <div class="text-center mx-auto mb-4 pb-2" style="max-width: 680px;">
+                <h2 class="lp-section-title">Pertanyaan yang Sering Diajukan</h2>
+                <p class="lp-section-sub">
+                    Informasi penting dan panduan praktis terkait alih media arsip digital di lingkungan Pemerintah Kabupaten Buleleng.
+                </p>
+            </div>
+
+            <div class="mx-auto" style="max-width: 780px;">
+                <div class="accordion lp-faq-accordion" id="faqAccordion">
+                    <!-- FAQ 1 -->
+                    <div class="accordion-item">
+                        <h3 class="accordion-header" id="faqHeading1">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1" aria-expanded="true" aria-controls="faqCollapse1">
+                                Apa dasar hukum pelaksanaan alih media arsip melalui aplikasi SIAMA?
+                            </button>
+                        </h3>
+                        <div id="faqCollapse1" class="accordion-collapse collapse show" aria-labelledby="faqHeading1">
+                            <div class="accordion-body">
+                                Pelaksanaan alih media arsip didasarkan pada pedoman Arsip Nasional Republik Indonesia (ANRI) dan Peraturan Bupati Buleleng tentang Penyelenggaraan Sistem Pemerintahan Berbasis Elektronik (SPBE), yang menjamin naskah digital memiliki keabsahan hukum dan akuntabilitas kearsipan yang sama dengan arsip fisik aslinya.
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-lg-5 d-flex flex-wrap align-items-center justify-content-lg-end gap-3">
-                        <a href="javascript:void(0)" onclick="alert('Buku Panduan SIAMA (PDF) sedang dalam proses pembaruan berkas.')" class="lp-btn-doc" title="Unduh Buku Panduan SIAMA">
-                            <i class="bi bi-file-earmark-pdf-fill text-danger fs-5"></i>
-                            <span>Buku Panduan (PDF)</span>
-                        </a>
-                        <a href="https://wa.me/6281234567890?text=Halo%20Helpdesk%20SIAMA%20Buleleng" target="_blank" rel="noopener" class="lp-btn-helpdesk">
-                            <i class="bi bi-whatsapp"></i>
-                            <span>Konsultasi Helpdesk</span>
-                        </a>
+
+                    <!-- FAQ 2 -->
+                    <div class="accordion-item">
+                        <h3 class="accordion-header" id="faqHeading2">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2" aria-expanded="false" aria-controls="faqCollapse2">
+                                Apakah dokumen fisik boleh langsung dimusnahkan setelah dialihmediakan?
+                            </button>
+                        </h3>
+                        <div id="faqCollapse2" class="accordion-collapse collapse" aria-labelledby="faqHeading2">
+                            <div class="accordion-body">
+                                Tidak. Dokumen fisik tidak boleh dimusnahkan secara sembarangan. Proses penyusutan atau pemusnahan arsip fisik tetap wajib berpedoman pada Jadwal Retensi Arsip (JRA), penilaian tim kearsipan, serta penerbitan Berita Acara Pemusnahan yang disahkan oleh Pimpinan Perangkat Daerah dan Lembaga Kearsipan Daerah.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 3 -->
+                    <div class="accordion-item">
+                        <h3 class="accordion-header" id="faqHeading3">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3" aria-expanded="false" aria-controls="faqCollapse3">
+                                Bagaimana cara memastikan keaslian naskah digital hasil alih media?
+                            </button>
+                        </h3>
+                        <div id="faqCollapse3" class="accordion-collapse collapse" aria-labelledby="faqHeading3">
+                            <div class="accordion-body">
+                                Setiap dokumen hasil alih media dibubuhi watermark autentikasi instansi Pemerintah Kabupaten Buleleng, diverifikasi melalui alur berjenjang (Kepala Bidang dan Pimpinan OPD), serta diikat dengan Berita Acara (BA) Alih Media resmi bernomor unik.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 4 -->
+                    <div class="accordion-item">
+                        <h3 class="accordion-header" id="faqHeading4">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse4" aria-expanded="false" aria-controls="faqCollapse4">
+                                Siapa saja yang memiliki hak akses untuk mengunduh naskah digital utuh?
+                            </button>
+                        </h3>
+                        <div id="faqCollapse4" class="accordion-collapse collapse" aria-labelledby="faqHeading4">
+                            <div class="accordion-body">
+                                Masyarakat umum dapat melihat ringkasan metadata arsip yang bersifat publik melalui fitur Cari Arsip. Namun, pengunduhan berkas naskah digital utuh dibatasi khusus bagi ASN Perangkat Daerah pengelola dan pihak berwenang yang telah melakukan login dengan akun terverifikasi.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 5 -->
+                    <div class="accordion-item">
+                        <h3 class="accordion-header" id="faqHeading5">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse5" aria-expanded="false" aria-controls="faqCollapse5">
+                                Ke mana harus berkonsultasi jika mengalami kendala dalam penggunaan sistem?
+                            </button>
+                        </h3>
+                        <div id="faqCollapse5" class="accordion-collapse collapse" aria-labelledby="faqHeading5">
+                            <div class="accordion-body">
+                                Anda dapat menghubungi Tim Layanan Kearsipan Dinas Kearsipan dan Perpustakaan Daerah Kabupaten Buleleng melalui kontak resmi yang tertera di bagian footer halaman ini pada hari dan jam kerja.
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -635,11 +685,11 @@
                         <img src="<?= esc($logoUrl) ?>" alt="<?= esc($siteName) ?>" style="height: 44px; max-width: 150px; object-fit: contain;">
                         <div>
                             <div class="fw-bold text-white fs-5 lh-1"><?= esc($siteName) ?> Buleleng</div>
-                            <div class="small text-white-50 mt-1">Dinas Kearsipan &amp; Perpustakaan Daerah</div>
+                            <div class="small text-white-50 mt-1"><?= esc($siteTagline) ?></div>
                         </div>
                     </div>
                     <p class="small text-white-50 mb-3" style="max-width: 440px; line-height: 1.7;">
-                        Platform tata kelola kearsipan digital terintegrasi Pemerintah Kabupaten Buleleng yang mempermudah proses alih media, penatausahaan surat, serta autentikasi memori kolektif daerah secara aman dan akuntabel.
+                        <?= esc($desc) ?>
                     </p>
                     <div class="d-flex align-items-center gap-2">
                         <?php if (!empty($settings['social_website'])) : ?>
@@ -679,23 +729,13 @@
                     </ul>
                 </div>
 
-                <!-- Kolom 3: Didukung Oleh (ANRI, BSrE BSSN, Diskominfo) -->
+                <!-- Kolom 3: Didukung Oleh (BSrE BSSN & Diskominfosanti) -->
                 <div class="col-12 col-sm-6 col-lg-4">
                     <h6 class="fw-bold text-white mb-3" style="font-size: 13px; letter-spacing: 0.5px;">DIDUKUNG OLEH</h6>
-                    
-                    <div class="lp-footer-partner-card">
-                        <div class="rounded-2 bg-white bg-opacity-10 p-2 text-white">
-                            <i class="bi bi-shield-check fs-5"></i>
-                        </div>
-                        <div>
-                            <div class="fw-bold text-white small">ANRI</div>
-                            <div class="text-white-50" style="font-size: 11px;">Standar Kearsipan Nasional</div>
-                        </div>
-                    </div>
 
                     <div class="lp-footer-partner-card">
-                        <div class="rounded-2 bg-white bg-opacity-10 p-2 text-white">
-                            <i class="bi bi-lock-fill fs-5"></i>
+                        <div class="lp-footer-partner-logo-wrap">
+                            <img src="<?= base_url('Images/logo_bsre.png') ?>" alt="BSrE BSSN" class="lp-footer-partner-logo">
                         </div>
                         <div>
                             <div class="fw-bold text-white small">BSrE BSSN</div>
@@ -704,8 +744,8 @@
                     </div>
 
                     <div class="lp-footer-partner-card">
-                        <div class="rounded-2 bg-white bg-opacity-10 p-2 text-white">
-                            <i class="bi bi-cpu-fill fs-5"></i>
+                        <div class="lp-footer-partner-logo-wrap">
+                            <img src="<?= base_url('Images/Logo_Kominfosanti.jpg') ?>" alt="Diskominfosanti" class="lp-footer-partner-logo">
                         </div>
                         <div>
                             <div class="fw-bold text-white small">Diskominfosanti</div>
@@ -732,50 +772,58 @@
 
     <!-- Client-side Interactive Search Script -->
     <script>
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
     function renderArchiveCard(item, isLoggedIn) {
-        const badgeClass = item.is_terbuka ? 'lp-badge-public' : 'lp-badge-internal';
-        const iconLock = item.is_terbuka ? 'bi-unlock-fill' : 'bi-lock-fill';
-        const bidangText = (item.nama_bidang && item.nama_bidang !== '-') ? ` &bull; ${item.nama_bidang}` : '';
-        const baText = (item.nomor_ba && item.nomor_ba !== '-') ? ` &bull; BA: ${item.nomor_ba}` : '';
-        
-        let actionBtn = '';
-        if (isLoggedIn) {
-            actionBtn = `<a href="<?= base_url('/arsip') ?>" class="btn btn-sm btn-outline-primary py-1 px-3 rounded-2 fw-medium">
-                Buka di Dashboard <i class="bi bi-arrow-right ms-1"></i>
-            </a>`;
-        } else {
-            actionBtn = `<a href="<?= base_url('/login') ?>" class="btn btn-sm btn-light border py-1 px-3 rounded-2 text-secondary fw-medium">
-                <i class="bi bi-box-arrow-in-right me-1"></i> Login untuk Unduh Berkas
-            </a>`;
-        }
+        const hasBa = item.nomor_ba && item.nomor_ba !== '-';
+        const baHtml = hasBa ? `<span class="lp-card-sep">|</span><span class="lp-card-no-ba">BA: ${escapeHtml(item.nomor_ba)}</span>` : '';
+        const hasBidang = item.nama_bidang && item.nama_bidang !== '-';
+        const bidangHtml = hasBidang ? `<span class="lp-card-dot">&bull;</span><span class="lp-card-bidang">${escapeHtml(item.nama_bidang)}</span>` : '';
+        const actionUrl = isLoggedIn ? '<?= base_url('/arsip') ?>' : '<?= base_url('/login') ?>';
 
         return `
             <div class="lp-archive-result-card">
-                <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap mb-2">
-                    <div>
-                        <span class="font-monospace fw-bold text-primary small d-inline-block me-2">${item.nomor_arsip}</span>
-                        ${baText ? `<span class="text-muted small">${baText}</span>` : ''}
-                    </div>
-                    <div>
-                        <span class="${badgeClass}">
-                            <i class="bi ${iconLock} me-1"></i>${item.akses_publik}
-                        </span>
-                    </div>
+                <!-- Baris 1: Identitas Arsip -->
+                <div class="lp-card-identity-row">
+                    <span class="lp-card-no-arsip">${escapeHtml(item.nomor_arsip)}</span>
+                    ${baHtml}
                 </div>
-                <h5 class="fw-bold text-dark mb-2" style="font-size: 16px;">
-                    ${item.nama_arsip}
-                </h5>
-                <div class="d-flex flex-wrap align-items-center gap-3 text-secondary small mb-3">
-                    <span><i class="bi bi-building me-1"></i> ${item.nama_opd}${bidangText}</span>
-                    <span><i class="bi bi-calendar3 me-1"></i> Kurun Waktu: ${item.kurun_waktu}</span>
+
+                <!-- Baris 2: Judul Arsip -->
+                <h3 class="lp-card-archive-title">
+                    ${escapeHtml(item.nama_arsip)}
+                </h3>
+
+                <!-- Baris 4: Informasi OPD -->
+                <div class="lp-card-opd-row">
+                    <span class="lp-card-opd">${escapeHtml(item.nama_opd)}</span>
+                    ${bidangHtml}
                 </div>
-                <div class="p-2.5 rounded-3 bg-light border d-flex flex-wrap align-items-center justify-content-between gap-2" style="font-size: 12px;">
-                    <div class="text-muted">
-                        <i class="bi bi-info-circle me-1 text-primary"></i>
-                        <span>Klasifikasi: <strong>${item.kode_klasifikasi}</strong></span>
+
+                <!-- Baris 5: Kurun Waktu -->
+                <div class="lp-card-year-row">
+                    <span>Kurun Waktu: <strong class="lp-card-year-val">${escapeHtml(item.kurun_waktu)}</strong></span>
+                </div>
+
+                <!-- Baris 6: Informasi Klasifikasi dan Aksi -->
+                <div class="lp-card-bottom-bar">
+                    <div class="lp-card-klasifikasi">
+                        <span class="lp-card-klasifikasi-label">Klasifikasi:</span>
+                        <span class="lp-card-klasifikasi-val">${escapeHtml(item.kode_klasifikasi)}</span>
                     </div>
-                    <div>
-                        ${actionBtn}
+                    <div class="lp-card-action">
+                        <a href="${actionUrl}" class="lp-btn-card-action">
+                            <span>Buka di Dashboard</span>
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -839,6 +887,139 @@
             console.error('Dedicated search error:', err);
         });
     }
+
+    // Navbar Scroll & Glassmorphism Transition
+    window.addEventListener('scroll', function() {
+        const navbar = document.getElementById('mainNavbar');
+        if (navbar) {
+            if (window.scrollY > 30) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        }
+    }, { passive: true });
+
+    // Active Nav Indicator on Click
+    document.querySelectorAll('.lp-nav-link').forEach(link => {
+        link.addEventListener('click', function() {
+            document.querySelectorAll('.lp-nav-link').forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+
+    // Mobile Menu Dropdown Handler
+    const mobileMenu = document.getElementById('mobileNavMenu');
+    if (mobileMenu) {
+        mobileMenu.addEventListener('show.bs.collapse', function() {
+            const navbar = document.getElementById('mainNavbar');
+            if (navbar) navbar.classList.add('menu-open');
+        });
+        mobileMenu.addEventListener('hidden.bs.collapse', function() {
+            const navbar = document.getElementById('mainNavbar');
+            if (navbar) navbar.classList.remove('menu-open');
+        });
+    }
+    function closeMobileNav(linkEl) {
+        if (linkEl) {
+            document.querySelectorAll('.lp-mobile-nav-link').forEach(l => l.classList.remove('active'));
+            linkEl.classList.add('active');
+        }
+        const mobileMenu = document.getElementById('mobileNavMenu');
+        if (mobileMenu && window.bootstrap) {
+            const bsCollapse = bootstrap.Collapse.getInstance(mobileMenu);
+            if (bsCollapse) bsCollapse.hide();
+        }
+    }
+
+    // Animated Workflow Journey: 01 -> 02 -> 03 -> 04 -> 05
+    (function initWorkflowJourney() {
+        const stepper = document.getElementById('workflowStepper');
+        if (!stepper) return;
+
+        const progressBar = document.getElementById('stepperProgressBar');
+        const travelDot = document.getElementById('stepperTravelDot');
+        const items = [
+            document.getElementById('timelineItem0'),
+            document.getElementById('timelineItem1'),
+            document.getElementById('timelineItem2'),
+            document.getElementById('timelineItem3'),
+            document.getElementById('timelineItem4')
+        ];
+        const nodes = [
+            document.getElementById('timelineNode0'),
+            document.getElementById('timelineNode1'),
+            document.getElementById('timelineNode2'),
+            document.getElementById('timelineNode3'),
+            document.getElementById('timelineNode4')
+        ];
+
+        const percentages = [0, 25, 50, 75, 100];
+        let currentStep = 0;
+        let isPaused = false;
+        let journeyInterval = null;
+
+        function updateStep(index) {
+            currentStep = index;
+            const pct = percentages[currentStep];
+
+            if (progressBar) progressBar.style.width = pct + '%';
+            if (travelDot) {
+                travelDot.style.left = pct + '%';
+                if (currentStep === 4) {
+                    travelDot.style.background = '#F59E0B';
+                    travelDot.style.boxShadow = '0 0 14px rgba(245, 158, 11, 0.9), 0 0 0 4px rgba(245, 158, 11, 0.25)';
+                } else {
+                    travelDot.style.background = '#1E60EC';
+                    travelDot.style.boxShadow = '0 0 12px rgba(30, 96, 236, 0.8), 0 0 0 4px rgba(30, 96, 236, 0.2)';
+                }
+            }
+
+            nodes.forEach((node, i) => {
+                if (node) {
+                    if (i <= currentStep) {
+                        node.classList.add('active');
+                    } else {
+                        node.classList.remove('active');
+                    }
+                }
+            });
+
+            items.forEach((item, i) => {
+                if (item) {
+                    if (i === currentStep) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                }
+            });
+        }
+
+        updateStep(0);
+
+        function startCycle() {
+            if (journeyInterval) clearInterval(journeyInterval);
+            journeyInterval = setInterval(() => {
+                if (isPaused) return;
+                let next = (currentStep + 1) % 5;
+                updateStep(next);
+            }, 2400);
+        }
+
+        startCycle();
+
+        stepper.addEventListener('mouseenter', () => { isPaused = true; });
+        stepper.addEventListener('mouseleave', () => { isPaused = false; });
+
+        items.forEach((item, index) => {
+            if (item) {
+                item.addEventListener('click', () => {
+                    updateStep(index);
+                });
+            }
+        });
+    })();
     </script>
 </body>
 </html>

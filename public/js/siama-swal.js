@@ -1,10 +1,3 @@
-/**
- * ==============================================================
- * SIAMEDA - Centralized SweetAlert2 Notification & Action System
- * Consistent, Modern, and Professional UI Notifications
- * ==============================================================
- */
-
 (function (window, document) {
     'use strict';
 
