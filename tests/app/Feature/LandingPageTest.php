@@ -21,7 +21,7 @@ class LandingPageTest extends CIUnitTestCase
         // 2. Hero Section (clean & classy dengan heading, deskripsi, dan tombol aksi frosted glass)
         $result->assertSee('Layanan Alih Media Arsip');
         $result->assertSee('Digital');
-        $result->assertSee('Panduan &amp; Regulasi');
+        $result->assertSee('Lihat Buku Panduan');
         $this->assertStringNotContainsString('heroSearchWidget', $result->getBody());
         $this->assertStringNotContainsString('lp-hero-glass-panel', $result->getBody());
 

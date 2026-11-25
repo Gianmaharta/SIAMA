@@ -112,9 +112,9 @@
                         <span>Masuk Portal ASN</span>
                     </a>
                 <?php endif; ?>
-                <a href="#alur" class="lp-btn-cta-outline">
+                <a href="#bantuan" class="lp-btn-cta-outline">
                     <i class="bi bi-file-earmark-text"></i>
-                    <span>Panduan &amp; Regulasi</span>
+                    <span>Lihat Buku Panduan</span>
                 </a>
             </div>
 
