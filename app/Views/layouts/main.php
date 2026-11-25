@@ -84,6 +84,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         <?php if (session()->getFlashdata('generated_password')) : ?>
             Swal.fire({
+                position: 'center',
                 icon: 'success',
                 title: 'Password Random Berhasil Dibuat',
                 html: `
@@ -102,32 +103,6 @@
                 confirmButtonText: 'Selesai',
                 confirmButtonColor: '#1E60EC'
             });
-        <?php elseif (session()->getFlashdata('success')) : ?>
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: <?= json_encode(strip_tags((string) session()->getFlashdata('success'))) ?>,
-                    timer: 2600,
-                    showConfirmButton: false,
-                    toast: true,
-                    position: 'top-end',
-                    timerProgressBar: true
-                });
-            }
-        <?php elseif (session()->getFlashdata('error')) : ?>
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Perhatian',
-                    text: <?= json_encode(strip_tags((string) session()->getFlashdata('error'))) ?>,
-                    timer: 3800,
-                    showConfirmButton: false,
-                    toast: true,
-                    position: 'top-end',
-                    timerProgressBar: true
-                });
-            }
         <?php endif; ?>
         const toggleBtn = document.getElementById('sidebarToggleBtn');
         const closeBtn = document.getElementById('sidebarCloseBtn');

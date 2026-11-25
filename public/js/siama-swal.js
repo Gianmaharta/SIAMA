@@ -37,6 +37,8 @@
     }
 
     const SwalSIAMA = Swal.mixin({
+        position: 'center',
+        toast: false,
         customClass: baseCustomClass,
         buttonsStyling: false,
         reverseButtons: true,
@@ -182,16 +184,17 @@
         /**
          * Notifikasi Informasi (Info)
          */
-        info: function (title, message = null) {
+        info: function (title, message = null, timer = 3000) {
             return SwalSIAMA.fire({
                 icon: 'info',
                 title: title || 'Pemberitahuan',
                 html: message || '',
-                showConfirmButton: true,
-                confirmButtonText: 'Tutup',
-                customClass: getCustomClass({
-                    confirmButton: 'siama-swal-btn siama-swal-btn-primary'
-                })
+                timer: timer,
+                timerProgressBar: true,
+                showConfirmButton: false,
+                showCancelButton: false,
+                showDenyButton: false,
+                allowOutsideClick: true
             });
         },
 
@@ -206,7 +209,7 @@
                 title: 'Apakah Anda yakin?',
                 text: 'Tindakan ini tidak dapat dibatalkan.',
                 icon: 'warning',
-                confirmButtonText: 'Ya, Lanjutkan',
+                confirmButtonText: 'Iya',
                 cancelButtonText: 'Batal',
                 isDanger: false,
                 showLoaderOnConfirm: true
@@ -246,7 +249,7 @@
                 text: 'Data yang dihapus tidak dapat dikembalikan.',
                 itemName: null,
                 itemSub: null,
-                confirmButtonText: 'Ya, Hapus',
+                confirmButtonText: 'Iya',
                 cancelButtonText: 'Batal'
             };
             const config = Object.assign({}, defaults, options);
@@ -343,7 +346,7 @@
                                  form.action.includes('cleanse') ||
                                  form.action.includes('reset');
                 const title = form.getAttribute('data-swal-title') || 'Apakah Anda yakin?';
-                const btnText = form.getAttribute('data-swal-btn') || (isDanger ? 'Ya, Lanjutkan' : 'Ya, Simpan');
+                const btnText = form.getAttribute('data-swal-btn') || 'Iya';
 
                 SiamaSwal.confirm({
                     title: title,
@@ -498,7 +501,7 @@
                     title: title,
                     html: msg,
                     isDanger: isDanger,
-                    confirmButtonText: isDanger ? 'Ya, Lanjutkan' : 'Ya'
+                    confirmButtonText: 'Iya'
                 }).then((res) => {
                     if (res.isConfirmed) {
                         if (href && href !== '#' && !href.startsWith('javascript:')) {

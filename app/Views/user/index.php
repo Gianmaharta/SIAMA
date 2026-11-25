@@ -1245,6 +1245,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
+                    position: 'center',
                     icon: 'question',
                     title: 'Reset Password Pengguna?',
                     html: `<div class="small text-secondary mb-2">Pilih metode reset password untuk <strong>${escapeHtml(nama)}</strong>:</div>`,
@@ -1314,21 +1315,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (statActiveEl) statActiveEl.textContent = activeCnt.toLocaleString('id-ID');
                 if (statInactiveEl) statInactiveEl.textContent = inactiveCnt.toLocaleString('id-ID');
 
-                if (typeof Swal !== 'undefined') {
+                if (window.SiamaSwal) {
+                    SiamaSwal.success('Status Diperbarui', data.message, 2200);
+                } else if (typeof Swal !== 'undefined') {
                     Swal.fire({
                         icon: 'success',
                         title: 'Status Diperbarui',
                         text: data.message,
-                        timer: 2000,
+                        position: 'center',
+                        timer: 2200,
                         showConfirmButton: false,
-                        toast: true,
-                        position: 'top-end'
+                        timerProgressBar: true
                     });
                 }
             } else {
                 toggleEl.checked = !intendedState;
-                if (typeof Swal !== 'undefined') {
-                    Swal.fire({ icon: 'error', title: 'Gagal', text: data.message || 'Gagal mengubah status.' });
+                if (window.SiamaSwal) {
+                    SiamaSwal.error('Gagal', data.message || 'Gagal mengubah status.');
+                } else if (typeof Swal !== 'undefined') {
+                    Swal.fire({ icon: 'error', title: 'Gagal', text: data.message || 'Gagal mengubah status.', position: 'center' });
                 }
             }
         })
