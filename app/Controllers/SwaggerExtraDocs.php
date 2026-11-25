@@ -657,4 +657,13 @@ class SwaggerExtraDocs
 
     #[OA\Post(path: '/system-cleanse/execute', summary: 'Eksekusi Reset / Pembersihan Data', tags: ['System Maintenance'], security: [['sessionAuth' => []]], responses: [new OA\Response(response: 302, description: 'Redirect setelah proses selesai')])]
     public function systemCleanseExecute(): void {}
+
+    #[OA\Post(path: '/system-cleanse/backup', operationId: 'systemBackupCreate', summary: 'Buat Backup Database (.SQL) Manual (Khusus Super_Admin)', tags: ['System Maintenance'], security: [['sessionAuth' => []]], responses: [new OA\Response(response: 200, description: 'Backup .sql berhasil dibuat tanpa menghapus data (JSON)')])]
+    public function systemBackupCreate(): void {}
+
+    #[OA\Get(path: '/system-cleanse/backup-download/{folder}', operationId: 'systemBackupDownload', summary: 'Download File Backup Database .SQL (Khusus Super_Admin)', tags: ['System Maintenance'], security: [['sessionAuth' => []]], parameters: [new OA\Parameter(name: 'folder', in: 'path', required: true, schema: new OA\Schema(type: 'string', example: 'backup_20261125_073500'))], responses: [new OA\Response(response: 200, description: 'Stream file .sql hasil backup')])]
+    public function systemBackupDownload(): void {}
+
+    #[OA\Post(path: '/system-cleanse/backup-delete/{folder}', operationId: 'systemBackupDelete', summary: 'Hapus File Backup Database (Khusus Super_Admin)', tags: ['System Maintenance'], security: [['sessionAuth' => []]], parameters: [new OA\Parameter(name: 'folder', in: 'path', required: true, schema: new OA\Schema(type: 'string', example: 'backup_20261125_073500'))], responses: [new OA\Response(response: 200, description: 'Backup berhasil dihapus')])]
+    public function systemBackupDelete(): void {}
 }

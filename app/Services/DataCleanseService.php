@@ -173,6 +173,125 @@ class DataCleanseService
     }
 
     /**
+     * Membuat backup database (.sql) mandiri tanpa menghapus data apapun (Khusus Super Admin).
+     */
+    public function createDatabaseOnlyBackup(): array
+    {
+        $timestamp = date('Ymd_His');
+        $targetDir = ROOTPATH . 'backups' . DIRECTORY_SEPARATOR . 'backup_' . $timestamp;
+
+        if (!is_dir($targetDir) && !mkdir($targetDir, 0755, true) && !is_dir($targetDir)) {
+            throw new Exception("Gagal membuat direktori backup: {$targetDir}");
+        }
+
+        $dbDumpFile = $targetDir . DIRECTORY_SEPARATOR . 'db_siama.sql';
+        $this->dumpDatabase($dbDumpFile);
+
+        if (!file_exists($dbDumpFile) || filesize($dbDumpFile) === 0) {
+            throw new Exception("File backup database gagal dibuat atau berukuran 0 byte.");
+        }
+
+        return [
+            'folder'    => 'backup_' . $timestamp,
+            'db_file'   => $dbDumpFile,
+            'db_size'   => filesize($dbDumpFile),
+            'timestamp' => $timestamp,
+        ];
+    }
+
+    /**
+     * Mengambil daftar riwayat backup yang tersimpan di direktori backups/.
+     */
+    public function listBackups(): array
+    {
+        $backupRoot = ROOTPATH . 'backups';
+        if (!is_dir($backupRoot)) {
+            return [];
+        }
+
+        $entries = scandir($backupRoot, SCANDIR_SORT_DESCENDING);
+        if (!$entries) {
+            return [];
+        }
+
+        $backups = [];
+        foreach ($entries as $entry) {
+            if (!preg_match('/^backup_(\d{8})_(\d{6})$/', $entry, $m)) {
+                continue;
+            }
+            $dirPath = $backupRoot . DIRECTORY_SEPARATOR . $entry;
+            $sqlPath = $dirPath . DIRECTORY_SEPARATOR . 'db_siama.sql';
+            if (!is_dir($dirPath) || !is_file($sqlPath)) {
+                continue;
+            }
+
+            $sizeBytes = filesize($sqlPath) ?: 0;
+            $dt = \DateTime::createFromFormat('YmdHis', $m[1] . $m[2]);
+
+            $backups[] = [
+                'folder'         => $entry,
+                'filename'       => 'siama_backup_' . $m[1] . '_' . $m[2] . '.sql',
+                'size_bytes'     => $sizeBytes,
+                'size_formatted' => $sizeBytes >= 1048576
+                    ? round($sizeBytes / 1048576, 2) . ' MB'
+                    : round(max($sizeBytes, 1) / 1024, 2) . ' KB',
+                'created_at'     => $dt ? $dt->format('d M Y, H:i:s') : date('d M Y, H:i:s', filemtime($sqlPath)),
+                'has_uploads'    => is_dir($dirPath . DIRECTORY_SEPARATOR . 'uploads'),
+            ];
+        }
+
+        return $backups;
+    }
+
+    /**
+     * Mengambil path file .sql yang valid untuk diunduh (anti path-traversal).
+     */
+    public function getBackupFilePath(string $folder): ?string
+    {
+        if (!preg_match('/^backup_\d{8}_\d{6}$/', $folder)) {
+            return null;
+        }
+        $sqlPath = ROOTPATH . 'backups' . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . 'db_siama.sql';
+        return is_file($sqlPath) ? $sqlPath : null;
+    }
+
+    /**
+     * Menghapus satu folder backup berdasarkan nama folder yang valid.
+     */
+    public function deleteBackup(string $folder): bool
+    {
+        if (!preg_match('/^backup_\d{8}_\d{6}$/', $folder)) {
+            return false;
+        }
+        $dirPath = ROOTPATH . 'backups' . DIRECTORY_SEPARATOR . $folder;
+        if (!is_dir($dirPath)) {
+            return false;
+        }
+        $this->deleteDirectory($dirPath);
+        return !is_dir($dirPath);
+    }
+
+    /**
+     * Hapus direktori beserta seluruh isinya secara rekursif.
+     */
+    protected function deleteDirectory(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+        $items = array_diff(scandir($dir) ?: [], ['.', '..']);
+        foreach ($items as $item) {
+            $path = $dir . DIRECTORY_SEPARATOR . $item;
+            if (is_dir($path)) {
+                $this->deleteDirectory($path);
+            } else {
+                @unlink($path);
+            }
+        }
+        @rmdir($dir);
+    }
+
+    /**
      * Dump database menggunakan mysqldump atau fallback PHP PDO export.
      */
     protected function dumpDatabase(string $outputFile): void

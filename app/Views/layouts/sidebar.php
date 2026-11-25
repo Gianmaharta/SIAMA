@@ -64,7 +64,7 @@ if (session()->get('user_id')) {
             <li class="nav-item">
                 <a href="<?= base_url('/system-cleanse') ?>" class="nav-link <?= ($currentSegment === 'system-cleanse') ? 'active' : '' ?>">
                     <i class="bi bi-database-gear"></i>
-                    <span>Reset &amp; Cleansing</span>
+                    <span>Reset &amp; Backup Database</span>
                 </a>
             </li>
 

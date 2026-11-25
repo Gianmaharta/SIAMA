@@ -194,8 +194,11 @@ $routes->group('audit-log', ['filter' => ['auth', 'role:Super_Admin,Admin_Pemkab
     $routes->get('activity/export', 'AuditLog::exportActivityCsv');
 });
 
-// --- Reset Data / Data Cleansing (Super_Admin & Admin_Pemkab) ---
+// --- Reset Data / Data Cleansing & Backup Database (Super_Admin & Admin_Pemkab) ---
 $routes->group('system-cleanse', ['filter' => ['auth', 'role:Super_Admin,Admin_Pemkab']], static function ($routes) {
     $routes->get('/', 'SystemMaintenance::index');
     $routes->post('execute', 'SystemMaintenance::execute');
+    $routes->post('backup', 'SystemMaintenance::createBackup', ['filter' => 'role:Super_Admin']);
+    $routes->get('backup-download/(:segment)', 'SystemMaintenance::downloadBackup/$1', ['filter' => 'role:Super_Admin']);
+    $routes->post('backup-delete/(:segment)', 'SystemMaintenance::deleteBackup/$1', ['filter' => 'role:Super_Admin']);
 });

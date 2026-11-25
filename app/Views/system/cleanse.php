@@ -16,7 +16,7 @@ Reset & Data Cleansing - SIAMA
         </div>
         <div>
             <span class="badge bg-danger px-3 py-2 fs-6 rounded-pill">
-                <i class="bi bi-shield-lock me-1"></i> Khusus Admin Pemkab
+                <i class="bi bi-shield-lock me-1"></i> Khusus Super Admin
             </span>
         </div>
     </div>
@@ -83,6 +83,95 @@ Reset & Data Cleansing - SIAMA
             </div>
         </div>
     </div>
+
+    <!-- Panel Backup Database Mandiri (Khusus Super Admin) -->
+    <?php if (session()->get('nama_role') === 'Super_Admin') : ?>
+        <div class="card border-0 shadow-sm rounded-4 mb-4 border-primary border-top border-4">
+            <div class="card-header bg-white border-0 py-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
+                <div>
+                    <h5 class="fw-bold mb-1 text-dark d-flex align-items-center gap-2">
+                        <i class="bi bi-database-fill-check text-primary"></i>
+                        Backup Database (.SQL) — Khusus Super Admin
+                    </h5>
+                    <p class="text-secondary small mb-0">Buat dan unduh salinan penuh database SIAMA kapan saja tanpa menghapus atau mengubah data operasional.</p>
+                </div>
+                <form action="<?= base_url('/system-cleanse/backup') ?>" method="post" class="m-0">
+                    <?= csrf_field() ?>
+                    <button type="submit" class="btn btn-primary px-3 py-2 rounded-3 fw-semibold d-inline-flex align-items-center gap-2" style="background-color: #1E60EC; border-color: #1E60EC;">
+                        <i class="bi bi-cloud-arrow-down-fill"></i>
+                        <span>Buat Backup Sekarang</span>
+                    </button>
+                </form>
+            </div>
+            <div class="card-body p-0">
+                <?php if (!empty($backups)) : ?>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" style="font-size: 13.5px;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">Tanggal & Waktu Backup</th>
+                                    <th>Nama File Unduhan</th>
+                                    <th>Tipe</th>
+                                    <th>Ukuran</th>
+                                    <th class="text-end pe-4">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($backups as $bk) : ?>
+                                    <tr>
+                                        <td class="ps-4 fw-medium text-dark"><?= esc($bk['created_at']) ?></td>
+                                        <td>
+                                            <span class="font-monospace text-primary small"><?= esc($bk['filename']) ?></span>
+                                        </td>
+                                        <td>
+                                            <?php if (!empty($bk['has_uploads'])) : ?>
+                                                <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2.5 py-1">Database + Storage</span>
+                                            <?php else : ?>
+                                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1">Database (.sql)</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="text-secondary"><?= esc($bk['size_formatted']) ?></td>
+                                        <td class="text-end pe-4">
+                                            <div class="d-inline-flex align-items-center gap-1">
+                                                <a href="<?= base_url('/system-cleanse/backup-download/' . $bk['folder']) ?>"
+                                                   class="btn btn-sm btn-outline-primary rounded-2 d-inline-flex align-items-center justify-content-center"
+                                                   style="width: 32px; height: 32px; padding: 0;"
+                                                   data-bs-toggle="tooltip"
+                                                   title="Download <?= esc($bk['filename']) ?>">
+                                                    <i class="bi bi-download"></i>
+                                                </a>
+                                                <form action="<?= base_url('/system-cleanse/backup-delete/' . $bk['folder']) ?>"
+                                                      method="post"
+                                                      class="m-0 d-inline"
+                                                      data-swal-title="Hapus File Backup?"
+                                                      data-swal-confirm="File backup <?= esc($bk['filename']) ?> akan dihapus dari server."
+                                                      data-swal-danger="true"
+                                                      data-swal-btn="Ya, Hapus">
+                                                    <?= csrf_field() ?>
+                                                    <button type="submit"
+                                                            class="btn btn-sm btn-outline-danger rounded-2 d-inline-flex align-items-center justify-content-center"
+                                                            style="width: 32px; height: 32px; padding: 0;"
+                                                            data-bs-toggle="tooltip"
+                                                            title="Hapus Backup">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php else : ?>
+                    <div class="text-center py-4 text-secondary small">
+                        <i class="bi bi-inbox fs-4 d-block mb-1 text-muted"></i>
+                        Belum ada file backup database yang tersimpan. Klik <strong>Buat Backup Sekarang</strong> untuk membuat cadangan `.sql` pertama.
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    <?php endif; ?>
 
     <!-- Ringkasan Rinci & Tombol Aksi -->
     <div class="row g-4">
