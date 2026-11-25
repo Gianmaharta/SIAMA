@@ -4,6 +4,8 @@ use CodeIgniter\Router\RouteCollection;
 
 /** @var RouteCollection $routes */
 $routes->get('/', 'Landing::index');
+$routes->get('cari-arsip', 'Landing::search');
+$routes->post('cari-arsip', 'Landing::search');
 
 // --- Pengaturan Website (Khusus Super_Admin) ---
 $routes->group('settings', ['filter' => ['auth', 'role:Super_Admin']], static function ($routes) {
