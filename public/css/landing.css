@@ -1,0 +1,820 @@
+/**
+ * ==============================================================
+ * SIAMEDA - Modern Landing Page Stylesheet
+ * Reference Design: Clean, Classy, Modern Navy & White
+ * ==============================================================
+ */
+
+:root {
+    --lp-navy-dark: #0B1930;
+    --lp-navy-deep: #07101E;
+    --lp-navy-card: #0F2342;
+    --lp-blue-primary: #1E60EC;
+    --lp-blue-hover: #154EC2;
+    --lp-blue-light: #EFF6FF;
+    --lp-blue-accent: #60A5FA;
+    --lp-text-dark: #0B1528;
+    --lp-text-muted: #64748B;
+    --lp-text-light: #CBD5E1;
+    --lp-border-subtle: #E2E8F0;
+    --lp-border-card: #EEF2F6;
+    --lp-bg-gray: #F8FAFC;
+    --lp-green: #10B981;
+    --lp-green-dark: #059669;
+}
+
+body {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: #1E293B;
+    background-color: #FFFFFF;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+}
+
+/* NAVBAR */
+.lp-navbar {
+    background: #FFFFFF;
+    border-bottom: 1px solid var(--lp-border-subtle);
+    padding: 14px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1040;
+    box-shadow: 0 2px 12px rgba(11, 25, 48, 0.04);
+}
+
+.lp-brand-title {
+    font-size: 16.5px;
+    font-weight: 700;
+    color: var(--lp-navy-dark);
+    line-height: 1.1;
+    letter-spacing: -0.2px;
+}
+
+.lp-brand-sub {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--lp-text-muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+.lp-nav-link {
+    color: #475569;
+    font-size: 13.5px;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.lp-nav-link:hover,
+.lp-nav-link:focus {
+    color: var(--lp-blue-primary);
+    background-color: var(--lp-blue-light);
+}
+
+.lp-btn-login {
+    background-color: var(--lp-blue-primary);
+    color: #FFFFFF !important;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 9px 22px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(30, 96, 236, 0.25);
+    border: 1px solid var(--lp-blue-primary);
+}
+
+.lp-btn-login:hover {
+    background-color: var(--lp-blue-hover);
+    border-color: var(--lp-blue-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(30, 96, 236, 0.35);
+}
+
+/* HERO SECTION DENGAN BACKGROUND FOTO & SUBTLE GLASS EFFECT */
+.lp-hero-section {
+    position: relative;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    padding: 95px 0 120px;
+    color: #FFFFFF;
+}
+
+.lp-hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* Overlay navy transparan agar gambar TINOL.jpeg tetap terlihat jelas dengan kontras teks tajam */
+    background: linear-gradient(180deg, rgba(11, 25, 48, 0.74) 0%, rgba(11, 25, 48, 0.83) 50%, rgba(11, 25, 48, 0.92) 100%);
+    z-index: 1;
+}
+
+.lp-hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+/* Badge Identitas SPBE dengan Subtle Frosted Glass */
+.lp-pill-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #FFFFFF;
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 7px 18px;
+    border-radius: 50px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14);
+    transition: all 0.25s ease;
+}
+
+.lp-pill-badge:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.26);
+}
+
+.lp-pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #10B981;
+    display: inline-block;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    animation: lpPulse 2s infinite;
+}
+
+@keyframes lpPulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+.lp-hero-title {
+    font-size: clamp(2.4rem, 4.4vw, 3.8rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.6px;
+    color: #FFFFFF;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+.lp-hero-title-accent {
+    color: var(--lp-blue-accent);
+}
+
+.lp-hero-desc {
+    color: var(--lp-text-light);
+    font-size: 15.5px;
+    line-height: 1.7;
+    max-width: 740px;
+    margin: 0 auto 28px;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.lp-btn-cta-primary {
+    background-color: var(--lp-blue-primary);
+    color: #FFFFFF !important;
+    font-size: 14.5px;
+    font-weight: 600;
+    padding: 13px 30px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 8px 24px rgba(30, 96, 236, 0.35);
+    border: 1px solid var(--lp-blue-primary);
+}
+
+.lp-btn-cta-primary:hover {
+    background-color: var(--lp-blue-hover);
+    border-color: var(--lp-blue-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(30, 96, 236, 0.45);
+}
+
+/* Tombol Sekunder Panduan & Regulasi dengan Subtle Frosted Glass */
+.lp-btn-cta-outline {
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: #FFFFFF !important;
+    font-size: 14.5px;
+    font-weight: 500;
+    padding: 13px 26px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transition: all 0.25s ease;
+}
+
+.lp-btn-cta-outline:hover {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.32);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+    color: #FFFFFF !important;
+}
+
+/* Panel Informasi Pendukung dengan Subtle Glassmorphism */
+.lp-hero-glass-panel {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 50px;
+    padding: 10px 24px;
+    margin-top: 36px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.16);
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.25s ease;
+}
+
+.lp-hero-glass-panel:hover {
+    background: rgba(255, 255, 255, 0.13);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.lp-hero-glass-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.lp-hero-glass-divider {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+@media (max-width: 767.98px) {
+    .lp-hero-glass-panel {
+        border-radius: 16px;
+        flex-direction: column;
+        gap: 10px;
+        padding: 14px 20px;
+        width: 100%;
+        max-width: 380px;
+    }
+    .lp-hero-glass-divider {
+        display: none;
+    }
+}
+
+.lp-search-card-title {
+    font-size: 15.5px;
+    font-weight: 700;
+    color: var(--lp-text-dark);
+    margin-bottom: 2px;
+}
+
+.lp-search-card-sub {
+    font-size: 12px;
+    color: var(--lp-text-muted);
+    margin-bottom: 16px;
+}
+
+.lp-search-input-wrap {
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: 14px;
+    padding: 5px 6px 5px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s ease;
+}
+
+.lp-search-input-wrap:focus-within {
+    border-color: var(--lp-blue-primary);
+    box-shadow: 0 0 0 3px rgba(30, 96, 236, 0.14);
+}
+
+.lp-search-input {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    font-size: 13.5px;
+    color: var(--lp-text-dark);
+    width: 100%;
+    background: transparent;
+    padding: 8px 0;
+}
+
+.lp-search-input::placeholder {
+    color: #94A3B8;
+    font-size: 12.5px;
+}
+
+.lp-btn-search {
+    background-color: var(--lp-blue-primary);
+    color: #FFFFFF;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 22px;
+    border-radius: 10px;
+    white-space: nowrap;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.lp-btn-search:hover {
+    background-color: var(--lp-blue-hover);
+}
+
+/* STATISTIK RINGKAS */
+.lp-stat-section {
+    position: relative;
+    z-index: 10;
+    margin-top: -46px;
+}
+
+.lp-stat-card {
+    background: #FFFFFF;
+    border-radius: 18px;
+    padding: 20px 22px;
+    box-shadow: 0 12px 30px rgba(15, 35, 66, 0.08);
+    border: 1px solid var(--lp-border-subtle);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 100%;
+    transition: all 0.25s ease;
+}
+
+.lp-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 36px rgba(15, 35, 66, 0.12);
+}
+
+.lp-stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.lp-stat-num {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--lp-text-dark);
+    line-height: 1.1;
+}
+
+.lp-stat-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--lp-text-muted);
+    margin-top: 3px;
+}
+
+/* SECTION HEADERS */
+.lp-section-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--lp-blue-light);
+    color: var(--lp-blue-primary);
+    border: 1px solid #BFDBFE;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    border-radius: 50px;
+    padding: 5px 14px;
+    margin-bottom: 12px;
+}
+
+.lp-section-title {
+    font-size: clamp(1.7rem, 2.6vw, 2.2rem);
+    font-weight: 800;
+    color: var(--lp-text-dark);
+    letter-spacing: -0.4px;
+    line-height: 1.25;
+}
+
+.lp-section-sub {
+    font-size: 14px;
+    color: var(--lp-text-muted);
+    max-width: 660px;
+    margin: 8px auto 0;
+    line-height: 1.6;
+}
+
+/* 5 TAHAPAN ALUR KERJA */
+.lp-step-col {
+    display: flex;
+}
+
+.lp-step-card-modern {
+    background: #FFFFFF;
+    border: 1px solid var(--lp-border-subtle);
+    border-radius: 18px;
+    padding: 22px 18px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.25s ease;
+    position: relative;
+    width: 100%;
+}
+
+.lp-step-card-modern:hover {
+    transform: translateY(-4px);
+    border-color: #93C5FD;
+    box-shadow: 0 14px 30px rgba(30, 96, 236, 0.08);
+}
+
+.lp-step-card-final {
+    border: 1.5px solid #FDE68A !important;
+    background: #FFFDF7 !important;
+}
+
+.lp-step-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.lp-step-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--lp-blue-light);
+    color: var(--lp-blue-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.lp-step-icon-final {
+    background: #FEF3C7 !important;
+    color: #D97706 !important;
+}
+
+.lp-step-watermark-num {
+    font-size: 26px;
+    font-weight: 800;
+    color: #E2E8F0;
+    line-height: 1;
+}
+
+.lp-step-watermark-num-final {
+    color: #FCD34D !important;
+}
+
+.lp-step-tag {
+    font-size: 9.5px;
+    font-weight: 700;
+    color: var(--lp-blue-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 6px;
+}
+
+.lp-step-tag-final {
+    color: #D97706 !important;
+}
+
+.lp-step-title {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--lp-text-dark);
+    margin-bottom: 8px;
+    letter-spacing: -0.2px;
+}
+
+.lp-step-desc {
+    font-size: 12.5px;
+    color: var(--lp-text-muted);
+    line-height: 1.6;
+    margin-bottom: 16px;
+}
+
+.lp-step-authority {
+    font-size: 11px;
+    color: #64748B;
+    background: #F8FAFC;
+    border: 1px solid #EEF2F6;
+    border-radius: 8px;
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.lp-step-authority-final {
+    background: #FEF3C7 !important;
+    color: #92400E !important;
+    border-color: #FDE68A !important;
+}
+
+/* PERAN DAN PENGGUNA */
+.lp-role-card {
+    background: #FFFFFF;
+    border: 1px solid var(--lp-border-subtle);
+    border-radius: 20px;
+    padding: 26px 26px;
+    height: 100%;
+    box-shadow: 0 4px 16px rgba(11, 21, 40, 0.03);
+    transition: all 0.25s ease;
+}
+
+.lp-role-card:hover {
+    border-color: #BFDBFE;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(30, 96, 236, 0.08);
+}
+
+.lp-role-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+.lp-role-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: var(--lp-blue-light);
+    color: var(--lp-blue-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.lp-role-badge {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #1E60EC;
+    background: #EFF6FF;
+    border: 1px solid #DBEAFE;
+    border-radius: 50px;
+    padding: 4px 12px;
+    display: inline-block;
+}
+
+.lp-role-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--lp-text-dark);
+    margin-bottom: 6px;
+}
+
+.lp-role-desc {
+    font-size: 13.5px;
+    color: var(--lp-text-muted);
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+/* TATA KELOLA TERSTANDAR (DARK NAVY CONTAINER) */
+.lp-governance-box {
+    background: var(--lp-navy-dark);
+    border-radius: 26px;
+    padding: 56px 44px;
+    color: #FFFFFF;
+    box-shadow: 0 20px 50px rgba(11, 25, 48, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.lp-gov-pill {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #93C5FD;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 5px 16px;
+    border-radius: 50px;
+    display: inline-flex;
+    margin-bottom: 18px;
+}
+
+.lp-gov-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 22px 18px;
+    text-align: left;
+    height: 100%;
+    transition: all 0.2s ease;
+}
+
+.lp-gov-card:hover {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+}
+
+.lp-gov-card-icon {
+    font-size: 22px;
+    color: var(--lp-blue-accent);
+    margin-bottom: 12px;
+}
+
+.lp-gov-card-title {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 6px;
+}
+
+.lp-gov-card-desc {
+    font-size: 12px;
+    color: #94A3B8;
+    line-height: 1.55;
+    margin-bottom: 0;
+}
+
+/* PUSAT ASISTENSI & BANTUAN */
+.lp-helpdesk-card {
+    background: #FFFFFF;
+    border: 1px solid var(--lp-border-subtle);
+    border-radius: 20px;
+    padding: 28px 36px;
+    box-shadow: 0 6px 20px rgba(11, 25, 48, 0.03);
+}
+
+.lp-btn-doc {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--lp-text-dark);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.lp-btn-doc:hover {
+    background: #F1F5F9;
+    border-color: #CBD5E1;
+    color: var(--lp-blue-primary);
+}
+
+.lp-btn-helpdesk {
+    background: var(--lp-green-dark);
+    color: #FFFFFF !important;
+    border-radius: 12px;
+    padding: 10px 22px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(5, 150, 105, 0.25);
+    border: none;
+}
+
+.lp-btn-helpdesk:hover {
+    background: #047857;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(5, 150, 105, 0.35);
+}
+
+/* CARI ARSIP RESULT CARDS */
+.lp-archive-result-card {
+    background: #FFFFFF;
+    border: 1px solid var(--lp-border-subtle);
+    border-radius: 16px;
+    padding: 20px 22px;
+    margin-bottom: 14px;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(11, 21, 40, 0.03);
+    text-align: left;
+}
+
+.lp-archive-result-card:hover {
+    border-color: #93C5FD;
+    box-shadow: 0 8px 24px rgba(30, 96, 236, 0.08);
+}
+
+.lp-badge-public {
+    background: #ECFDF5;
+    color: #065F46;
+    border: 1px solid #A7F3D0;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 50px;
+}
+
+.lp-badge-internal {
+    background: #FEF3C7;
+    color: #92400E;
+    border: 1px solid #FDE68A;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 50px;
+}
+
+/* FOOTER */
+.lp-footer-section {
+    background: var(--lp-navy-deep);
+    color: var(--lp-text-light);
+    padding: 64px 0 28px;
+}
+
+.lp-footer-partner-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s ease;
+}
+
+.lp-footer-partner-card:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* RESPONSIVE TWEAKS */
+@media (max-width: 991.98px) {
+    .lp-governance-box {
+        padding: 40px 24px;
+    }
+    .lp-stat-section {
+        margin-top: -30px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .lp-hero-section {
+        padding: 60px 0 90px;
+    }
+    .lp-hero-search-card {
+        padding: 18px 18px;
+    }
+    .lp-search-input-wrap {
+        flex-direction: column;
+        gap: 8px;
+        padding: 10px;
+    }
+    .lp-btn-search {
+        width: 100%;
+        justify-content: center;
+    }
+}
