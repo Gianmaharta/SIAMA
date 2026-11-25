@@ -271,12 +271,16 @@ Reset &amp; Data Cleansing - SIAMA
                         <span class="cl-danger-accent" aria-hidden="true"></span>
                         <h2 class="h6 fw-bold text-danger mb-0">Prosedur &amp; Konfirmasi Keamanan</h2>
                     </div>
-                    <ul class="text-secondary small ps-3 mb-4" style="line-height: 1.75;">
+                    <ul class="text-secondary small ps-3 mb-3" style="line-height: 1.75;">
                         <li><strong>Backup Otomatis:</strong> Sistem akan membuat dump database dan duplikat file storage di folder <code>backups/</code> sebelum proses pembersihan dimulai.</li>
                         <li><strong>Integritas Database:</strong> Struktur tabel, kolom, view, index, dan foreign key <strong>tidak akan dihapus/diubah</strong>.</li>
                         <li><strong>Master Data Terjaga:</strong> Seluruh OPD (<?= $summary['masters']['opd'] ?>), Bidang (3), Klasifikasi (<?= $summary['masters']['kode_klasifikasi'] ?>), Role (5), dan akun Admin Pemkab tetap utuh.</li>
                         <li><strong>Transaksi Aman:</strong> Operasi database dijalankan dalam transaksi dan dapat dibatalkan jika terjadi error.</li>
                     </ul>
+
+                    <div class="alert alert-danger border-danger border-opacity-25 rounded-3 py-2 px-3 mb-3 small" role="alert" style="line-height: 1.6;">
+                        <strong>Peringatan:</strong> Seluruh data operasional (SPT, arsip, berita acara, notifikasi, log aktivitas, dan file PDF terkait) akan <strong>dihapus permanen dan hilang</strong> dari sistem setelah reset dijalankan.
+                    </div>
 
                     <form action="<?= base_url('/system-cleanse/execute') ?>" method="post"
                           data-swal-confirm="PERINGATAN KEAMANAN: Seluruh data operasional (SPT, Penugasan, Berita Acara, Pengesahan, Log Aktivitas, dan Notifikasi) akan dibersihkan secara permanen setelah cadangan otomatis disimpan. Apakah Anda yakin ingin melanjutkan?"
