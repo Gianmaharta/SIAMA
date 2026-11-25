@@ -402,9 +402,13 @@ $workflowList = $workflow_kabid_list ?? [];
                                         <?php endif; ?>
                                     </td>
                                     <td class="col-wf-aksi text-center">
-                                        <a href="<?= base_url('/spt/detail/' . $wf['id_spt']) ?>" class="btn-wf-detail" title="Lihat Detail SPT &amp; Penugasan">
+                                        <a href="<?= base_url('/spt/detail/' . $wf['id_spt']) ?>"
+                                           class="siama-aksi-btn siama-aksi-btn-detail"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top"
+                                           data-bs-title="Lihat Detail"
+                                           aria-label="Lihat Detail">
                                             <i class="bi bi-eye"></i>
-                                            <span>Detail</span>
                                         </a>
                                     </td>
                                 </tr>
@@ -466,8 +470,13 @@ $workflowList = $workflow_kabid_list ?? [];
                                                 </span>
                                             </td>
                                             <td class="text-center">
-                                                <a href="<?= base_url('/berita-acara/detail/' . $row['id_berita_acara']) ?>" class="btn btn-sm btn-outline-primary py-1 px-2" style="font-size: 12px; border-radius: 6px;">
-                                                    <i class="bi bi-eye"></i> Detail
+                                                <a href="<?= base_url('/berita-acara/detail/' . $row['id_berita_acara']) ?>"
+                                                   class="siama-aksi-btn siama-aksi-btn-detail"
+                                                   data-bs-toggle="tooltip"
+                                                   data-bs-placement="top"
+                                                   data-bs-title="Lihat Detail"
+                                                   aria-label="Lihat Detail">
+                                                    <i class="bi bi-eye"></i>
                                                 </a>
                                             </td>
                                         </tr>

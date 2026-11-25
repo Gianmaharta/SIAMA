@@ -402,9 +402,13 @@
                                     <?php endif; ?>
                                 </td>
                                 <td class="col-wf-aksi text-center">
-                                    <a href="<?= base_url('/spt/detail/' . $wf['id_spt']) ?>" class="btn-wf-detail" title="Lihat Detail SPT &amp; Workflow">
+                                    <a href="<?= base_url('/spt/detail/' . $wf['id_spt']) ?>"
+                                       class="siama-aksi-btn siama-aksi-btn-detail"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       data-bs-title="Lihat Detail"
+                                       aria-label="Lihat Detail">
                                         <i class="bi bi-eye"></i>
-                                        <span>Detail</span>
                                     </a>
                                 </td>
                             </tr>
@@ -507,8 +511,13 @@
                                     <?php endif; ?>
                                 </td>
                                 <td class="pe-4 text-center">
-                                    <a href="<?= base_url('/arsip/detail/' . $a['id_arsip']) ?>" class="btn-wf-detail" title="Detail Arsip">
-                                        <i class="bi bi-eye"></i> Detail
+                                    <a href="<?= base_url('/arsip/detail/' . $a['id_arsip']) ?>"
+                                       class="siama-aksi-btn siama-aksi-btn-detail"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       data-bs-title="Lihat Detail"
+                                       aria-label="Lihat Detail">
+                                        <i class="bi bi-eye"></i>
                                     </a>
                                 </td>
                             </tr>

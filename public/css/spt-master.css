@@ -410,7 +410,7 @@
 }
 
 .spt-table .col-aksi {
-    min-width: 180px;
+    min-width: 130px;
     text-align: center;
     white-space: nowrap;
     padding-right: 24px;
@@ -420,15 +420,14 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    row-gap: 8px;
-    flex-wrap: wrap;
+    gap: 6px;
+    flex-wrap: nowrap;
 }
 
 .spt-action-btn {
-    height: 30px;
+    height: 32px;
     padding: 0 10px;
-    border-radius: 6px;
+    border-radius: 8px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -442,8 +441,14 @@
     white-space: nowrap;
 }
 
+.spt-action-btn.spt-icon-only {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+}
+
 .spt-action-btn i {
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1;
 }
 

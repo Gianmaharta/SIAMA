@@ -170,12 +170,14 @@ Reset &amp; Data Cleansing - SIAMA
                                         </td>
                                         <td class="text-secondary"><?= esc($bk['size_formatted']) ?></td>
                                         <td class="text-end pe-4">
-                                            <div class="d-inline-flex align-items-center gap-2">
+                                            <div class="siama-aksi-group">
                                                 <a href="<?= base_url('/system-cleanse/backup-download/' . $bk['folder']) ?>"
-                                                   class="btn btn-sm btn-outline-primary rounded-2 d-inline-flex align-items-center gap-1 px-2.5"
-                                                   style="font-size: 12px;">
+                                                   class="siama-aksi-btn siama-aksi-btn-primary"
+                                                   data-bs-toggle="tooltip"
+                                                   data-bs-placement="top"
+                                                   data-bs-title="Unduh"
+                                                   aria-label="Unduh">
                                                     <i class="bi bi-download"></i>
-                                                    <span>Unduh</span>
                                                 </a>
                                                 <form action="<?= base_url('/system-cleanse/backup-delete/' . $bk['folder']) ?>"
                                                       method="post"
@@ -186,10 +188,12 @@ Reset &amp; Data Cleansing - SIAMA
                                                       data-swal-btn="Iya">
                                                     <?= csrf_field() ?>
                                                     <button type="submit"
-                                                            class="btn btn-sm btn-outline-danger rounded-2 d-inline-flex align-items-center gap-1 px-2.5"
-                                                            style="font-size: 12px;">
+                                                            class="siama-aksi-btn siama-aksi-btn-danger"
+                                                            data-bs-toggle="tooltip"
+                                                            data-bs-placement="top"
+                                                            data-bs-title="Hapus Data"
+                                                            aria-label="Hapus Data">
                                                         <i class="bi bi-trash"></i>
-                                                        <span>Hapus</span>
                                                     </button>
                                                 </form>
                                             </div>

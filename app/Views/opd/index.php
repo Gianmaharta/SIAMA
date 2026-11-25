@@ -595,27 +595,32 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td class="col-status">${statusBadge}</td>
                     <td class="col-aksi">
                         <div class="opd-action-group">
-                            <button 
-                                type="button" 
-                                class="opd-action-btn btn-action-edit btn-edit-opd" 
-                                data-bs-toggle="modal"
-                                data-bs-target="#modalEditOpd"
-                                data-id="${safeId}"
-                                data-kode="${safeKode}"
-                                data-nama="${safeNama}"
-                                data-kuota="${kuota}"
-                                data-active="${isActive ? '1' : '0'}"
-                                title="Edit Data OPD"
-                            >
-                                <i class="bi bi-pencil-square"></i>
-                            </button>
+                            <span class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit Data">
+                                <button 
+                                    type="button" 
+                                    class="opd-action-btn btn-action-edit btn-edit-opd" 
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modalEditOpd"
+                                    data-id="${safeId}"
+                                    data-kode="${safeKode}"
+                                    data-nama="${safeNama}"
+                                    data-kuota="${kuota}"
+                                    data-active="${isActive ? '1' : '0'}"
+                                    aria-label="Edit Data"
+                                >
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                            </span>
                             <button 
                                 type="button" 
                                 class="opd-action-btn btn-action-delete btn-delete-opd" 
                                 data-id="${safeId}"
                                 data-kode="${safeKode}"
                                 data-nama="${safeNama}"
-                                title="Hapus Data OPD"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                data-bs-title="Hapus Data"
+                                aria-label="Hapus Data"
                             >
                                 <i class="bi bi-trash"></i>
                             </button>

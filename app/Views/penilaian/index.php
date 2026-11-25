@@ -338,18 +338,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (st === 'belum dinilai' || st === '') {
             return `
-                <a href="${formUrl}" class="btn-beri-penilaian" title="Beri Penilaian untuk Arsip ini">
-                    Beri Penilaian
-                </a>
+                <div class="penilaian-action-stack">
+                    <a href="${formUrl}"
+                       class="btn-beri-penilaian"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       data-bs-title="Beri Penilaian Arsip"
+                       aria-label="Beri Penilaian Arsip">
+                        <i class="bi bi-clipboard-check"></i>
+                    </a>
+                </div>
             `;
         } else {
             return `
                 <div class="penilaian-action-stack">
-                    <a href="${detailUrl}" class="btn-detail-penilaian" title="Lihat Hasil Penilaian">
-                        Detail
+                    <a href="${detailUrl}"
+                       class="btn-detail-penilaian"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       data-bs-title="Lihat Detail Arsip"
+                       aria-label="Lihat Detail Arsip">
+                        <i class="bi bi-eye"></i>
                     </a>
-                    <a href="${formUrl}" class="btn-edit-penilaian" title="Ubah Penilaian">
-                        <i class="bi bi-pencil-square"></i> Edit
+                    <a href="${formUrl}"
+                       class="btn-edit-penilaian"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       data-bs-title="Edit Penilaian Arsip"
+                       aria-label="Edit Penilaian Arsip">
+                        <i class="bi bi-pencil-square"></i>
                     </a>
                 </div>
             `;
@@ -494,6 +511,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Render Navigasi Pagination
         renderPagination(totalPages);
+
+        // Inisialisasi ulang Bootstrap 5 Tooltip pada baris tabel dinamis
+        initPenilaianActionTooltips();
+    }
+
+    /**
+     * Inisialisasi Bootstrap 5 Tooltip untuk tombol kolom AKSI
+     */
+    function initPenilaianActionTooltips() {
+        if (typeof bootstrap === 'undefined' || !bootstrap.Tooltip) return;
+        document.querySelectorAll('.tooltip.bs-tooltip-auto, .tooltip.bs-tooltip-top').forEach(t => t.remove());
+        const triggers = tableBody.querySelectorAll('[data-bs-toggle="tooltip"]');
+        triggers.forEach(el => {
+            const existing = bootstrap.Tooltip.getInstance(el);
+            if (existing) existing.dispose();
+            new bootstrap.Tooltip(el, {
+                container: 'body',
+                boundary: 'window',
+                trigger: 'hover focus'
+            });
+        });
     }
 
     /**

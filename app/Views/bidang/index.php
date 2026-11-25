@@ -544,26 +544,31 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td class="col-nama-bidang">${safeBidang}</td>
                     <td class="col-aksi">
                         <div class="bidang-action-group">
-                            <button 
-                                type="button" 
-                                class="bidang-action-btn btn-action-edit btn-edit-bidang" 
-                                data-bs-toggle="modal"
-                                data-bs-target="#modalEditBidang"
-                                data-id="${safeId}"
-                                data-opd-id="${opdId}"
-                                data-opd-name="${safeOpd}"
-                                data-bidang="${safeBidang}"
-                                title="Edit Bidang"
-                            >
-                                <i class="bi bi-pencil-square"></i>
-                            </button>
+                            <span class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit Data">
+                                <button 
+                                    type="button" 
+                                    class="bidang-action-btn btn-action-edit btn-edit-bidang" 
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modalEditBidang"
+                                    data-id="${safeId}"
+                                    data-opd-id="${opdId}"
+                                    data-opd-name="${safeOpd}"
+                                    data-bidang="${safeBidang}"
+                                    aria-label="Edit Data"
+                                >
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                            </span>
                             <button 
                                 type="button" 
                                 class="bidang-action-btn btn-action-delete btn-delete-bidang" 
                                 data-id="${safeId}"
                                 data-opd-name="${safeOpd}"
                                 data-bidang="${safeBidang}"
-                                title="Hapus Bidang"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                data-bs-title="Hapus Data"
+                                aria-label="Hapus Data"
                             >
                                 <i class="bi bi-trash"></i>
                             </button>

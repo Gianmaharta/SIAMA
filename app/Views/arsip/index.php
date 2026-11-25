@@ -298,8 +298,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         return `
             <div class="d-inline-flex align-items-center justify-content-center">
-                <a href="${detailUrl}" class="arsip-btn-action-detail" title="Lihat Detail Arsip">
-                    <i class="bi bi-eye"></i> Detail
+                <a href="${detailUrl}"
+                   class="arsip-btn-action-detail"
+                   data-bs-toggle="tooltip"
+                   data-bs-placement="top"
+                   data-bs-title="Lihat Detail"
+                   aria-label="Lihat Detail">
+                    <i class="bi bi-eye"></i>
                 </a>
             </div>
         `;
@@ -483,6 +488,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Render Navigasi Pagination
         renderPagination(totalPages);
+
+        // Inisialisasi ulang Bootstrap 5 Tooltip pada baris tabel dinamis
+        initArsipActionTooltips();
+    }
+
+    /**
+     * Inisialisasi Bootstrap 5 Tooltip untuk tombol Detail kolom AKSI
+     */
+    function initArsipActionTooltips() {
+        if (typeof bootstrap === 'undefined' || !bootstrap.Tooltip) return;
+        document.querySelectorAll('.tooltip.bs-tooltip-auto, .tooltip.bs-tooltip-top').forEach(t => t.remove());
+        const triggers = tableBody.querySelectorAll('[data-bs-toggle="tooltip"]');
+        triggers.forEach(el => {
+            const existing = bootstrap.Tooltip.getInstance(el);
+            if (existing) existing.dispose();
+            new bootstrap.Tooltip(el, {
+                container: 'body',
+                boundary: 'window',
+                trigger: 'hover focus'
+            });
+        });
     }
 
     /**

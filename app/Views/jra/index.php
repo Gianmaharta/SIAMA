@@ -676,7 +676,8 @@ document.addEventListener('DOMContentLoaded', function() {
                    <button type="button" class="jra-action-btn btn-action-disabled" disabled style="width:34px;height:34px;padding:0;justify-content:center;" data-bs-toggle="tooltip" title="Data JRA dengan status Musnah tidak dapat dihapus" aria-label="Hapus dinonaktifkan (Status Musnah)">
                         <i class="bi bi-trash"></i>
                    </button>`
-                : `<button type="button" class="jra-action-btn btn-action-edit" style="width:34px;height:34px;padding:0;justify-content:center;" title="Edit JRA"
+                : `<span class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit Data">
+                    <button type="button" class="jra-action-btn btn-action-edit" style="width:34px;height:34px;padding:0;justify-content:center;" aria-label="Edit Data"
                         data-bs-toggle="modal" data-bs-target="#modalEditJra"
                         data-id="${escHtml(row.id_jra)}"
                         data-kode="${escHtml(kode)}"
@@ -692,7 +693,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         data-unit-pengolah="${escHtml(unitPengolah)}">
                         <i class="bi bi-pencil-square"></i>
                    </button>
-                   <button type="button" class="jra-action-btn btn-action-delete" style="width:34px;height:34px;padding:0;justify-content:center;" title="Hapus JRA"
+                   </span>
+                   <button type="button" class="jra-action-btn btn-action-delete" style="width:34px;height:34px;padding:0;justify-content:center;" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Hapus Data" aria-label="Hapus Data"
                         data-id="${escHtml(row.id_jra)}"
                         data-kode="${escHtml(kodeText)}"
                         data-keterangan="${escHtml(keterangan)}">

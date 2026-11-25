@@ -119,12 +119,22 @@ $statusData = $status_arsip_arsiparis ?? [
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <div class="d-inline-flex align-items-center gap-2 flex-wrap justify-content-center table-action-group" style="gap: 8px; row-gap: 8px;">
-                                        <a href="<?= base_url('/arsip/create?id_spt=' . $spt['id_spt']) ?>" class="btn-action-start" title="Mulai unggah berkas alih media untuk SPT ini">
-                                            <i class="bi bi-folder-plus"></i> Mulai Alih Media
+                                    <div class="siama-aksi-group">
+                                        <a href="<?= base_url('/arsip/create?id_spt=' . $spt['id_spt']) ?>"
+                                           class="siama-aksi-btn siama-aksi-btn-primary"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top"
+                                           data-bs-title="Mulai Alih Media"
+                                           aria-label="Mulai Alih Media">
+                                            <i class="bi bi-folder-plus"></i>
                                         </a>
-                                        <a href="<?= base_url('/spt/detail/' . $spt['id_spt']) ?>" class="btn-action-detail" title="Lihat Informasi Lengkap SPT">
-                                            <i class="bi bi-eye"></i> Detail
+                                        <a href="<?= base_url('/spt/detail/' . $spt['id_spt']) ?>"
+                                           class="siama-aksi-btn siama-aksi-btn-detail"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top"
+                                           data-bs-title="Lihat Detail"
+                                           aria-label="Lihat Detail">
+                                            <i class="bi bi-eye"></i>
                                         </a>
                                     </div>
                                 </td>
@@ -295,13 +305,23 @@ $statusData = $status_arsip_arsiparis ?? [
                                     ?>
                                 </td>
                                 <td class="text-center">
-                                    <div class="d-inline-flex align-items-center gap-2 flex-wrap justify-content-center" style="gap: 8px; row-gap: 8px;">
-                                        <a href="<?= base_url('/arsip/detail/' . $rowArsip['id_arsip']) ?>" class="btn-action-detail" title="Lihat Rincian Arsip">
-                                            <i class="bi bi-eye"></i> Detail
+                                    <div class="siama-aksi-group">
+                                        <a href="<?= base_url('/arsip/detail/' . $rowArsip['id_arsip']) ?>"
+                                           class="siama-aksi-btn siama-aksi-btn-detail"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top"
+                                           data-bs-title="Lihat Detail"
+                                           aria-label="Lihat Detail">
+                                            <i class="bi bi-eye"></i>
                                         </a>
                                         <?php if (in_array($stLabel, ['Draft', 'Revisi', 'Ditolak'])) : ?>
-                                            <a href="<?= base_url('/arsip/edit/' . $rowArsip['id_arsip']) ?>" class="btn-action-edit" title="Edit / Perbaiki Berkas">
-                                                <i class="bi bi-pencil"></i>
+                                            <a href="<?= base_url('/arsip/edit/' . $rowArsip['id_arsip']) ?>"
+                                               class="siama-aksi-btn siama-aksi-btn-primary"
+                                               data-bs-toggle="tooltip"
+                                               data-bs-placement="top"
+                                               data-bs-title="Edit Data"
+                                               aria-label="Edit Data">
+                                                <i class="bi bi-pencil-square"></i>
                                             </a>
                                         <?php endif; ?>
                                     </div>
@@ -470,8 +490,13 @@ $statusData = $status_arsip_arsiparis ?? [
                                             <?php endif; ?>
                                         </td>
                                         <td class="text-center">
-                                            <a href="<?= base_url('/berita-acara/detail/' . $ba['id_berita_acara']) ?>" class="btn-action-detail" title="Lihat Rincian Berita Acara">
-                                                <i class="bi bi-eye"></i> Detail
+                                            <a href="<?= base_url('/berita-acara/detail/' . $ba['id_berita_acara']) ?>"
+                                               class="siama-aksi-btn siama-aksi-btn-detail"
+                                               data-bs-toggle="tooltip"
+                                               data-bs-placement="top"
+                                               data-bs-title="Lihat Detail"
+                                               aria-label="Lihat Detail">
+                                                <i class="bi bi-eye"></i>
                                             </a>
                                         </td>
                                     </tr>

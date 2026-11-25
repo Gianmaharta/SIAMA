@@ -146,24 +146,37 @@ Daftar Berita Acara - SIAMA
                                 </span>
                             </td>
                             <td class="text-center">
-                                <div class="ba-action-group justify-content-center">
-                                    <a href="<?= base_url('/berita-acara/detail/' . $row['id_berita_acara']) ?>" class="btn-ba-action btn-ba-detail" title="Lihat Detail Berita Acara">
-                                        <i class="bi bi-file-earmark-text"></i>
-                                        <span>Detail</span>
+                                <div class="siama-aksi-group">
+                                    <a href="<?= base_url('/berita-acara/detail/' . $row['id_berita_acara']) ?>"
+                                       class="siama-aksi-btn siama-aksi-btn-detail"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       data-bs-title="Lihat Detail"
+                                       aria-label="Lihat Detail">
+                                        <i class="bi bi-eye"></i>
                                     </a>
                                     <?php 
                                         $userRole = session()->get('nama_role') ?? session()->get('role');
                                         if (in_array($rawStatus, ['Draf_Kabid', 'Revisi']) && $userRole === 'Arsiparis') : 
                                     ?>
-                                        <a href="<?= base_url('/berita-acara/edit/' . $row['id_berita_acara']) ?>" class="btn-ba-action btn-ba-edit" title="Edit Draf Berita Acara">
+                                        <a href="<?= base_url('/berita-acara/edit/' . $row['id_berita_acara']) ?>"
+                                           class="siama-aksi-btn siama-aksi-btn-primary"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top"
+                                           data-bs-title="Edit Data"
+                                           aria-label="Edit Data">
                                             <i class="bi bi-pencil-square"></i>
-                                            <span>Edit</span>
                                         </a>
                                     <?php endif; ?>
                                     <?php if ($rawStatus === 'Selesai' || $rawStatus === 'Draf_Pimpinan' || $rawStatus === 'Draf_Kabid') : ?>
-                                        <a href="<?= base_url('/berita-acara/cetak/' . $row['id_berita_acara']) ?>" target="_blank" class="btn-ba-action btn-ba-print" title="Cetak Berita Acara (PDF)">
+                                        <a href="<?= base_url('/berita-acara/cetak/' . $row['id_berita_acara']) ?>"
+                                           target="_blank"
+                                           class="siama-aksi-btn siama-aksi-btn-neutral"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top"
+                                           data-bs-title="Cetak"
+                                           aria-label="Cetak">
                                             <i class="bi bi-printer"></i>
-                                            <span>Cetak</span>
                                         </a>
                                     <?php endif; ?>
                                 </div>

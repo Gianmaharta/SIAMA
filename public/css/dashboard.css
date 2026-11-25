@@ -2091,5 +2091,585 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     color: #475569;
 }
 
+/* ====================================================================== */
+/* GLOBAL ICON-ONLY ACTION BUTTONS & BOOTSTRAP 5 TOOLTIP STYLING          */
+/* ====================================================================== */
+.siama-aksi-group {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: nowrap;
+}
+
+.siama-aksi-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: all 0.18s ease;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.siama-aksi-btn-detail {
+    background-color: #F8FAFC;
+    color: #475569;
+    border-color: #E2E8F0;
+}
+.siama-aksi-btn-detail:hover {
+    background-color: #334155;
+    color: #FFFFFF;
+    border-color: #334155;
+}
+
+.siama-aksi-btn-primary {
+    background-color: #EFF6FF;
+    color: #1E60EC;
+    border-color: #BFDBFE;
+}
+.siama-aksi-btn-primary:hover {
+    background-color: #1E60EC;
+    color: #FFFFFF;
+    border-color: #1E60EC;
+}
+
+.siama-aksi-btn-navy {
+    background-color: #0B1528;
+    color: #FFFFFF;
+    border-color: #0B1528;
+}
+.siama-aksi-btn-navy:hover {
+    background-color: #1E3A8A;
+    color: #FFFFFF;
+    border-color: #1E3A8A;
+}
+
+.siama-aksi-btn-danger {
+    background-color: #FEF2F2;
+    color: #DC2626;
+    border-color: #FEE2E2;
+}
+.siama-aksi-btn-danger:hover {
+    background-color: #DC2626;
+    color: #FFFFFF;
+    border-color: #DC2626;
+}
+
+.siama-aksi-btn-neutral {
+    background-color: #FFFFFF;
+    color: #475569;
+    border-color: #CBD5E1;
+}
+.siama-aksi-btn-neutral:hover {
+    background-color: #F1F5F9;
+    color: #0B1528;
+    border-color: #94A3B8;
+}
+
+/* Bootstrap 5 Tooltip clean enterprise look */
+.tooltip {
+    z-index: 9999 !important;
+    font-family: var(--font-poppins);
+}
+.tooltip .tooltip-inner {
+    font-size: 11.5px;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 6px;
+    background-color: #0B1528;
+    box-shadow: 0 4px 12px rgba(11, 21, 40, 0.18);
+}
+.tooltip.bs-tooltip-top .tooltip-arrow::before {
+    border-top-color: #0B1528;
+}
+
+/* ====================================================================== */
+/* GLOBAL DROPDOWN DESIGN SYSTEM (SELECT & BOOTSTRAP DROPDOWN MENU)       */
+/* ====================================================================== */
+body .form-select,
+body .form-select-custom,
+body select.bidang-form-control,
+body .bidang-form-select,
+body select.opd-form-control,
+body .opd-form-select,
+body select.user-form-control,
+body .user-form-select,
+body .ws-select {
+    font-family: var(--font-poppins);
+    font-size: 13px;
+    font-weight: 500;
+    color: #0B1528;
+    background-color: #FFFFFF;
+    border: 1px solid #E5EAF1;
+    border-radius: 8px;
+    height: 40px;
+    min-height: 40px;
+    padding: 8px 36px 8px 13px;
+    line-height: 1.4;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2364748B' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.8' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 11px 8px;
+    cursor: pointer;
+    max-width: 100%;
+    box-sizing: border-box;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+/* Compact Filter & Table Toolbar Selects */
+body .form-select-sm,
+body .dashboard-select,
+body .arsip-filter-select,
+body .spt-filter-select,
+body .penilaian-filter-select,
+body .opd-select-control,
+body .user-select-control,
+body .acc-select,
+body .act-select,
+body .jra-filter-select {
+    font-family: var(--font-poppins);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: #0B1528;
+    background-color: #FFFFFF;
+    border: 1px solid #E5EAF1;
+    border-radius: 8px;
+    height: 38px;
+    min-height: 38px;
+    padding: 6px 32px 6px 12px;
+    line-height: 1.35;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2364748B' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.8' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 11px center;
+    background-size: 10px 7px;
+    cursor: pointer;
+    max-width: 100%;
+    box-sizing: border-box;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+body .dashboard-select.has-left-icon {
+    padding-left: 32px;
+}
+
+body .arsip-select-per-page,
+body .spt-select-per-page,
+body .penilaian-select-per-page,
+body .opd-select-per-page,
+body .user-select-per-page {
+    min-width: 74px;
+    padding-right: 28px;
+}
+
+/* Hover, Focus & Disabled States */
+body .form-select:hover:not(:disabled),
+body .form-select-custom:hover:not(:disabled),
+body select.bidang-form-control:hover:not(:disabled),
+body .bidang-form-select:hover:not(:disabled),
+body select.opd-form-control:hover:not(:disabled),
+body .opd-form-select:hover:not(:disabled),
+body select.user-form-control:hover:not(:disabled),
+body .user-form-select:hover:not(:disabled),
+body .ws-select:hover:not(:disabled),
+body .dashboard-select:hover:not(:disabled),
+body .arsip-filter-select:hover:not(:disabled),
+body .spt-filter-select:hover:not(:disabled),
+body .penilaian-filter-select:hover:not(:disabled),
+body .opd-select-control:hover:not(:disabled),
+body .user-select-control:hover:not(:disabled),
+body .acc-select:hover:not(:disabled),
+body .act-select:hover:not(:disabled),
+body .jra-filter-select:hover:not(:disabled) {
+    border-color: #CBD5E1;
+}
+
+body .form-select:focus,
+body .form-select-custom:focus,
+body select.bidang-form-control:focus,
+body .bidang-form-select:focus,
+body select.opd-form-control:focus,
+body .opd-form-select:focus,
+body select.user-form-control:focus,
+body .user-form-select:focus,
+body .ws-select:focus,
+body .dashboard-select:focus,
+body .arsip-filter-select:focus,
+body .spt-filter-select:focus,
+body .penilaian-filter-select:focus,
+body .opd-select-control:focus,
+body .user-select-control:focus,
+body .acc-select:focus,
+body .act-select:focus,
+body .jra-filter-select:focus {
+    border-color: #1E60EC;
+    box-shadow: 0 0 0 3px rgba(30, 96, 236, 0.12);
+    outline: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%231E60EC' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.8' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+
+body .form-select:disabled,
+body .form-select-custom:disabled,
+body select.bidang-form-control:disabled,
+body .bidang-form-select:disabled,
+body select.opd-form-control:disabled,
+body .opd-form-select:disabled,
+body select.user-form-control:disabled,
+body .user-form-select:disabled {
+    background-color: #F8FAFC;
+    color: #94A3B8;
+    cursor: not-allowed;
+    opacity: 0.9;
+}
+
+/* Native Option & Placeholder Styling */
+body select option {
+    font-family: var(--font-poppins);
+    font-size: 13px;
+    color: #0B1528;
+    background-color: #FFFFFF;
+    padding: 8px 12px;
+}
+
+body select option[value=""] {
+    color: #64748B;
+}
+
+/* Bootstrap 5 Dropdown Menu Panels (Custom Searchable, Topbar, Navigation) */
+body .dropdown-menu {
+    font-family: var(--font-poppins);
+    background-color: #FFFFFF;
+    border: 1px solid #E5EAF1;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(11, 21, 40, 0.08);
+    padding: 6px;
+    z-index: 1065;
+    max-width: calc(100vw - 24px);
+    box-sizing: border-box;
+}
+
+body .dropdown-menu .dropdown-item {
+    font-size: 13px;
+    color: #0B1528;
+    padding: 7px 12px;
+    border-radius: 6px;
+    line-height: 1.4;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+body .dropdown-menu .dropdown-item:hover,
+body .dropdown-menu .dropdown-item:focus {
+    background-color: #F1F5F9;
+    color: #1E60EC;
+}
+
+body .dropdown-menu .dropdown-item.active,
+body .dropdown-menu .dropdown-item:active {
+    background-color: #EFF6FF;
+    color: #1E60EC;
+    font-weight: 600;
+}
+
+/* Custom Select Dropdowns: Lebar menu selalu identik dengan tombol/input pemicunya */
+body .opd-select-dropdown,
+body .bidang-select-dropdown {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+}
+
+body .dropdown-menu.w-100,
+body .opd-select-dropdown .dropdown-menu,
+body .bidang-select-dropdown .dropdown-menu {
+    top: 100% !important;
+    bottom: auto !important;
+    left: 0 !important;
+    right: 0 !important;
+    transform: none !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    max-height: 280px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin-top: 4px;
+}
+
+body .dropdown-menu.w-100 .dropdown-item,
+body .opd-dropdown-item,
+body .bidang-dropdown-item {
+    width: 100%;
+    max-width: 100%;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    line-height: 1.4;
+    padding: 7px 10px;
+}
+
+@media (max-width: 768px) {
+    body .form-select,
+    body .form-select-custom,
+    body select.bidang-form-control,
+    body .bidang-form-select,
+    body select.opd-form-control,
+    body .opd-form-select,
+    body select.user-form-control,
+    body .user-form-select,
+    body .dashboard-select,
+    body .arsip-filter-select,
+    body .spt-filter-select,
+    body .penilaian-filter-select,
+    body .opd-select-control,
+    body .user-select-control,
+    body .acc-select,
+    body .act-select {
+        max-width: 100%;
+        font-size: 13px;
+    }
+}
+
+/* ====================================================================== */
+/* GLOBAL CUSTOM SELECT (siama-select.js) — EXACT TRIGGER WIDTH MATCHING  */
+/* ====================================================================== */
+.siama-cselect-wrap {
+    position: relative;
+    display: inline-flex;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.siama-cselect-wrap.is-compact {
+    width: auto;
+}
+
+.siama-cselect-wrap.is-per-page {
+    min-width: 74px;
+    width: auto;
+}
+
+.siama-native-select-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+.siama-cselect-trigger {
+    width: 100%;
+    height: 40px;
+    min-height: 40px;
+    background-color: #FFFFFF;
+    border: 1px solid #E5EAF1;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-family: var(--font-poppins);
+    font-size: 13px;
+    font-weight: 500;
+    color: #0B1528;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    text-align: left;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+.siama-cselect-trigger.is-compact {
+    height: 38px;
+    min-height: 38px;
+    padding: 6px 11px;
+    font-size: 12.5px;
+}
+
+.siama-cselect-trigger.has-left-icon {
+    padding-left: 32px;
+}
+
+.siama-cselect-trigger.is-placeholder {
+    color: #64748B;
+    font-weight: 400;
+}
+
+.siama-cselect-trigger:hover:not(:disabled) {
+    border-color: #CBD5E1;
+}
+
+.siama-cselect-trigger:focus,
+.siama-cselect-trigger.is-open {
+    border-color: #1E60EC;
+    box-shadow: 0 0 0 3px rgba(30, 96, 236, 0.12);
+    outline: none;
+}
+
+.siama-cselect-trigger.is-invalid {
+    border-color: #DC4444;
+    box-shadow: 0 0 0 3px rgba(220, 68, 68, 0.12);
+}
+
+.siama-cselect-trigger.is-disabled,
+.siama-cselect-trigger:disabled {
+    background-color: #F8FAFC;
+    color: #94A3B8;
+    cursor: not-allowed;
+}
+
+.siama-cselect-label {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.siama-cselect-chevron {
+    flex-shrink: 0;
+    font-size: 11px;
+    color: #64748B;
+    line-height: 1;
+    transition: transform 0.18s ease, color 0.18s ease;
+}
+
+.siama-cselect-trigger.is-open .siama-cselect-chevron {
+    transform: rotate(180deg);
+    color: #1E60EC;
+}
+
+/* Floating Menu (appended to body, width locked to trigger.getBoundingClientRect().width) */
+.siama-cselect-menu {
+    position: fixed;
+    z-index: 9998;
+    background-color: #FFFFFF;
+    border: 1px solid #E5EAF1;
+    border-radius: 10px;
+    box-shadow: 0 10px 28px rgba(11, 21, 40, 0.12);
+    padding: 6px;
+    box-sizing: border-box;
+    display: none;
+    flex-direction: column;
+    font-family: var(--font-poppins);
+}
+
+.siama-cselect-menu.show {
+    display: flex;
+}
+
+.siama-cselect-search-wrap {
+    padding: 2px 2px 6px 2px;
+    border-bottom: 1px solid #F1F5F9;
+    margin-bottom: 4px;
+}
+
+.siama-cselect-search {
+    height: 34px;
+    font-size: 12.5px;
+    border: 1px solid #E5EAF1;
+    border-radius: 6px;
+    padding: 4px 10px;
+}
+
+.siama-cselect-search:focus {
+    border-color: #1E60EC;
+    box-shadow: 0 0 0 2px rgba(30, 96, 236, 0.12);
+}
+
+.siama-cselect-list {
+    max-height: 240px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.siama-cselect-option {
+    width: 100%;
+    max-width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 11px;
+    font-family: var(--font-poppins);
+    font-size: 13px;
+    font-weight: 400;
+    color: #0B1528;
+    line-height: 1.4;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+    transition: background-color 0.14s ease, color 0.14s ease;
+}
+
+.siama-cselect-option:hover:not(:disabled) {
+    background-color: #F1F5F9;
+    color: #1E60EC;
+}
+
+.siama-cselect-option.is-selected {
+    background-color: #EFF6FF;
+    color: #1E60EC;
+    font-weight: 600;
+}
+
+.siama-cselect-option.is-disabled,
+.siama-cselect-option:disabled {
+    color: #94A3B8;
+    cursor: not-allowed;
+}
+
+.siama-cselect-empty {
+    padding: 12px 10px;
+    text-align: center;
+    font-size: 12.5px;
+    color: #94A3B8;
+}
+
+@media (max-width: 768px) {
+    .siama-cselect-wrap.is-compact {
+        width: 100%;
+    }
+    .siama-cselect-wrap.is-per-page {
+        width: auto;
+    }
+}
+
+
+
+
 
 

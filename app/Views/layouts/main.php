@@ -162,6 +162,10 @@
     </script>
     <!-- Notification System Dynamic Handler -->
     <script src="<?= base_url('js/notification.js') ?>"></script>
+    <!-- Global Bootstrap 5 Tooltip Manager -->
+    <script src="<?= base_url('js/siama-tooltip.js?v=' . (file_exists(FCPATH . 'js/siama-tooltip.js') ? filemtime(FCPATH . 'js/siama-tooltip.js') : time())) ?>"></script>
+    <!-- Global Bootstrap 5 Custom Select Manager -->
+    <script src="<?= base_url('js/siama-select.js?v=' . (file_exists(FCPATH . 'js/siama-select.js') ? filemtime(FCPATH . 'js/siama-select.js') : time())) ?>"></script>
     <!-- SweetAlert2 Library & SIAMA Centralized Notification Handler -->
     <script src="<?= base_url('js/sweetalert2.all.min.js') ?>"></script>
     <script src="<?= base_url('js/siama-swal.js?v=' . (file_exists(FCPATH . 'js/siama-swal.js') ? filemtime(FCPATH . 'js/siama-swal.js') : time())) ?>"></script>

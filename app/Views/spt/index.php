@@ -610,22 +610,39 @@ document.addEventListener('DOMContentLoaded', function() {
                 let actionHtml = `<div class="spt-action-group">`;
                 if (isBelumMulai) {
                     actionHtml += `
-                        <a href="${baseArsipCreateUrl}?id_spt=${encodeURIComponent(row.id_spt)}" class="spt-action-btn spt-btn-assign" style="background-color: #1E60EC; color: #FFFFFF;" title="Mulai Alih Media">
-                            <i class="bi bi-folder-plus"></i> <span>Mulai Alih Media</span>
+                        <a href="${baseArsipCreateUrl}?id_spt=${encodeURIComponent(row.id_spt)}"
+                           class="spt-action-btn spt-btn-assign spt-icon-only"
+                           style="background-color: #1E60EC; color: #FFFFFF;"
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="top"
+                           data-bs-title="Mulai Alih Media"
+                           aria-label="Mulai Alih Media">
+                            <i class="bi bi-folder-plus"></i>
                         </a>
                     `;
                 }
                 actionHtml += `
-                    <a href="${detailUrl}" class="spt-action-btn spt-btn-detail" title="Lihat Detail SPT">
-                        <i class="bi bi-eye"></i> <span>Detail</span>
+                    <a href="${detailUrl}"
+                       class="spt-action-btn spt-btn-detail spt-icon-only"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       data-bs-title="Lihat Detail SPT"
+                       aria-label="Lihat Detail SPT">
+                        <i class="bi bi-eye"></i>
                     </a>
                 `;
                 if (row.file_spt && String(row.file_spt).trim() !== '') {
                     const fileUrl = baseFileUrl + '/' + encodeURIComponent(row.file_spt);
                     const safeNomorSpt = escapeHtml(row.nomor_spt || 'SPT').replace(/'/g, "\\'");
                     actionHtml += `
-                        <button type="button" class="spt-action-btn spt-btn-doc" onclick="viewSptPdf('${safeNomorSpt}', '${fileUrl}')" title="Lihat Dokumen SPT (PDF)">
-                            <i class="bi bi-file-earmark-pdf"></i> <span>Dokumen</span>
+                        <button type="button"
+                                class="spt-action-btn spt-btn-doc spt-icon-only"
+                                onclick="viewSptPdf('${safeNomorSpt}', '${fileUrl}')"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                data-bs-title="Lihat Dokumen SPT"
+                                aria-label="Lihat Dokumen SPT">
+                            <i class="bi bi-file-earmark-pdf"></i>
                         </button>
                     `;
                 }
@@ -672,22 +689,38 @@ document.addEventListener('DOMContentLoaded', function() {
                 let actionHtml = `<div class="spt-action-group">`;
                 if (canAssign && isBelumDitugaskan) {
                     actionHtml += `
-                        <a href="${assignUrl}" class="spt-action-btn spt-btn-assign" title="Tugaskan Arsiparis">
-                            <i class="bi bi-person-plus"></i> <span>Tugaskan</span>
+                        <a href="${assignUrl}"
+                           class="spt-action-btn spt-btn-assign spt-icon-only"
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="top"
+                           data-bs-title="Tugaskan Arsiparis"
+                           aria-label="Tugaskan Arsiparis">
+                            <i class="bi bi-person-plus"></i>
                         </a>
                     `;
                 }
                 actionHtml += `
-                    <a href="${detailUrl}" class="spt-action-btn spt-btn-detail" title="Lihat Detail SPT">
-                        <i class="bi bi-eye"></i> <span>Detail</span>
+                    <a href="${detailUrl}"
+                       class="spt-action-btn spt-btn-detail spt-icon-only"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       data-bs-title="Lihat Detail SPT"
+                       aria-label="Lihat Detail SPT">
+                        <i class="bi bi-eye"></i>
                     </a>
                 `;
                 if (row.file_spt && String(row.file_spt).trim() !== '') {
                     const fileUrl = baseFileUrl + '/' + encodeURIComponent(row.file_spt);
                     const safeNomorSpt = escapeHtml(row.nomor_spt || 'SPT').replace(/'/g, "\\'");
                     actionHtml += `
-                        <button type="button" class="spt-action-btn spt-btn-doc" onclick="viewSptPdf('${safeNomorSpt}', '${fileUrl}')" title="Lihat Dokumen SPT (PDF)">
-                            <i class="bi bi-file-earmark-pdf"></i> <span>Dokumen</span>
+                        <button type="button"
+                                class="spt-action-btn spt-btn-doc spt-icon-only"
+                                onclick="viewSptPdf('${safeNomorSpt}', '${fileUrl}')"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                data-bs-title="Lihat Dokumen SPT"
+                                aria-label="Lihat Dokumen SPT">
+                            <i class="bi bi-file-earmark-pdf"></i>
                         </button>
                     `;
                 }
@@ -734,6 +767,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Render Navigasi Pagination
         renderPagination(totalPages);
+
+        // Inisialisasi ulang Bootstrap 5 Tooltip pada setiap render (termasuk AJAX / filter / pagination)
+        initSptActionTooltips();
+    }
+
+    /**
+     * Inisialisasi Bootstrap 5 Tooltip untuk tombol kolom AKSI
+     * container: 'body' mencegah tooltip terpotong oleh table-responsive overflow
+     */
+    function initSptActionTooltips() {
+        if (typeof bootstrap === 'undefined' || !bootstrap.Tooltip) return;
+        document.querySelectorAll('.tooltip.bs-tooltip-auto, .tooltip.bs-tooltip-top').forEach(t => t.remove());
+        const triggers = tableBody.querySelectorAll('[data-bs-toggle="tooltip"]');
+        triggers.forEach(el => {
+            const existing = bootstrap.Tooltip.getInstance(el);
+            if (existing) existing.dispose();
+            new bootstrap.Tooltip(el, {
+                container: 'body',
+                boundary: 'window',
+                trigger: 'hover focus'
+            });
+        });
     }
 
     /**

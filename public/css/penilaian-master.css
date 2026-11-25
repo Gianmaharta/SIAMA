@@ -543,30 +543,9 @@
     background-color: #94A3B8;
 }
 
-/* Action Buttons */
-.btn-beri-penilaian {
-    background-color: var(--penilaian-navy-btn);
-    color: #FFFFFF;
-    font-size: 13px;
-    font-weight: 500;
-    padding: 7px 18px;
-    border-radius: 8px;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    transition: background-color 0.15s ease, transform 0.15s ease;
-    white-space: nowrap;
-}
-
-.btn-beri-penilaian:hover {
-    background-color: var(--penilaian-navy-btn-hover);
-    color: #FFFFFF;
-}
-
+/* Action Buttons (Seragam 32x32px Icon-Only) */
 .penilaian-action-stack {
-    display: flex;
+    display: inline-flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
@@ -574,49 +553,60 @@
     flex-wrap: nowrap;
 }
 
-.btn-detail-penilaian {
-    padding: 6px 14px;
-    background: #FFFFFF;
-    border: 1px solid #CBD5E1;
-    border-radius: 6px;
-    color: var(--penilaian-navy-btn);
-    font-size: 12.5px;
-    font-weight: 500;
+.btn-beri-penilaian,
+.btn-detail-penilaian,
+.btn-edit-penilaian {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.15s ease;
+    transition: all 0.18s ease;
     white-space: nowrap;
+}
+
+.btn-beri-penilaian {
+    background-color: var(--penilaian-navy-btn);
+    color: #FFFFFF;
+    border: 1px solid var(--penilaian-navy-btn);
+}
+
+.btn-beri-penilaian:hover {
+    background-color: var(--penilaian-navy-btn-hover);
+    border-color: var(--penilaian-navy-btn-hover);
+    color: #FFFFFF;
+    box-shadow: 0 2px 6px rgba(32, 61, 117, 0.25);
+}
+
+.btn-detail-penilaian {
+    background-color: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    color: #475569;
 }
 
 .btn-detail-penilaian:hover {
-    background-color: #F8FAFC;
-    border-color: #94A3B8;
-    color: #0B1528;
+    background-color: #334155;
+    border-color: #334155;
+    color: #FFFFFF;
+    box-shadow: 0 2px 6px rgba(51, 65, 85, 0.2);
 }
 
 .btn-edit-penilaian {
-    padding: 6px 14px;
-    background: #FFFFFF;
+    background-color: #EFF6FF;
     border: 1px solid #BFDBFE;
-    border-radius: 6px;
     color: var(--penilaian-primary-blue);
-    font-size: 12.5px;
-    font-weight: 500;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    transition: all 0.15s ease;
-    white-space: nowrap;
 }
 
 .btn-edit-penilaian:hover {
-    background-color: #EFF6FF;
-    border-color: #93C5FD;
-    color: var(--penilaian-primary-blue-hover);
+    background-color: var(--penilaian-primary-blue);
+    border-color: var(--penilaian-primary-blue);
+    color: #FFFFFF;
+    box-shadow: 0 2px 6px rgba(30, 96, 236, 0.25);
 }
 
 /* Empty State */

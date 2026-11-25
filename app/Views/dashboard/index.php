@@ -174,8 +174,14 @@ Dashboard - SIAMA
                                     </div>
                                 </td>
                                 <td class="text-end">
-                                    <a href="#monitoringWorkflow" class="btn-dashboard-action filter-opd-quick" data-opd-id="<?= esc($item['id_opd']) ?>" title="Pantau Workflow OPD ini">
-                                        <i class="bi bi-diagram-3"></i> Pantau Workflow
+                                    <a href="#monitoringWorkflow"
+                                       class="siama-aksi-btn siama-aksi-btn-primary filter-opd-quick"
+                                       data-opd-id="<?= esc($item['id_opd']) ?>"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       data-bs-title="Pantau Workflow OPD"
+                                       aria-label="Pantau Workflow OPD">
+                                        <i class="bi bi-diagram-3"></i>
                                     </a>
                                 </td>
                             </tr>
@@ -473,9 +479,13 @@ Dashboard - SIAMA
                                     <?php endif; ?>
                                 </td>
                                 <td class="col-wf-aksi text-center">
-                                    <a href="<?= base_url('/spt/detail/' . $wf['id_spt']) ?>" class="btn-wf-detail" title="Lihat Detail SPT &amp; Alur">
+                                    <a href="<?= base_url('/spt/detail/' . $wf['id_spt']) ?>"
+                                       class="siama-aksi-btn siama-aksi-btn-detail"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       data-bs-title="Lihat Detail"
+                                       aria-label="Lihat Detail">
                                         <i class="bi bi-eye"></i>
-                                        <span>Detail</span>
                                     </a>
                                 </td>
                             </tr>

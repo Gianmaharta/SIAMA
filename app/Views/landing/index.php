@@ -76,7 +76,7 @@
                     <?php else : ?>
                         <a href="<?= base_url('/login') ?>" class="lp-btn-login" title="Login ke Dashboard SIAMA">
                             <i class="bi bi-box-arrow-in-right"></i>
-                            <span>Ke Dashboard</span>
+                            <span>Masuk</span>
                         </a>
                     <?php endif; ?>
 
@@ -688,7 +688,7 @@
                             <div class="small text-white-50 mt-1"><?= esc($siteTagline) ?></div>
                         </div>
                     </div>
-                    <p class="small text-white-50 mb-3" style="max-width: 440px; line-height: 1.7;">
+                    <p class="small text-white-50 mb-3" style="max-width: 440px; line-height: 1.7; text-align: justify;">
                         <?= esc($desc) ?>
                     </p>
                     <div class="d-flex align-items-center gap-2">

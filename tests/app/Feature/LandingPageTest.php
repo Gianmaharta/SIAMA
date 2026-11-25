@@ -17,7 +17,7 @@ class LandingPageTest extends CIUnitTestCase
         // 1. Header & Brand (Dynamic sesuai konfigurasi Super Admin)
         $result->assertSee('SIAMA Buleleng');
         $result->assertSee('Sistem Informasi Alih Media Arsip');
-        $result->assertSee('Ke Dashboard');
+        $result->assertSee('Masuk');
 
         // 2. Hero Section (clean & classy dengan heading, deskripsi, dan tombol aksi frosted glass)
         $result->assertSee('Layanan Alih Media Arsip');

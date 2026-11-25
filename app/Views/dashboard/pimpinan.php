@@ -1,7 +1,3 @@
-<!-- ============================================================== -->
-<!-- DASHBOARD KHUSUS PIMPINAN / KEPALA DINAS - SIAMA                -->
-<!-- ============================================================== -->
-
 <link rel="stylesheet" href="<?= base_url('css/pimpinan-dashboard.css?v=' . (file_exists(FCPATH . 'css/pimpinan-dashboard.css') ? filemtime(FCPATH . 'css/pimpinan-dashboard.css') : time())) ?>">
 
 <div class="pimpinan-dashboard">
@@ -149,8 +145,13 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <a href="<?= base_url('/berita-acara/detail/' . $item['id_berita_acara']) ?>" class="btn-pimpinan-action" title="Periksa dan Sahkan Berita Acara">
-                                        <i class="bi bi-pen"></i> Tinjau & Sahkan
+                                    <a href="<?= base_url('/berita-acara/detail/' . $item['id_berita_acara']) ?>"
+                                       class="siama-aksi-btn siama-aksi-btn-navy"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       data-bs-title="Tinjau &amp; Sahkan"
+                                       aria-label="Tinjau &amp; Sahkan">
+                                        <i class="bi bi-pen"></i>
                                     </a>
                                 </td>
                             </tr>
@@ -234,8 +235,13 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <a href="<?= base_url('/spt/detail/' . $spt['id_spt']) ?>" class="btn-pimpinan-detail" title="Lihat Detail SPT">
-                                        <i class="bi bi-eye"></i> Detail
+                                    <a href="<?= base_url('/spt/detail/' . $spt['id_spt']) ?>"
+                                       class="siama-aksi-btn siama-aksi-btn-detail"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       data-bs-title="Lihat Detail"
+                                       aria-label="Lihat Detail">
+                                        <i class="bi bi-eye"></i>
                                     </a>
                                 </td>
                             </tr>
@@ -366,8 +372,13 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <a href="<?= base_url('/berita-acara/detail/' . $ba['id_berita_acara']) ?>" class="btn-pimpinan-detail" title="Lihat Detail Berita Acara">
-                                        <i class="bi bi-eye"></i> Detail
+                                    <a href="<?= base_url('/berita-acara/detail/' . $ba['id_berita_acara']) ?>"
+                                       class="siama-aksi-btn siama-aksi-btn-detail"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       data-bs-title="Lihat Detail"
+                                       aria-label="Lihat Detail">
+                                        <i class="bi bi-eye"></i>
                                     </a>
                                 </td>
                             </tr>
