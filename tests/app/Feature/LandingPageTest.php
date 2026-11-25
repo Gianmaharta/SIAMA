@@ -18,13 +18,12 @@ class LandingPageTest extends CIUnitTestCase
         $result->assertSee('SIAMA Buleleng');
         $result->assertSee('Dinas Kearsipan &amp; Perpustakaan Daerah');
 
-        // 2. Hero Section (dengan subtle glass SPBE badge, buttons, dan info panel)
+        // 2. Hero Section (clean & classy dengan heading, deskripsi, dan tombol aksi frosted glass)
         $result->assertSee('Layanan Alih Media Arsip');
         $result->assertSee('Digital');
-        $result->assertSee('Sistem Pemerintahan Berbasis Elektronik (SPBE)');
         $result->assertSee('Panduan &amp; Regulasi');
-        $result->assertSee('Standar Regulasi ANRI &amp; SPBE');
         $this->assertStringNotContainsString('heroSearchWidget', $result->getBody());
+        $this->assertStringNotContainsString('lp-hero-glass-panel', $result->getBody());
 
         // 3. Workflow 5 Tahapan
         $result->assertSee('5 Tahapan Alih Media Arsip di SIAMA');

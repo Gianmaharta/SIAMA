@@ -88,12 +88,6 @@
         <div class="lp-hero-overlay"></div>
         <div class="container text-center lp-hero-content">
             
-                        <!-- SPBE Pill Badge dengan Subtle Glass Effect -->
-            <div class="lp-pill-badge">
-                <span class="lp-pulse-dot"></span>
-                <span>Sistem Pemerintahan Berbasis Elektronik (SPBE) &bull; Pemkab Buleleng</span>
-            </div>
-
             <!-- Judul Utama -->
             <h1 class="lp-hero-title mb-3">
                 Layanan Alih Media Arsip
@@ -122,24 +116,6 @@
                     <i class="bi bi-file-earmark-text"></i>
                     <span>Panduan &amp; Regulasi</span>
                 </a>
-            </div>
-
-            <!-- Panel Informasi Pendukung dengan Subtle Glass Effect -->
-            <div class="lp-hero-glass-panel">
-                <div class="lp-hero-glass-item">
-                    <i class="bi bi-shield-check text-info"></i>
-                    <span>Standar Regulasi ANRI &amp; SPBE</span>
-                </div>
-                <div class="lp-hero-glass-divider"></div>
-                <div class="lp-hero-glass-item">
-                    <i class="bi bi-patch-check text-warning"></i>
-                    <span>TTE &amp; Watermark Autentik</span>
-                </div>
-                <div class="lp-hero-glass-divider"></div>
-                <div class="lp-hero-glass-item">
-                    <i class="bi bi-building-check text-success"></i>
-                    <span>Terintegrasi Seluruh Perangkat Daerah</span>
-                </div>
             </div>
 
         </div>
