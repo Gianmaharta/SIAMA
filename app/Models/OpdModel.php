@@ -12,7 +12,7 @@ class OpdModel extends BaseModel
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id_opd', 'kode_opd', 'nama_opd', 'kuota_storage_mb', 'is_active', 'created_by', 'updated_by'];
+    protected $allowedFields    = ['id_opd', 'kode_opd', 'nama_opd', 'nama_jenis', 'alamat', 'kuota_storage_mb', 'is_active', 'created_by', 'updated_by'];
 
     protected $beforeInsert = ['generateUuid', 'setCreatedBy', 'ensureKodeOpd'];
 

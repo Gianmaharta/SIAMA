@@ -110,6 +110,18 @@ Master Data OPD - SIAMA
                 </select>
             </div>
 
+            <!-- Tombol Sinkronisasi API SIMPEG/SSO -->
+            <form action="<?= base_url('/opd/sync-api') ?>" method="post" class="m-0 d-inline"
+                  data-swal-title="Sinkronisasi OPD dari API?"
+                  data-swal-confirm="Data Master OPD akan ditarik dan disinkronkan langsung dari API SIMPEG/SSO Pemkab Buleleng (https://sso.bllkom.site). Lanjutkan?"
+                  data-swal-btn="Ya, Sinkronkan">
+                <?= csrf_field() ?>
+                <button type="submit" class="btn btn-outline-primary d-inline-flex align-items-center gap-2 rounded-3 fw-medium" style="height: 38px; font-size: 13.5px;" title="Tarik data OPD resmi dari API SIMPEG/SSO">
+                    <i class="bi bi-arrow-repeat"></i>
+                    <span>Sinkronisasi API</span>
+                </button>
+            </form>
+
             <!-- Tombol Tambah OPD -->
             <button 
                 type="button" 
@@ -572,11 +584,20 @@ document.addEventListener('DOMContentLoaded', function() {
             const safeId = escapeHtml(row.id_opd);
             const safeKode = escapeHtml(row.kode_opd);
             const safeNama = escapeHtml(row.nama_opd);
+            const safeJenis = escapeHtml(row.nama_jenis || '');
+            const safeAlamat = escapeHtml(row.alamat || '');
             const kuota = escapeHtml(row.kuota_storage_mb || '1000');
 
             const statusBadge = isActive 
                 ? `<span class="badge-status-pill status-aktif"><span class="status-dot dot-aktif"></span>Aktif</span>`
                 : `<span class="badge-status-pill status-nonaktif"><span class="status-dot dot-nonaktif"></span>Non Aktif</span>`;
+
+            const jenisBadge = safeJenis
+                ? `<span class="badge bg-primary-subtle text-primary border border-primary-subtle ms-1" style="font-size:10px;">${safeJenis}</span>`
+                : '';
+            const alamatSub = safeAlamat
+                ? `<div class="text-muted text-truncate" style="font-size:11.5px; max-width:340px;" title="${safeAlamat}">${safeAlamat}</div>`
+                : '';
 
             htmlRows += `
                 <tr>
@@ -590,7 +611,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         >${safeId}</span>
                     </td>
                     <td class="col-kode">${safeKode}</td>
-                    <td class="col-nama">${safeNama}</td>
+                    <td class="col-nama">${safeNama}${jenisBadge}${alamatSub}</td>
                     <td class="col-kuota">${kuota}</td>
                     <td class="col-status">${statusBadge}</td>
                     <td class="col-aksi">

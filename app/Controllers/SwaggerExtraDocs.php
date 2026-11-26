@@ -300,6 +300,9 @@ class SwaggerExtraDocs
     )]
     public function opdDatatable(): void {}
 
+    #[OA\Post(path: '/opd/sync-api', operationId: 'opdSyncApi', summary: 'Sinkronisasi Master OPD dari API SIMPEG/SSO Pemkab Buleleng', description: 'Menarik seluruh OPD utama dari endpoint eksternal (/unit-kerja/utama) menggunakan Bearer Token di .env dan melakukan upsert ke tabel opd.', tags: ['Master OPD'], security: [['sessionAuth' => []]], responses: [new OA\Response(response: 200, description: 'Statistik sinkronisasi OPD berhasil (JSON)'), new OA\Response(response: 500, description: 'Gagal terhubung ke API eksternal')])]
+    public function opdSyncApi(): void {}
+
     #[OA\Get(path: '/opd/create', summary: 'Form Tambah OPD', tags: ['Master OPD'], security: [['sessionAuth' => []]], responses: [new OA\Response(response: 200, description: 'Halaman tambah OPD')])]
     public function opdCreate(): void {}
 
@@ -335,6 +338,30 @@ class SwaggerExtraDocs
         responses: [new OA\Response(response: 200, description: 'Payload DataTables Master Bidang JSON')]
     )]
     public function bidangDatatable(): void {}
+
+    #[OA\Post(
+        path: '/bidang/sync-api',
+        operationId: 'bidangSyncApi',
+        summary: 'Sinkronisasi Master Bidang dari API SIMPEG/SSO Pemkab Buleleng',
+        description: 'Menarik seluruh bidang aktif per OPD dari endpoint eksternal (/unit-kerja/{kode}/bidang) menggunakan Bearer Token di .env.',
+        tags: ['Master Bidang'],
+        security: [['sessionAuth' => []]],
+        requestBody: new OA\RequestBody(
+            content: new OA\MediaType(
+                mediaType: 'application/x-www-form-urlencoded',
+                schema: new OA\Schema(
+                    properties: [
+                        new OA\Property(property: 'id_opd', type: 'string', description: 'Opsional UUID OPD tertentu; kosongkan untuk sinkronisasi seluruh OPD'),
+                    ]
+                )
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'Statistik sinkronisasi Bidang berhasil (JSON)'),
+            new OA\Response(response: 500, description: 'Gagal terhubung ke API eksternal'),
+        ]
+    )]
+    public function bidangSyncApi(): void {}
 
     #[OA\Get(path: '/bidang/create', summary: 'Form Tambah Bidang', tags: ['Master Bidang'], security: [['sessionAuth' => []]], responses: [new OA\Response(response: 200, description: 'Halaman tambah Bidang')])]
     public function bidangCreate(): void {}

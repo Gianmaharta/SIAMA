@@ -90,6 +90,7 @@ class Bidang extends BaseController
         if ($search !== '') {
             $baseBuilder->groupStart()
                 ->like('bidang.id_bidang', $search)
+                ->orLike('bidang.kode_bidang', $search)
                 ->orLike('opd.nama_opd', $search)
                 ->orLike('bidang.nama_bidang', $search)
                 ->groupEnd();
@@ -153,6 +154,53 @@ class Bidang extends BaseController
         log_activity('Bidang', 'CREATE', "Menambahkan data master Bidang baru: {$namaBidang}");
 
         return redirect()->to('/bidang')->with('success', 'Data Bidang berhasil ditambahkan.');
+    }
+
+    /**
+     * Sinkronisasi Master Bidang langsung dari API SIMPEG/SSO Pemkab Buleleng (`POST /bidang/sync-api`)
+     */
+    public function syncApi()
+    {
+        if (function_exists('set_time_limit')) {
+            @set_time_limit(180);
+        }
+        $session   = session();
+        $nama_role = $session->get('nama_role');
+        $targetOpd = ($nama_role === 'Admin_OPD')
+            ? (string) $session->get('id_opd')
+            : trim((string) ($this->request->getPost('id_opd') ?? ''));
+
+        try {
+            $syncService = new \App\Services\SimpegSyncService();
+            $stats = $syncService->syncBidang($targetOpd !== '' ? $targetOpd : null);
+
+            $msg = sprintf(
+                'Sinkronisasi Master Bidang dari API berhasil: %d OPD diproses, %d bidang dari API (%d baru, %d diperbarui).',
+                $stats['opds_processed'],
+                $stats['total_api'],
+                $stats['inserted'],
+                $stats['updated']
+            );
+            log_activity('Bidang', 'SYNC_API', $msg);
+
+            if ($this->wantsJson() || $this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status'  => 'success',
+                    'message' => $msg,
+                    'data'    => $stats,
+                ]);
+            }
+
+            return redirect()->to('/bidang')->with('success', $msg);
+        } catch (\Throwable $e) {
+            if ($this->wantsJson() || $this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status'  => 'error',
+                    'message' => $e->getMessage(),
+                ])->setStatusCode(500);
+            }
+            return redirect()->to('/bidang')->with('error', $e->getMessage());
+        }
     }
 
     public function edit($id)

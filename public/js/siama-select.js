@@ -31,6 +31,8 @@
     function createCustomSelect(selectEl) {
         if (!selectEl || selectEl.dataset.siamaSelectInit === '1') return;
         if (selectEl.multiple || selectEl.dataset.nativeSelect === 'true') return;
+        if (selectEl.classList.contains('swal2-select') || selectEl.closest('.swal2-container, .swal2-popup')) return;
+        if (selectEl.style.display === 'none') return;
 
         selectEl.dataset.siamaSelectInit = '1';
 
@@ -316,7 +318,7 @@
 
     function initAllSelects(root) {
         const scope = root && root.querySelectorAll ? root : document;
-        scope.querySelectorAll('select').forEach(createCustomSelect);
+        scope.querySelectorAll('select:not(.swal2-select)').forEach(createCustomSelect);
     }
 
     let rafPending = false;

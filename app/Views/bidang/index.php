@@ -35,8 +35,19 @@ Master Data Bidang - SIAMA
             </button>
         </div>
 
-        <!-- Tombol Tambah Bidang -->
-        <div class="bidang-toolbar-actions">
+        <!-- Tombol Sinkronisasi API & Tambah Bidang -->
+        <div class="bidang-toolbar-actions d-flex align-items-center gap-2">
+            <form action="<?= base_url('/bidang/sync-api') ?>" method="post" class="m-0 d-inline"
+                  data-swal-title="Sinkronisasi Bidang dari API?"
+                  data-swal-confirm="Daftar Bidang aktif setiap OPD akan ditarik langsung dari API SIMPEG/SSO Pemkab Buleleng. Proses ini membutuhkan beberapa detik. Lanjutkan?"
+                  data-swal-btn="Ya, Sinkronkan">
+                <?= csrf_field() ?>
+                <button type="submit" class="btn btn-outline-primary d-inline-flex align-items-center gap-2 rounded-3 fw-medium" style="height: 38px; font-size: 13.5px;" title="Tarik data Bidang resmi per OPD dari API SIMPEG/SSO">
+                    <i class="bi bi-arrow-repeat"></i>
+                    <span>Sinkronisasi API</span>
+                </button>
+            </form>
+
             <button 
                 type="button" 
                 class="bidang-btn-add btn-toolbar-primary" 
@@ -526,8 +537,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const rowNumber = startIndex + idx + 1;
             const safeId = escapeHtml(row.id_bidang);
             const safeOpd = escapeHtml(row.nama_opd || '-');
+            const safeKodeBidang = escapeHtml(row.kode_bidang || '');
             const safeBidang = escapeHtml(row.nama_bidang || '-');
             const opdId = escapeHtml(row.id_opd || '');
+            const kodeBadge = safeKodeBidang
+                ? `<span class="badge bg-light text-secondary border font-monospace me-1" style="font-size:11px;">${safeKodeBidang}</span>`
+                : '';
 
             htmlRows += `
                 <tr>
@@ -541,7 +556,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         >${safeId}</span>
                     </td>
                     <td class="col-nama-opd">${safeOpd}</td>
-                    <td class="col-nama-bidang">${safeBidang}</td>
+                    <td class="col-nama-bidang">${kodeBadge}${safeBidang}</td>
                     <td class="col-aksi">
                         <div class="bidang-action-group">
                             <span class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit Data">

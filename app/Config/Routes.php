@@ -52,6 +52,7 @@ $routes->get('swagger/json', 'Swagger::json');
 $routes->group('opd', ['filter' => ['auth', 'role:Super_Admin,Admin_Pemkab']], static function ($routes) {
     $routes->get('/', 'Opd::index');
     $routes->get('datatable', 'Opd::datatable');
+    $routes->post('sync-api', 'Opd::syncApi');
     $routes->get('create', 'Opd::create');
     $routes->post('store', 'Opd::store');
     $routes->get('edit/(:segment)', 'Opd::edit/$1');
@@ -63,6 +64,7 @@ $routes->group('opd', ['filter' => ['auth', 'role:Super_Admin,Admin_Pemkab']], s
 $routes->group('bidang', ['filter' => ['auth', 'role:Super_Admin,Admin_Pemkab,Admin_OPD']], static function ($routes) {
     $routes->get('/', 'Bidang::index');
     $routes->get('datatable', 'Bidang::datatable');
+    $routes->post('sync-api', 'Bidang::syncApi');
     $routes->get('create', 'Bidang::create');
     $routes->post('store', 'Bidang::store');
     $routes->get('edit/(:segment)', 'Bidang::edit/$1');

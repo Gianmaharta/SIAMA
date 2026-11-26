@@ -139,6 +139,46 @@ class Opd extends BaseController
         return redirect()->to('/opd')->with('success', "Data OPD '{$namaOpd}' ({$kodeOpd}) berhasil ditambahkan.");
     }
 
+    /**
+     * Sinkronisasi Master OPD langsung dari API SIMPEG/SSO Pemkab Buleleng (`POST /opd/sync-api`)
+     */
+    public function syncApi()
+    {
+        if (function_exists('set_time_limit')) {
+            @set_time_limit(120);
+        }
+        try {
+            $syncService = new \App\Services\SimpegSyncService();
+            $stats = $syncService->syncOpd();
+
+            $msg = sprintf(
+                'Sinkronisasi Master OPD dari API berhasil: %d data diproses (%d OPD baru ditambahkan, %d OPD diperbarui).',
+                $stats['total_api'],
+                $stats['inserted'],
+                $stats['updated']
+            );
+            log_activity('OPD', 'SYNC_API', $msg);
+
+            if ($this->wantsJson() || $this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status'  => 'success',
+                    'message' => $msg,
+                    'data'    => $stats,
+                ]);
+            }
+
+            return redirect()->to('/opd')->with('success', $msg);
+        } catch (\Throwable $e) {
+            if ($this->wantsJson() || $this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status'  => 'error',
+                    'message' => $e->getMessage(),
+                ])->setStatusCode(500);
+            }
+            return redirect()->to('/opd')->with('error', $e->getMessage());
+        }
+    }
+
     public function edit($id)
     {
         $data['opd'] = $this->opdModel->find($id);
