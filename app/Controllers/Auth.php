@@ -89,7 +89,7 @@ class Auth extends BaseController
                     return redirect()->to('/change-password');
                 }
 
-                return redirect()->to('/dashboard')->with('success', 'Login berhasil. Selamat datang, ' . $user['nama'] . '!');
+                return redirect()->to('/dashboard');
             } else {
                 if (isset($user['id_user'])) {
                     log_access($user['id_user'], 'failed_login');
