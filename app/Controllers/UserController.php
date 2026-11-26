@@ -745,7 +745,7 @@ class UserController extends BaseController
             ]);
         }
 
-        return redirect()->to('/dashboard')->with('success', 'Berhasil masuk sebagai: ' . $targetUser['nama'] . ' (' . str_replace('_', ' ', $roleInfo['nama_role']) . ')');
+        return redirect()->to('/dashboard');
     }
 
     /**
@@ -791,6 +791,6 @@ class UserController extends BaseController
             ]);
         }
 
-        return redirect()->to('/dashboard')->with('success', 'Anda telah kembali ke akun Super Admin.');
+        return redirect()->to('/dashboard');
     }
 }
